@@ -1,0 +1,30 @@
+export const imageMapping: Record<string, string> = {
+  "character-cafe":
+    "https://images.unsplash.com/photo-1624796867412-58706c3e67d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaGFyYWN0ZXIlMjBjYWZlfGVufDF8fHx8MTc2NzE1NjY0NXww&ixlib=rb-4.1.0&q=80&w=1080",
+  "vintage-denim":
+    "https://images.unsplash.com/photo-1741939483735-6923b430ca89?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aW50YWdlJTIwZGVuaW18ZW58MXx8fHwxNzY3MTE4NTg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+  "beauty-lab":
+    "https://images.unsplash.com/photo-1692991231653-9ef3f5d1b0e7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWF1dHklMjBsYWJ8ZW58MXx8fHwxNzY3MTU2NjQ2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+  "croissant-popup":
+    "https://images.unsplash.com/photo-1568471382005-99e347e2aef0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcm9pc3NhbnQlMjBiYWtlcnl8ZW58MXx8fHwxNzY3MTE3NzAzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+  "digital-art":
+    "https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaWdpdGFsJTIwYXJ0fGVufDF8fHx8MTc2NzA5NzczMHww&ixlib=rb-4.1.0&q=80&w=1080",
+  "sneaker-culture":
+    "https://images.unsplash.com/photo-1645106405184-5ed28cf0217e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzbmVha2VyJTIwY3VsdHVyZXxlbnwxfHx8fDE3NjcxNTY2NDd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+  "beauty-garden":
+    "https://images.unsplash.com/photo-1622818171279-fe0b6a336835?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib3RhbmljYWwlMjBnYXJkZW58ZW58MXx8fHwxNzY3MTM1MzEyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+  "minimalist-home":
+    "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaW5pbWFsaXN0JTIwaG9tZXxlbnwxfHx8fDE3NjcxNTY2NDd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+  "matcha-cafe":
+    "https://images.unsplash.com/photo-1566657040726-62fd1e379726?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYXRjaGElMjBjYWZlfGVufDF8fHx8MTc2NzE1NjY0OHww&ixlib=rb-4.1.0&q=80&w=1080",
+  "retro-arcade":
+    "https://images.unsplash.com/photo-1511882150382-421056c89033?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZXRybyUyMGFyY2FkZXxlbnwxfHx8fDE3NjcwNzQ5OTl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+  "plant-workshop":
+    "https://images.unsplash.com/photo-1417037129170-06a2750eaa47?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwbGFudCUyMHdvcmtzaG9wfGVufDF8fHx8MTc2NzE1NjY0OHww&ixlib=rb-4.1.0&q=80&w=1080",
+  "pokemon-popup":
+    "https://images.unsplash.com/photo-1701281941457-274900e0cfa7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwb2tlbW9uJTIwdG95fGVufDF8fHx8MTc2NzE1NjY0OXww&ixlib=rb-4.1.0&q=80&w=1080",
+  "jewelry-studio":
+    "https://images.unsplash.com/photo-1609619742069-f5e18afeef17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxqZXdlbHJ5JTIwbWFraW5nfGVufDF8fHx8MTc2NzE1NjY0OXww&ixlib=rb-4.1.0&q=80&w=1080",
+  "chocolate-factory":
+    "https://images.unsplash.com/photo-1551884171-004163219904?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaG9jb2xhdGUlMjBmYWN0b3J5fGVufDF8fHx8MTc2NzE1NjY0OXww&ixlib=rb-4.1.0&q=80&w=1080",
+};

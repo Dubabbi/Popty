@@ -1,0 +1,48 @@
+<!-- src/assets/Logo.svg -->
+<svg
+  width="40"
+  height="40"
+  viewBox="0 0 32 32"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <ellipse cx="16" cy="28" rx="10" ry="2" fill="#000000" opacity="0.08" />
+
+  <circle cx="10" cy="16" r="7.5" fill="url(#bubbleGradient1)" />
+  <circle cx="10" cy="16" r="3.5" fill="white" opacity="0.95" />
+
+  <circle cx="8" cy="13" r="2" fill="white" opacity="0.6" />
+
+  <rect x="20" y="8" width="6" height="12" rx="3" fill="url(#bubbleGradient2)" />
+  <rect x="20" y="23" width="6" height="4" rx="2" fill="url(#bubbleGradient2)" />
+
+  <rect x="23" y="10" width="1.5" height="5" rx="0.75" fill="white" opacity="0.5" />
+
+  <circle cx="27" cy="9" r="1.2" fill="#C8FF00" />
+  <circle cx="27" cy="9" r="0.6" fill="white" />
+
+  <defs>
+    <linearGradient
+      id="bubbleGradient1"
+      x1="10"
+      y1="8.5"
+      x2="10"
+      y2="23.5"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop offset="0%" stop-color="#D4FF3D" />
+      <stop offset="100%" stop-color="#B8E600" />
+    </linearGradient>
+    <linearGradient
+      id="bubbleGradient2"
+      x1="23"
+      y1="8"
+      x2="23"
+      y2="27"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop offset="0%" stop-color="#D4FF3D" />
+      <stop offset="100%" stop-color="#B8E600" />
+    </linearGradient>
+  </defs>
+</svg>
