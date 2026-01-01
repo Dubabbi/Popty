@@ -1,4 +1,5 @@
 import { ChevronRight, TrendingUp } from "lucide-react";
+import { useCallback, useRef } from "react";
 import { HERO_IMAGES } from "@/constants/heroImages";
 import { getTrendingPopups } from "@/data/popups";
 import type { ViewType } from "@/routes/routes";
@@ -11,11 +12,14 @@ interface TrendingCarouselSectionProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
 }
 
+const APPBAR_HEIGHT = 60;
+const DRAG_THRESHOLD_PX = 10;
+
 export function TrendingCarouselSection({
   onNavigate,
 }: TrendingCarouselSectionProps) {
   const trending = getTrendingPopups();
-  const APPBAR_HEIGHT = 60;
+
   const {
     carouselRef,
     setItemRef,
@@ -31,6 +35,157 @@ export function TrendingCarouselSection({
     idleMs: 140,
   });
 
+  const pointerDownRef = useRef(false);
+  const draggingRef = useRef(false);
+
+  const startXRef = useRef(0);
+  const startScrollLeftRef = useRef(0);
+
+  const prevSnapRef = useRef<string | null>(null);
+  const prevScrollBehaviorRef = useRef<string | null>(null);
+
+  const blockClickUntilRef = useRef(0);
+
+  const snapToClosestCard = useCallback((el: HTMLDivElement) => {
+    const children = Array.from(el.children) as HTMLDivElement[];
+    if (children.length === 0) return;
+
+    const containerRect = el.getBoundingClientRect();
+    const containerCenter = containerRect.left + containerRect.width / 2;
+
+    let bestDelta = 0;
+    let bestDist = Number.POSITIVE_INFINITY;
+
+    for (const child of children) {
+      const r = child.getBoundingClientRect();
+      const childCenter = r.left + r.width / 2;
+      const delta = childCenter - containerCenter;
+      const dist = Math.abs(delta);
+
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestDelta = delta;
+      }
+    }
+
+    el.scrollTo({ left: el.scrollLeft + bestDelta, behavior: "smooth" });
+  }, []);
+
+  const beginDragging = useCallback((el: HTMLDivElement, pointerId: number) => {
+    draggingRef.current = true;
+
+    el.setPointerCapture(pointerId);
+
+    prevSnapRef.current = el.style.scrollSnapType || "";
+    prevScrollBehaviorRef.current = el.style.scrollBehavior || "";
+
+    el.style.scrollSnapType = "none";
+    el.style.scrollBehavior = "auto";
+    el.style.cursor = "default";
+    el.style.userSelect = "none";
+  }, []);
+
+  const endDragging = useCallback(
+    (pointerId: number) => {
+      const el = carouselRef.current;
+      if (!el) return;
+
+      try {
+        el.releasePointerCapture(pointerId);
+      } catch {
+        // ignore
+      }
+
+      pointerDownRef.current = false;
+      const didDrag = draggingRef.current;
+
+      draggingRef.current = false;
+
+      el.style.cursor = "default";
+      el.style.userSelect = "";
+
+      el.style.scrollSnapType = prevSnapRef.current ?? "";
+      el.style.scrollBehavior = prevScrollBehaviorRef.current ?? "";
+
+      prevSnapRef.current = null;
+      prevScrollBehaviorRef.current = null;
+
+      if (didDrag) {
+        blockClickUntilRef.current = Date.now() + 250;
+        requestAnimationFrame(() => snapToClosestCard(el));
+      }
+    },
+    [carouselRef, snapToClosestCard],
+  );
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      // ✅ mouse만 커스텀 드래그
+      if (e.pointerType !== "mouse") return;
+      if (e.button !== 0) return;
+
+      const el = carouselRef.current;
+      if (!el) return;
+
+      pointerDownRef.current = true;
+      draggingRef.current = false;
+
+      startXRef.current = e.clientX;
+      startScrollLeftRef.current = el.scrollLeft;
+    },
+    [carouselRef],
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.pointerType !== "mouse") return;
+      if (!pointerDownRef.current) return;
+
+      const el = carouselRef.current;
+      if (!el) return;
+
+      const dx = e.clientX - startXRef.current;
+
+      if (!draggingRef.current) {
+        if (Math.abs(dx) < DRAG_THRESHOLD_PX) return;
+        beginDragging(el, e.pointerId);
+      }
+
+      el.scrollLeft = startScrollLeftRef.current - dx;
+    },
+    [carouselRef, beginDragging],
+  );
+
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.pointerType !== "mouse") return;
+
+      if (draggingRef.current) endDragging(e.pointerId);
+      else pointerDownRef.current = false;
+    },
+    [endDragging],
+  );
+
+  const handlePointerCancel = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.pointerType !== "mouse") return;
+
+      if (draggingRef.current) endDragging(e.pointerId);
+      pointerDownRef.current = false;
+    },
+    [endDragging],
+  );
+
+  const handlePointerLeave = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.pointerType !== "mouse") return;
+
+      if (draggingRef.current) endDragging(e.pointerId);
+      pointerDownRef.current = false;
+    },
+    [endDragging],
+  );
+
   if (realLen <= 0) return null;
 
   return (
@@ -38,12 +193,10 @@ export function TrendingCarouselSection({
       <section
         style={{
           padding: `calc(var(--space-6) + ${APPBAR_HEIGHT}px) var(--space-4) var(--space-6)`,
-
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Background Overlay */}
         <div
           style={{
             position: "absolute",
@@ -60,6 +213,7 @@ export function TrendingCarouselSection({
             pointerEvents: "none",
           }}
         />
+
         <div style={{ position: "relative", zIndex: 1 }}>
           <div
             style={{
@@ -97,7 +251,6 @@ export function TrendingCarouselSection({
             </button>
           </div>
 
-          {/* Carousel Container */}
           <div
             style={{
               position: "relative",
@@ -108,7 +261,18 @@ export function TrendingCarouselSection({
             <div
               ref={carouselRef}
               className="trending-carousel"
-              style={carouselStyle}
+              style={{
+                ...carouselStyle,
+                cursor: "default",
+                WebkitOverflowScrolling: "touch",
+                overscrollBehaviorX: "contain",
+              }}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerCancel}
+              onPointerLeave={handlePointerLeave}
+              onDragStart={(e) => e.preventDefault()}
             >
               {infiniteItems.map((popup, index) => {
                 const actualIndex = getActualIndex(index);
@@ -117,9 +281,12 @@ export function TrendingCarouselSection({
 
                 return (
                   <div
-                    key={`${String(popup.id)}-${index}`}
-                    onClick={() => onNavigate("detail", popup.id)}
+                    key={`${popup.id}-${index}`}
                     ref={setItemRef(index)}
+                    onClick={() => {
+                      if (Date.now() < blockClickUntilRef.current) return;
+                      onNavigate("detail", popup.id);
+                    }}
                     style={{
                       position: "relative",
                       flexShrink: 0,
@@ -259,6 +426,7 @@ export function TrendingCarouselSection({
           </div>
         </div>
       </section>
+
       <div id="home-trending-sentinel" style={{ height: 1 }} />
     </>
   );
