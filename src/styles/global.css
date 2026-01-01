@@ -2,7 +2,7 @@
 @import "./theme.css";
 @import "./reset.css";
 @import "./custom-utilities.css";
-@import "./scrollToTopFab.css";
+@import "./scrollToTop.css";
 
 /* Design Tokens - Pastel & Friendly Color System */
 :root {
