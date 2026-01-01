@@ -45,17 +45,14 @@ export function PopupCard({
           borderRadius: "var(--radius-lg)",
           overflow: "hidden",
           cursor: "pointer",
-          boxShadow: "var(--shadow-sm)",
           transition: "all 0.2s",
           padding: "var(--space-4)",
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = "translateY(-2px)";
-          e.currentTarget.style.boxShadow = "var(--shadow-md)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "var(--shadow-sm)";
         }}
       >
         <img
@@ -187,18 +184,14 @@ export function PopupCard({
         borderRadius: "12px",
         overflow: "hidden",
         cursor: "pointer",
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.08)",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         border: "1px solid rgba(0, 0, 0, 0.04)",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = "var(--color-primary)";
-        e.currentTarget.style.boxShadow =
-          "0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 2px rgba(217, 249, 95, 0.1)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.04)";
-        e.currentTarget.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.08)";
       }}
     >
       <div style={{ position: "relative" }}>
