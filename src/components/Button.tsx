@@ -1,8 +1,8 @@
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 
 interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'ghost';
-  size?: 'small' | 'medium' | 'large';
+  variant?: "primary" | "secondary" | "ghost";
+  size?: "small" | "medium" | "large";
   fullWidth?: boolean;
   disabled?: boolean;
   onClick?: () => void;
@@ -11,8 +11,8 @@ interface ButtonProps {
 }
 
 export function Button({
-  variant = 'primary',
-  size = 'medium',
+  variant = "primary",
+  size = "medium",
   fullWidth = false,
   disabled = false,
   onClick,
@@ -20,55 +20,57 @@ export function Button({
   icon,
 }: ButtonProps) {
   const baseStyles = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 'var(--space-2)',
-    borderRadius: 'var(--radius-lg)',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "var(--space-2)",
+    borderRadius: "var(--radius-lg)",
     fontWeight: 600,
-    transition: 'all 0.2s',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    border: 'none',
-    width: fullWidth ? '100%' : 'auto',
+    transition: "all 0.2s",
+    cursor: disabled ? "not-allowed" : "pointer",
+    border: "none",
+    width: fullWidth ? "100%" : "auto",
   };
 
   const sizeStyles = {
     small: {
-      padding: 'var(--space-2) var(--space-4)',
-      fontSize: '0.875rem',
+      padding: "var(--space-2) var(--space-4)",
+      fontSize: "0.875rem",
     },
     medium: {
-      padding: 'var(--space-3) var(--space-6)',
-      fontSize: '1rem',
+      padding: "var(--space-3) var(--space-6)",
+      fontSize: "1rem",
     },
     large: {
-      padding: 'var(--space-4) var(--space-8)',
-      fontSize: '1.125rem',
+      padding: "var(--space-4) var(--space-8)",
+      fontSize: "1.125rem",
     },
   };
 
   const variantStyles = {
     primary: {
-      background: disabled ? 'var(--color-gray-300)' : 'var(--color-accent)',
-      color: 'white',
-      boxShadow: disabled ? 'none' : 'var(--shadow-md)',
+      background: disabled ? "var(--color-gray-300)" : "var(--color-accent)",
+      color: "white",
+      boxShadow: disabled ? "none" : "var(--shadow-md)",
     },
     secondary: {
-      background: disabled ? 'var(--color-gray-200)' : 'var(--color-primary-bg)',
-      color: disabled ? 'var(--color-gray-400)' : 'var(--color-primary)',
-      border: `2px solid ${disabled ? 'var(--color-gray-300)' : 'var(--color-primary)'}`,
+      background: disabled ? "var(--color-gray-200)" : "var(--color-primary-bg)",
+      color: disabled ? "var(--color-gray-400)" : "var(--color-primary)",
+      border: `2px solid ${disabled ? "var(--color-gray-300)" : "var(--color-primary)"}`,
     },
     ghost: {
-      background: 'transparent',
-      color: disabled ? 'var(--color-gray-400)' : 'var(--color-text-secondary)',
+      background: "transparent",
+      color: disabled ? "var(--color-gray-400)" : "var(--color-text-secondary)",
     },
   };
 
-  const hoverStyles = !disabled ? {
-    primary: { transform: 'translateY(-1px)', boxShadow: 'var(--shadow-lg)' },
-    secondary: { background: 'var(--color-primary-light)', color: 'white' },
-    ghost: { background: 'var(--color-gray-100)' },
-  } : {};
+  const hoverStyles = !disabled
+    ? {
+        primary: { transform: "translateY(-1px)", boxShadow: "var(--shadow-lg)" },
+        secondary: { background: "var(--color-primary-light)", color: "white" },
+        ghost: { background: "var(--color-gray-100)" },
+      }
+    : {};
 
   return (
     <button

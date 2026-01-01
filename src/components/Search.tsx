@@ -109,7 +109,7 @@ export function Search({ onNavigate }: SearchProps) {
   const [results, setResults] = useState<PopupResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [savedItems, setSavedItems] = useState<Set<string>>(
-    new Set(mockResults.filter((r) => r.isSaved).map((r) => r.id))
+    new Set(mockResults.filter((r) => r.isSaved).map((r) => r.id)),
   );
 
   const handleSearch = (query: string) => {
@@ -122,7 +122,7 @@ export function Search({ onNavigate }: SearchProps) {
           (result) =>
             result.title.toLowerCase().includes(query.toLowerCase()) ||
             result.category.toLowerCase().includes(query.toLowerCase()) ||
-            result.location.toLowerCase().includes(query.toLowerCase())
+            result.location.toLowerCase().includes(query.toLowerCase()),
         );
         setResults(filtered);
         setIsSearching(false);
@@ -157,7 +157,8 @@ export function Search({ onNavigate }: SearchProps) {
   };
 
   const showEmptyState = searchQuery.length === 0;
-  const showNoResults = searchQuery.length > 0 && results.length === 0 && !isSearching;
+  const showNoResults =
+    searchQuery.length > 0 && results.length === 0 && !isSearching;
 
   return (
     <div style={{ background: "white", padding: "var(--space-4)" }}>
@@ -225,17 +226,35 @@ export function Search({ onNavigate }: SearchProps) {
         <>
           {/* Recent Searches */}
           <div style={{ marginBottom: "var(--space-6)" }}>
-            <h2 style={{ margin: 0, marginBottom: "var(--space-3)", fontSize: "1.125rem" }}>
+            <h2
+              style={{
+                margin: 0,
+                marginBottom: "var(--space-3)",
+                fontSize: "1.125rem",
+              }}
+            >
               최근 검색어
             </h2>
-            <p style={{ margin: 0, color: "var(--color-text-tertiary)", fontSize: "0.9375rem" }}>
+            <p
+              style={{
+                margin: 0,
+                color: "var(--color-text-tertiary)",
+                fontSize: "0.9375rem",
+              }}
+            >
               No recent search history.
             </p>
           </div>
 
           {/* Popular Searches */}
           <div style={{ marginBottom: "var(--space-6)" }}>
-            <h2 style={{ margin: 0, marginBottom: "var(--space-4)", fontSize: "1.125rem" }}>
+            <h2
+              style={{
+                margin: 0,
+                marginBottom: "var(--space-4)",
+                fontSize: "1.125rem",
+              }}
+            >
               인기 검색어
             </h2>
             <div
@@ -262,7 +281,10 @@ export function Search({ onNavigate }: SearchProps) {
                 >
                   <span
                     style={{
-                      color: index < 3 ? "var(--color-primary)" : "var(--color-text-tertiary)",
+                      color:
+                        index < 3
+                          ? "var(--color-primary)"
+                          : "var(--color-text-tertiary)",
                       fontSize: "0.9375rem",
                       fontWeight: 600,
                       minWidth: "16px",
@@ -286,7 +308,13 @@ export function Search({ onNavigate }: SearchProps) {
 
           {/* Recently Viewed Popups */}
           <div>
-            <h2 style={{ margin: 0, marginBottom: "var(--space-4)", fontSize: "1.125rem" }}>
+            <h2
+              style={{
+                margin: 0,
+                marginBottom: "var(--space-4)",
+                fontSize: "1.125rem",
+              }}
+            >
               Recently Viewed Pop-ups
             </h2>
             <div
@@ -379,7 +407,12 @@ export function Search({ onNavigate }: SearchProps) {
               }
             `}
           </style>
-          <p style={{ margin: "var(--space-4) 0 0", color: "var(--color-text-tertiary)" }}>
+          <p
+            style={{
+              margin: "var(--space-4) 0 0",
+              color: "var(--color-text-tertiary)",
+            }}
+          >
             Searching...
           </p>
         </div>
@@ -409,7 +442,13 @@ export function Search({ onNavigate }: SearchProps) {
           >
             No results found
           </h3>
-          <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--color-text-tertiary)" }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: "0.875rem",
+              color: "var(--color-text-tertiary)",
+            }}
+          >
             Try different keywords or browse popular searches
           </p>
         </div>
@@ -419,12 +458,25 @@ export function Search({ onNavigate }: SearchProps) {
       {results.length > 0 && !isSearching && (
         <>
           <div style={{ marginBottom: "var(--space-4)" }}>
-            <p style={{ margin: 0, color: "var(--color-text-tertiary)", fontSize: "0.875rem" }}>
-              {results.length} {results.length === 1 ? "result" : "results"} for "{searchQuery}"
+            <p
+              style={{
+                margin: 0,
+                color: "var(--color-text-tertiary)",
+                fontSize: "0.875rem",
+              }}
+            >
+              {results.length} {results.length === 1 ? "result" : "results"} for
+              "{searchQuery}"
             </p>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "var(--space-3)",
+            }}
+          >
             {results.map((result) => (
               <div
                 key={result.id}
@@ -439,7 +491,8 @@ export function Search({ onNavigate }: SearchProps) {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.12)";
+                  e.currentTarget.style.boxShadow =
+                    "0 8px 24px rgba(0,0,0,0.12)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "translateY(0)";
@@ -487,7 +540,9 @@ export function Search({ onNavigate }: SearchProps) {
                           marginBottom: "var(--space-2)",
                         }}
                       >
-                        <h3 style={{ margin: 0, marginBottom: "var(--space-1)" }}>
+                        <h3
+                          style={{ margin: 0, marginBottom: "var(--space-1)" }}
+                        >
                           {result.title}
                         </h3>
                         <button
@@ -510,7 +565,11 @@ export function Search({ onNavigate }: SearchProps) {
                                 ? "var(--color-error)"
                                 : "var(--color-text-tertiary)"
                             }
-                            fill={savedItems.has(result.id) ? "var(--color-error)" : "none"}
+                            fill={
+                              savedItems.has(result.id)
+                                ? "var(--color-error)"
+                                : "none"
+                            }
                           />
                         </button>
                       </div>
@@ -532,20 +591,45 @@ export function Search({ onNavigate }: SearchProps) {
                     </div>
 
                     <div
-                      style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "var(--space-1)",
+                      }}
                     >
-                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "var(--space-2)",
+                        }}
+                      >
                         <MapPin size={14} color="var(--color-text-tertiary)" />
                         <span
-                          style={{ fontSize: "0.8125rem", color: "var(--color-text-secondary)" }}
+                          style={{
+                            fontSize: "0.8125rem",
+                            color: "var(--color-text-secondary)",
+                          }}
                         >
                           {result.location}
                         </span>
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
-                        <Calendar size={14} color="var(--color-text-tertiary)" />
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "var(--space-2)",
+                        }}
+                      >
+                        <Calendar
+                          size={14}
+                          color="var(--color-text-tertiary)"
+                        />
                         <span
-                          style={{ fontSize: "0.8125rem", color: "var(--color-text-secondary)" }}
+                          style={{
+                            fontSize: "0.8125rem",
+                            color: "var(--color-text-secondary)",
+                          }}
                         >
                           {result.date}
                         </span>

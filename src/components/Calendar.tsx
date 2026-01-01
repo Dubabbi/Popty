@@ -197,10 +197,10 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
                     color: !day
                       ? "transparent"
                       : isSelected(day)
-                      ? "#4A90E2"
-                      : isToday(day)
-                      ? "#000000"
-                      : "#9B9B9B",
+                        ? "#4A90E2"
+                        : isToday(day)
+                          ? "#000000"
+                          : "#9B9B9B",
                     cursor: day ? "pointer" : "default",
                     position: "relative",
                     display: "flex",

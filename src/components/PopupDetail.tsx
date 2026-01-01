@@ -376,8 +376,8 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
                       {popup.crowdLevel === "high"
                         ? "🔴 High"
                         : popup.crowdLevel === "medium"
-                        ? "🟡 Medium"
-                        : "🟢 Low"}
+                          ? "🟡 Medium"
+                          : "🟢 Low"}
                     </div>
                   </div>
                 </div>

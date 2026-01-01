@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-  SlidersHorizontal,
-  Grid3x3,
-  List as ListIcon,
-} from "lucide-react";
+import { SlidersHorizontal, Grid3x3, List as ListIcon } from "lucide-react";
 import { PopupCard } from "./PopupCard";
 import { FilterChip } from "./FilterChip";
 import { FilterModal } from "./FilterModal";
@@ -16,33 +12,19 @@ interface BrowseProps {
   breakpoint: "mobile" | "tablet" | "desktop";
 }
 
-export function Browse({
-  onNavigate,
-  breakpoint,
-}: BrowseProps) {
+export function Browse({ onNavigate, breakpoint }: BrowseProps) {
   const [layout, setLayout] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedArea, setSelectedArea] = useState<string[]>(
-    [],
-  );
-  const [selectedCategory, setSelectedCategory] = useState<
-    string[]
-  >([]);
+  const [selectedArea, setSelectedArea] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   const gridCols =
-    breakpoint === "desktop"
-      ? 3
-      : breakpoint === "tablet"
-        ? 2
-        : 1;
+    breakpoint === "desktop" ? 3 : breakpoint === "tablet" ? 2 : 1;
 
   // Simulated filter
   const filteredPopups = popupsData.filter((popup) => {
-    if (
-      selectedArea.length > 0 &&
-      !selectedArea.includes(popup.area)
-    )
+    if (selectedArea.length > 0 && !selectedArea.includes(popup.area))
       return false;
     if (
       selectedCategory.length > 0 &&
@@ -52,19 +34,22 @@ export function Browse({
     return true;
   });
 
-  const handleApplyFilters = (filters: any) => {
+  type Filters = {
+    areas: string[];
+    categories: string[];
+  };
+
+  const handleApplyFilters = (filters: Filters) => {
     setSelectedArea(filters.areas);
     setSelectedCategory(filters.categories);
     setShowFilters(false);
 
-    // Simulate loading
     setLoading(true);
     setTimeout(() => setLoading(false), 800);
   };
 
   return (
     <>
-      {/* Filter Bar */}
       <div
         style={{
           position: "sticky",
@@ -119,9 +104,7 @@ export function Browse({
                 label={area}
                 selected
                 onRemove={() =>
-                  setSelectedArea(
-                    selectedArea.filter((a) => a !== area),
-                  )
+                  setSelectedArea(selectedArea.filter((a) => a !== area))
                 }
               />
             ))}
@@ -131,9 +114,7 @@ export function Browse({
                 label={cat}
                 selected
                 onRemove={() =>
-                  setSelectedCategory(
-                    selectedCategory.filter((c) => c !== cat),
-                  )
+                  setSelectedCategory(selectedCategory.filter((c) => c !== cat))
                 }
               />
             ))}
@@ -155,9 +136,7 @@ export function Browse({
                 borderRadius: "var(--radius-md)",
                 border: "none",
                 background:
-                  layout === "grid"
-                    ? "var(--color-primary-bg)"
-                    : "transparent",
+                  layout === "grid" ? "var(--color-primary-bg)" : "transparent",
                 cursor: "pointer",
               }}
             >
@@ -177,9 +156,7 @@ export function Browse({
                 borderRadius: "var(--radius-md)",
                 border: "none",
                 background:
-                  layout === "list"
-                    ? "var(--color-primary-bg)"
-                    : "transparent",
+                  layout === "list" ? "var(--color-primary-bg)" : "transparent",
                 cursor: "pointer",
               }}
             >
@@ -265,11 +242,8 @@ export function Browse({
             style={{
               display: layout === "grid" ? "grid" : "flex",
               gridTemplateColumns:
-                layout === "grid"
-                  ? `repeat(${gridCols}, 1fr)`
-                  : undefined,
-              flexDirection:
-                layout === "list" ? "column" : undefined,
+                layout === "grid" ? `repeat(${gridCols}, 1fr)` : undefined,
+              flexDirection: layout === "list" ? "column" : undefined,
               gap: "var(--space-4)",
             }}
           >
