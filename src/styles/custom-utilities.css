@@ -74,3 +74,85 @@
     @apply fixed bottom-0 left-1/2 z-[1] w-full max-w-[43rem] -translate-x-1/2;
   }
 }
+
+.mapBannerCard {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgba(176, 214, 85, 0.22);
+
+  background:
+    radial-gradient(
+      900px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(255, 255, 255, 0.4) 18%,
+      rgba(255, 255, 255, 0.06) 38%,
+      rgba(255, 255, 255, 0) 62%
+    ),
+    linear-gradient(135deg, #d4f4dd 0%, #b8e8c5 100%);
+
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+
+  transform-style: preserve-3d;
+  will-change: transform, box-shadow, background, filter;
+  transition:
+    transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 160ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 160ms ease,
+    filter 160ms ease;
+
+  user-select: none;
+}
+
+.mapBannerCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+
+  background: conic-gradient(
+    from 180deg at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0)
+  );
+
+  opacity: 0.25;
+  mix-blend-mode: overlay;
+  transition: opacity 160ms ease;
+}
+
+.mapBannerCard[data-hover="1"] {
+  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(var(--s, 1));
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.1),
+    0 10px 26px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border-color: rgba(176, 214, 85, 0.34);
+  filter: saturate(1.06) contrast(1.03);
+}
+
+.mapBannerCard[data-hover="1"]::before {
+  opacity: 0.45;
+}
+
+.mapBannerCard:active {
+  transform: perspective(800px) rotateX(calc(var(--rx, 0deg) * 0.5))
+    rotateY(calc(var(--ry, 0deg) * 0.5)) scale(0.99);
+}
+
+.mapBannerCard:focus-visible {
+  outline: 2px solid rgba(0, 0, 0, 0.18);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapBannerCard {
+    transition: none !important;
+  }
+  .mapBannerCard::before {
+    transition: none !important;
+  }
+}
