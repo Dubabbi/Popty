@@ -1,4 +1,4 @@
-import { ChevronRight, TrendingUp, Clock, MapPin } from "lucide-react";
+import { ChevronRight, TrendingUp, MapPin } from "lucide-react";
 import type { CSSProperties } from "react";
 import { useMemo } from "react";
 import { PopupCard } from "@/components/PopupCard";
@@ -10,9 +10,9 @@ import {
   popupsData,
 } from "@/data/popups";
 import type { ViewType } from "@/routes/routes";
-import mapIcon from "@/assets/mapIcon.svg";
 import { useInfiniteCarousel } from "@/hooks/useInfiniteCarousel";
 import type { StyleWithVars } from "@/types/cssVars";
+import { MapBanner } from "@/components/ui/home/MapBanner";
 
 interface HomeProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
@@ -26,6 +26,7 @@ export function Home({ onNavigate }: HomeProps) {
   const seongsuPopups = popupsData
     .filter((p) => p.area === "Seongsu")
     .slice(0, 4);
+
   const categoryPopups = useMemo(
     () => ({
       Character: popupsData
@@ -309,28 +310,7 @@ export function Home({ onNavigate }: HomeProps) {
         </section>
       )}
 
-      {/* Ending Soon */}
       <section style={{ padding: "0 var(--space-4) var(--space-6)" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "var(--space-4)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "var(--space-2)",
-            }}
-          >
-            <Clock size={24} color="var(--color-error)" />
-            <h3 style={{ margin: 0 }}>곧 종료! 😮</h3>
-          </div>
-        </div>
-
         <div style={responsiveGridStyle}>
           {endingSoon.map((popup) => (
             <PopupCard
@@ -430,48 +410,7 @@ export function Home({ onNavigate }: HomeProps) {
         ))}
       </section>
 
-      {/* Map Banner */}
-      <div
-        onClick={() => onNavigate("map")}
-        style={{
-          margin: "0 var(--space-4) var(--space-6)",
-          padding: "var(--space-5)",
-          background: "linear-gradient(135deg, #D4F4DD 0%, #B8E8C5 100%)",
-          borderRadius: "var(--radius-lg)",
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--space-4)",
-          border: "1px solid rgba(176, 214, 85, 0.2)",
-          cursor: "pointer",
-        }}
-      >
-        <img
-          src={mapIcon}
-          alt="Map"
-          style={{ width: "80px", height: "80px", flexShrink: 0 }}
-        />
-        <div>
-          <h4
-            style={{
-              margin: 0,
-              marginBottom: "var(--space-1)",
-              color: "var(--color-text-primary)",
-            }}
-          >
-            찾으시는 팝업이 없나요?
-          </h4>
-          <p
-            style={{
-              margin: 0,
-              fontSize: "0.875rem",
-              color: "var(--color-text-secondary)",
-              lineHeight: 1.5,
-            }}
-          >
-            지도에서 찾아보거나 새로운 팝업을 제보해 주세요!
-          </p>
-        </div>
-      </div>
+      <MapBanner onClick={() => onNavigate("map")} />
     </div>
   );
 }
