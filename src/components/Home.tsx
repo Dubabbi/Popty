@@ -1,10 +1,14 @@
 import { ChevronRight, TrendingUp, Clock, MapPin } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { SearchBar } from "./SearchBar";
 import { PopupCard } from "./PopupCard";
 import { Mascot } from "./Mascot";
-import { getTrendingPopups, getEndingSoonPopups, popupsData } from "../data/popups";
-import type { ViewType } from "../App";
+import {
+  getTrendingPopups,
+  getEndingSoonPopups,
+  popupsData,
+} from "../data/popups";
+import type { ViewType } from "../routes/routes";
+import mapIcon from "../assets/mapIcon.svg";
 
 interface HomeProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
@@ -14,7 +18,7 @@ interface HomeProps {
 export function Home({ onNavigate, breakpoint }: HomeProps) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [currentCardIndex, setCurrentCardIndex] = useState(1); // 초기값을 1로 설정 (실제 첫 번째 카드)
+  const [currentCardIndex, setCurrentCardIndex] = useState(1);
 
   const heroImages = [
     "https://images.unsplash.com/photo-1706282540364-962e8b1543da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2xvcmZ1bCUyMGFic3RyYWN0JTIwYXJ0JTIwcG9zdGVyfGVufDF8fHx8MTc2NzE2MDAxOHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
@@ -25,11 +29,15 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
     "https://images.unsplash.com/photo-1566419834777-c0e4c5e7870f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBtaW5pbWFsJTIwZGVzaWdufGVufDF8fHx8MTc2NzE1MDc1MHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
   ];
 
-  const [activeBackgroundImage, setActiveBackgroundImage] = useState(heroImages[0]);
+  const [activeBackgroundImage, setActiveBackgroundImage] = useState(
+    heroImages[0],
+  );
 
   const trending = getTrendingPopups();
   const endingSoon = getEndingSoonPopups();
-  const seongsuPopups = popupsData.filter((p) => p.area === "Seongsu").slice(0, 4);
+  const seongsuPopups = popupsData
+    .filter((p) => p.area === "Seongsu")
+    .slice(0, 4);
   const categoryPopups = {
     Character: popupsData.filter((p) => p.category === "Character").slice(0, 3),
     Food: popupsData.filter((p) => p.category === "Food").slice(0, 3),
@@ -70,7 +78,9 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
 
           entries.forEach((entry) => {
             if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-              const index = cardRefs.current.indexOf(entry.target as HTMLDivElement);
+              const index = cardRefs.current.indexOf(
+                entry.target as HTMLDivElement,
+              );
               if (index !== -1) {
                 maxRatio = entry.intersectionRatio;
                 maxIndex = index;
@@ -94,7 +104,7 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
         root: carousel,
         threshold: [0.5, 0.75, 1.0],
         rootMargin: "0px",
-      }
+      },
     );
 
     cardRefs.current.forEach((card) => {
@@ -107,37 +117,11 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
     };
   }, [breakpoint, currentCardIndex]);
 
-  const gridCols = breakpoint === "desktop" ? 4 : breakpoint === "tablet" ? 3 : 2;
+  const gridCols =
+    breakpoint === "desktop" ? 4 : breakpoint === "tablet" ? 3 : 2;
 
   return (
     <div style={{ paddingBottom: "var(--space-8)" }}>
-      {/* Hero Section with Mascot */}
-      <div
-        style={{
-          background:
-            "linear-gradient(135deg, var(--color-primary-bg) 0%, var(--color-lavender) 100%)",
-          padding: "var(--space-6) var(--space-4)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "var(--space-4)",
-            marginBottom: "var(--space-4)",
-          }}
-        >
-          <Mascot pose="welcome" size="large" />
-          <div>
-            <h2 style={{ margin: 0, marginBottom: "var(--space-1)" }}>안녕하세요! 👋</h2>
-            <p style={{ margin: 0, color: "var(--color-text-secondary)" }}>
-              방문할 가치가 있는 모든 팝업을 한곳에서!
-            </p>
-          </div>
-        </div>
-        <SearchBar />
-      </div>
-
       {/* Trending Carousel */}
       <section
         style={{
@@ -171,7 +155,13 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
               marginBottom: "var(--space-4)",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "var(--space-2)",
+              }}
+            >
               <TrendingUp size={24} color="var(--color-primary)" />
               <h3 style={{ margin: 0 }}>이번 주 트렌딩</h3>
             </div>
@@ -220,7 +210,12 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
               {(() => {
                 const cards = trending.slice(0, 6);
                 // 무한 반복 효과: 마지막 카드를 앞에, 첫 2개 카드를 뒤에 추가
-                const infiniteCards = [cards[cards.length - 1], ...cards, cards[0], cards[1]];
+                const infiniteCards = [
+                  cards[cards.length - 1],
+                  ...cards,
+                  cards[0],
+                  cards[1],
+                ];
 
                 return infiniteCards.map((popup, index) => {
                   // 실제 인덱스 계산
@@ -252,7 +247,12 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
                               : "calc(100% - 200px)",
                         borderRadius: "32px",
                         overflow: "hidden",
-                        height: breakpoint === "mobile" ? 520 : breakpoint === "tablet" ? 600 : 680,
+                        height:
+                          breakpoint === "mobile"
+                            ? 520
+                            : breakpoint === "tablet"
+                              ? 600
+                              : 680,
                         cursor: "pointer",
                         scrollSnapAlign: "center",
                         scrollSnapStop: "always",
@@ -261,7 +261,9 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
                         transition: "transform 0.3s ease, opacity 0.3s ease",
                         willChange: "transform, opacity",
                       }}
-                      ref={(el) => (cardRefs.current[index] = el)}
+                      ref={(el) => {
+                        cardRefs.current[index] = el;
+                      }}
                     >
                       {/* Background Image */}
                       <div
@@ -341,7 +343,7 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
                                 textShadow: "0 2px 12px rgba(0,0,0,0.3)",
                               }}
                             >
-                              {popup.title}
+                              {popup.popupName}
                             </h2>
                             <div
                               style={{
@@ -351,7 +353,7 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
                                 fontWeight: 700,
                               }}
                             >
-                              {popup.location}
+                              {popup.area}
                             </div>
                             <div
                               style={{
@@ -360,11 +362,14 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
                                 fontWeight: 600,
                               }}
                             >
-                              {new Date(popup.startDate).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "2-digit",
-                                day: "2-digit",
-                              })}
+                              {new Date(popup.startDate).toLocaleDateString(
+                                "en-US",
+                                {
+                                  year: "numeric",
+                                  month: "2-digit",
+                                  day: "2-digit",
+                                },
+                              )}
                             </div>
                           </div>
 
@@ -404,7 +409,13 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
             marginBottom: "var(--space-4)",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "var(--space-2)",
+            }}
+          >
             <Clock size={24} color="var(--color-error)" />
             <h3 style={{ margin: 0 }}>곧 종료! 😮</h3>
           </div>
@@ -437,7 +448,13 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
             marginBottom: "var(--space-4)",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "var(--space-2)",
+            }}
+          >
             <MapPin size={24} color="var(--color-accent)" />
             <h3 style={{ margin: 0 }}>성수동 이번 주</h3>
           </div>
@@ -507,26 +524,50 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
               </div>
             </div>
             {index < Object.entries(categoryPopups).length - 1 && (
-              <div style={{ width: "100%", height: "5px", background: "var(--color-gray-100)" }} />
+              <div
+                style={{
+                  width: "100%",
+                  height: "5px",
+                  background: "var(--color-gray-100)",
+                }}
+              />
             )}
           </div>
         ))}
       </section>
 
-      {/* Mascot Message */}
       <div
+        onClick={() => onNavigate("map")}
         style={{
           margin: "0 var(--space-4) var(--space-6)",
           padding: "var(--space-5)",
-          background: "linear-gradient(135deg, #E8F4FD 0%, #D4E9FA 100%)",
+          background: "linear-gradient(135deg, #D4F4DD 0%, #B8E8C5 100%)",
           borderRadius: "var(--radius-lg)",
           display: "flex",
           alignItems: "center",
           gap: "var(--space-4)",
-          border: "1px solid rgba(100, 149, 237, 0.1)",
+          border: "1px solid rgba(176, 214, 85, 0.2)",
+          cursor: "pointer",
+          transition: "transform 0.2s ease, box-shadow 0.2s ease",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "translateY(-2px)";
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "none";
         }}
       >
-        <Mascot pose="explore" size="large" />
+        <img
+          src={mapIcon}
+          alt="Map"
+          style={{
+            width: "80px",
+            height: "80px",
+            flexShrink: 0,
+          }}
+        />
         <div>
           <h4
             style={{
