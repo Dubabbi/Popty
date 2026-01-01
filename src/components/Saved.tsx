@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { Bell, Calendar as CalendarIcon } from "lucide-react";
-import { PopupCard } from "./PopupCard";
-import { Badge } from "./Badge";
-import { Mascot } from "./Mascot";
-import { popupsData, savedPopupIds } from "../data/popups";
-import type { ViewType } from "../App";
+import { PopupCard } from "@/components/PopupCard";
+import { Badge } from "@/components/Badge";
+import { Mascot } from "@/components/Mascot";
+import { popupsData, savedPopupIds } from "@/data/popups";
+import type { ViewType } from "@/routes/routes";
 
 interface SavedProps {
   onNavigate: (view: ViewType, popupId?: string) => void;

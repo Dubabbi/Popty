@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { SlidersHorizontal, Grid3x3, List as ListIcon } from "lucide-react";
-import { PopupCard } from "./PopupCard";
-import { FilterChip } from "./FilterChip";
-import { FilterModal } from "./FilterModal";
-import { popupsData } from "../data/popups";
-import { Mascot } from "./Mascot";
-import type { ViewType } from "../App";
+import { PopupCard } from "@/components/PopupCard";
+import { FilterChip } from "@/components/FilterChip";
+import { FilterModal } from "@/components/FilterModal";
+import { popupsData } from "@/data/popups";
+import { Mascot } from "@/components/Mascot";
+import type { ViewType } from "@/routes/routes";
 
 interface BrowseProps {
   onNavigate: (view: ViewType, popupId?: string) => void;

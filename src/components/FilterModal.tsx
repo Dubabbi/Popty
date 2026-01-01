@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
-import { FilterChip } from "./FilterChip";
-import { Button } from "./Button";
+import { FilterChip } from "@/components/FilterChip";
+import { Button } from "@/components/Button";
 
 interface FilterModalProps {
   onClose: () => void;
@@ -19,16 +19,33 @@ interface FilterModalProps {
   };
 }
 
-export function FilterModal({ onClose, onApply, initialFilters = {} }: FilterModalProps) {
-  const [selectedAreas, setSelectedAreas] = useState<string[]>(initialFilters.areas || []);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    initialFilters.categories || []
+export function FilterModal({
+  onClose,
+  onApply,
+  initialFilters = {},
+}: FilterModalProps) {
+  const [selectedAreas, setSelectedAreas] = useState<string[]>(
+    initialFilters.areas || [],
   );
-  const [selectedTags, setSelectedTags] = useState<string[]>(initialFilters.tags || []);
-  const [selectedTime, setSelectedTime] = useState<string>(initialFilters.time || "");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    initialFilters.categories || [],
+  );
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    initialFilters.tags || [],
+  );
+  const [selectedTime, setSelectedTime] = useState<string>(
+    initialFilters.time || "",
+  );
 
   const areas = ["Seongsu", "Hongdae", "Gangnam", "Yeouido", "Others"];
-  const categories = ["Goods", "Exhibition", "Beauty", "Food", "Fashion", "Character"];
+  const categories = [
+    "Goods",
+    "Exhibition",
+    "Beauty",
+    "Food",
+    "Fashion",
+    "Character",
+  ];
   const tags = [
     "Reservation Required",
     "Free Entry",
@@ -38,7 +55,11 @@ export function FilterModal({ onClose, onApply, initialFilters = {} }: FilterMod
   ];
   const timeOptions = ["Today", "This Week", "This Month", "Custom Range"];
 
-  const toggleSelection = (item: string, list: string[], setter: (list: string[]) => void) => {
+  const toggleSelection = (
+    item: string,
+    list: string[],
+    setter: (list: string[]) => void,
+  ) => {
     if (list.includes(item)) {
       setter(list.filter((i) => i !== item));
     } else {
@@ -130,13 +151,21 @@ export function FilterModal({ onClose, onApply, initialFilters = {} }: FilterMod
           {/* Area */}
           <div style={{ marginBottom: "var(--space-6)" }}>
             <h4 style={{ marginBottom: "var(--space-3)" }}>Area</h4>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "var(--space-2)",
+              }}
+            >
               {areas.map((area) => (
                 <FilterChip
                   key={area}
                   label={area}
                   selected={selectedAreas.includes(area)}
-                  onClick={() => toggleSelection(area, selectedAreas, setSelectedAreas)}
+                  onClick={() =>
+                    toggleSelection(area, selectedAreas, setSelectedAreas)
+                  }
                 />
               ))}
             </div>
@@ -145,13 +174,21 @@ export function FilterModal({ onClose, onApply, initialFilters = {} }: FilterMod
           {/* Time */}
           <div style={{ marginBottom: "var(--space-6)" }}>
             <h4 style={{ marginBottom: "var(--space-3)" }}>Time</h4>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "var(--space-2)",
+              }}
+            >
               {timeOptions.map((time) => (
                 <FilterChip
                   key={time}
                   label={time}
                   selected={selectedTime === time}
-                  onClick={() => setSelectedTime(selectedTime === time ? "" : time)}
+                  onClick={() =>
+                    setSelectedTime(selectedTime === time ? "" : time)
+                  }
                 />
               ))}
             </div>
@@ -160,14 +197,24 @@ export function FilterModal({ onClose, onApply, initialFilters = {} }: FilterMod
           {/* Category */}
           <div style={{ marginBottom: "var(--space-6)" }}>
             <h4 style={{ marginBottom: "var(--space-3)" }}>Category</h4>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "var(--space-2)",
+              }}
+            >
               {categories.map((category) => (
                 <FilterChip
                   key={category}
                   label={category}
                   selected={selectedCategories.includes(category)}
                   onClick={() =>
-                    toggleSelection(category, selectedCategories, setSelectedCategories)
+                    toggleSelection(
+                      category,
+                      selectedCategories,
+                      setSelectedCategories,
+                    )
                   }
                 />
               ))}
@@ -177,13 +224,21 @@ export function FilterModal({ onClose, onApply, initialFilters = {} }: FilterMod
           {/* Tags */}
           <div style={{ marginBottom: "var(--space-6)" }}>
             <h4 style={{ marginBottom: "var(--space-3)" }}>Tags</h4>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "var(--space-2)",
+              }}
+            >
               {tags.map((tag) => (
                 <FilterChip
                   key={tag}
                   label={tag}
                   selected={selectedTags.includes(tag)}
-                  onClick={() => toggleSelection(tag, selectedTags, setSelectedTags)}
+                  onClick={() =>
+                    toggleSelection(tag, selectedTags, setSelectedTags)
+                  }
                 />
               ))}
             </div>
@@ -202,10 +257,20 @@ export function FilterModal({ onClose, onApply, initialFilters = {} }: FilterMod
             gap: "var(--space-3)",
           }}
         >
-          <Button variant="secondary" size="medium" onClick={handleReset} fullWidth>
+          <Button
+            variant="secondary"
+            size="medium"
+            onClick={handleReset}
+            fullWidth
+          >
             Reset
           </Button>
-          <Button variant="primary" size="medium" onClick={handleApply} fullWidth>
+          <Button
+            variant="primary"
+            size="medium"
+            onClick={handleApply}
+            fullWidth
+          >
             Apply Filters
           </Button>
         </div>

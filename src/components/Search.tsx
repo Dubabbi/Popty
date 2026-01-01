@@ -1,6 +1,6 @@
 import { Search as SearchIcon, X, MapPin, Calendar, Heart } from "lucide-react";
 import { useState } from "react";
-import type { ViewType } from "../routes/routes";
+import type { ViewType } from "@/routes/routes";
 
 interface SearchProps {
   onNavigate: (view: ViewType, popupId?: string) => void;

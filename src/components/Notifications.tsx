@@ -1,6 +1,6 @@
 import { Bell, Clock, TrendingUp, Heart, Tag } from "lucide-react";
 import { useState } from "react";
-import type { ViewType } from "../App";
+import type { ViewType } from "@/routes/routes";
 
 interface NotificationsProps {
   onNavigate: (view: ViewType, popupId?: string) => void;

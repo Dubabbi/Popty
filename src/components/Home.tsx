@@ -1,7 +1,7 @@
 import { ChevronRight, TrendingUp, Clock, MapPin } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { PopupCard } from "./PopupCard";
-import { Mascot } from "./Mascot";
+import { PopupCard } from "@/components/PopupCard";
+import { Mascot } from "@/components/Mascot";
 import {
   getTrendingPopups,
   getEndingSoonPopups,

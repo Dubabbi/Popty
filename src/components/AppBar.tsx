@@ -1,6 +1,6 @@
 import { Search, Bell, Calendar } from "lucide-react";
-import type { ViewType } from "../App";
-import LogoImg from "../assets/logo.svg";
+import type { ViewType } from "@/routes/routes";
+import LogoImg from "@/assets/logo.svg";
 
 interface AppBarProps {
   title: string;
