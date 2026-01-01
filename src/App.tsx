@@ -1,14 +1,14 @@
 import { matchPath, useLocation, useNavigate } from "react-router-dom";
-import { useBreakpoint } from "./hooks/useBreakpoint";
-import { AppBar } from "./components/AppBar";
-
-import { AppRoutes } from "./routes/AppRoutes";
+import { useBreakpoint } from "@/hooks/useBreakpoint";
+import { AppBar } from "@/components/AppBar";
+import { ScrollToTopFab } from "@/components/scroll-to-top/ScrollToTopFab";
+import { AppRoutes } from "@/routes/AppRoutes";
 import {
   VIEW_PATH,
   getCurrentView,
   toTitle,
   type ViewType,
-} from "./routes/routes";
+} from "@/routes/routes";
 
 export default function App() {
   const breakpoint = useBreakpoint();
@@ -41,6 +41,7 @@ export default function App() {
         <main className="main-content">
           <AppRoutes breakpoint={breakpoint} onNavigate={handleNavigate} />
         </main>
+        <ScrollToTopFab scrollSelector=".main-content" />
       </div>
     </div>
   );

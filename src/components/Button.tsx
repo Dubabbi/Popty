@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 interface ButtonProps {
   variant?: "primary" | "secondary" | "ghost";
@@ -54,7 +54,9 @@ export function Button({
       boxShadow: disabled ? "none" : "var(--shadow-md)",
     },
     secondary: {
-      background: disabled ? "var(--color-gray-200)" : "var(--color-primary-bg)",
+      background: disabled
+        ? "var(--color-gray-200)"
+        : "var(--color-primary-bg)",
       color: disabled ? "var(--color-gray-400)" : "var(--color-primary)",
       border: `2px solid ${disabled ? "var(--color-gray-300)" : "var(--color-primary)"}`,
     },
@@ -66,7 +68,10 @@ export function Button({
 
   const hoverStyles = !disabled
     ? {
-        primary: { transform: "translateY(-1px)", boxShadow: "var(--shadow-lg)" },
+        primary: {
+          transform: "translateY(-1px)",
+          boxShadow: "var(--shadow-lg)",
+        },
         secondary: { background: "var(--color-primary-light)", color: "white" },
         ghost: { background: "var(--color-gray-100)" },
       }

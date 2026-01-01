@@ -7,7 +7,7 @@ import {
   HelpCircle,
   MessageSquarePlus,
 } from "lucide-react";
-import { Mascot } from "./Mascot";
+import { Mascot } from "@/components/Mascot";
 
 export function My() {
   const menuItems = [

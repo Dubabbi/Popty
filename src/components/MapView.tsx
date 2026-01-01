@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { MapPin, Navigation } from "lucide-react";
-import { PopupCard } from "./PopupCard";
-import { FilterChip } from "./FilterChip";
-import { popupsData } from "../data/popups";
-import type { ViewType } from "../App";
+import { PopupCard } from "@/components/PopupCard";
+import { FilterChip } from "@/components/FilterChip";
+import { popupsData } from "@/data/popups";
+import type { ViewType } from "@/routes/routes";
 
 interface MapViewProps {
   onNavigate: (view: ViewType, popupId?: string) => void;

@@ -1,5 +1,12 @@
-import { Home, List, Calendar as CalendarIcon, Map, Bookmark, User } from "lucide-react";
-import type { ViewType } from "../App";
+import {
+  Home,
+  List,
+  Calendar as CalendarIcon,
+  Map,
+  Bookmark,
+  User,
+} from "lucide-react";
+import type { ViewType } from "@/routes/routes";
 
 interface BottomNavProps {
   currentView: ViewType;
@@ -47,7 +54,9 @@ export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
               border: "none",
               cursor: "pointer",
               transition: "all 0.2s",
-              color: isActive ? "var(--color-primary)" : "var(--color-text-tertiary)",
+              color: isActive
+                ? "var(--color-primary)"
+                : "var(--color-text-tertiary)",
             }}
             onMouseEnter={(e) => {
               if (!isActive) {

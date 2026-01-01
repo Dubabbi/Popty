@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 
-import { cn } from "./utils";
+import { cn } from "@/components/ui/utils";
 
 const THEMES = { light: "", dark: ".dark" } as const;
 

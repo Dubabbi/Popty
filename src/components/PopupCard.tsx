@@ -1,7 +1,12 @@
 import { Bookmark, MapPin, Clock } from "lucide-react";
-import { type Popup, calculateDday, formatDateRange, isOpenToday } from "../data/popups";
-import { imageMapping } from "../data/imageMapping";
-import { Badge } from "./Badge";
+import {
+  type Popup,
+  calculateDday,
+  formatDateRange,
+  isOpenToday,
+} from "@/data/popups";
+import { imageMapping } from "@/data/imageMapping";
+import { Badge } from "@/components/Badge";
 import { useState } from "react";
 
 interface PopupCardProps {
@@ -64,13 +69,32 @@ export function PopupCard({
             flexShrink: 0,
           }}
         />
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--space-2)",
+          }}
+        >
           <div
-            style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+            }}
           >
             <div>
-              <h4 style={{ margin: 0, marginBottom: "var(--space-1)" }}>{popup.popupName}</h4>
-              <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--color-text-tertiary)" }}>
+              <h4 style={{ margin: 0, marginBottom: "var(--space-1)" }}>
+                {popup.popupName}
+              </h4>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "0.875rem",
+                  color: "var(--color-text-tertiary)",
+                }}
+              >
                 {popup.brandName}
               </p>
             </div>
@@ -91,7 +115,9 @@ export function PopupCard({
             </button>
           </div>
 
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
+          <div
+            style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}
+          >
             {openingToday && <Badge variant="new">Opens Today!</Badge>}
             {dday > 0 && dday <= 3 && <Badge variant="ending">D-{dday}</Badge>}
             {popup.trending && <Badge variant="trending">🔥 Trending</Badge>}
@@ -130,7 +156,9 @@ export function PopupCard({
             </div>
           </div>
 
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)" }}>
+          <div
+            style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)" }}
+          >
             {popup.tags.slice(0, 3).map((tag, index) => (
               <span
                 key={index}
@@ -225,7 +253,9 @@ export function PopupCard({
       </div>
 
       <div style={{ padding: "var(--space-4)" }}>
-        <h4 style={{ margin: 0, marginBottom: "var(--space-1)" }}>{popup.popupName}</h4>
+        <h4 style={{ margin: 0, marginBottom: "var(--space-1)" }}>
+          {popup.popupName}
+        </h4>
         <p
           style={{
             margin: 0,
@@ -262,10 +292,14 @@ export function PopupCard({
           }}
         >
           <MapPin size={14} color="var(--color-text-tertiary)" />
-          <span style={{ color: "var(--color-text-secondary)" }}>{popup.area}</span>
+          <span style={{ color: "var(--color-text-secondary)" }}>
+            {popup.area}
+          </span>
         </div>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)" }}>
+        <div
+          style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)" }}
+        >
           {popup.tags.slice(0, 2).map((tag, index) => (
             <span
               key={index}
