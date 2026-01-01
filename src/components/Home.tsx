@@ -1,40 +1,40 @@
 import { ChevronRight, TrendingUp, Clock, MapPin } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import type { CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { PopupCard } from "@/components/PopupCard";
 import { Mascot } from "@/components/Mascot";
+import { HERO_IMAGES } from "@/constants/heroImages";
 import {
   getTrendingPopups,
   getEndingSoonPopups,
   popupsData,
-} from "../data/popups";
-import type { ViewType } from "../routes/routes";
-import mapIcon from "../assets/mapIcon.svg";
+} from "@/data/popups";
+import type { ViewType } from "@/routes/routes";
+import mapIcon from "@/assets/mapIcon.svg";
 
 interface HomeProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
   breakpoint: "mobile" | "tablet" | "desktop";
 }
 
-export function Home({ onNavigate, breakpoint }: HomeProps) {
+/** ✅ CSS 변수 타입 안전하게 (any 없음) */
+type CSSVarName = `--${string}`;
+type StyleWithVars = CSSProperties & Partial<Record<CSSVarName, string>>;
+
+export function Home({ onNavigate }: HomeProps) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const [currentCardIndex, setCurrentCardIndex] = useState(1);
+  const [activeBackgroundImage, setActiveBackgroundImage] = useState("");
 
-  const heroImages = [
-    "https://images.unsplash.com/photo-1706282540364-962e8b1543da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2xvcmZ1bCUyMGFic3RyYWN0JTIwYXJ0JTIwcG9zdGVyfGVufDF8fHx8MTc2NzE2MDAxOHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    "https://images.unsplash.com/photo-1723283126758-28f2a308bc47?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aWJyYW50JTIwZ2VvbWV0cmljJTIwcGF0dGVybnxlbnwxfHx8fDE3NjcxNjY4MDB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    "https://images.unsplash.com/photo-1679294176201-f9b302961f42?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuZW9uJTIwbGlnaHRzJTIwdXJiYW4lMjBuaWdodHxlbnwxfHx8fDE3NjcwNDIyNzJ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    "https://images.unsplash.com/photo-1714972692832-618fae83ef30?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYXN0ZWwlMjBncmFkaWVudCUyMG1vZGVybnxlbnwxfHx8fDE3NjcxNjY4MDF8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    "https://images.unsplash.com/photo-1686405585580-2a1f5aac9837?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcnRpc3RpYyUyMGNvbG9yZnVsJTIwcGFpbnR8ZW58MXx8fHwxNzY3MTY2ODAxfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    "https://images.unsplash.com/photo-1566419834777-c0e4c5e7870f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBtaW5pbWFsJTIwZGVzaWdufGVufDF8fHx8MTc2NzE1MDc1MHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  ];
-
-  const [activeBackgroundImage, setActiveBackgroundImage] = useState(
-    heroImages[0],
-  );
-
+  const isJumpingRef = useRef(false);
+  const currentIndexRef = useRef(1);
+  const scrollRafRef = useRef<number | null>(null);
+  const scrollIdleTimerRef = useRef<number | null>(null);
   const trending = getTrendingPopups();
   const endingSoon = getEndingSoonPopups();
+
   const seongsuPopups = popupsData
     .filter((p) => p.area === "Seongsu")
     .slice(0, 4);
@@ -44,81 +44,221 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
     Fashion: popupsData.filter((p) => p.category === "Fashion").slice(0, 3),
   };
 
-  // 초기 스크롤 위치를 두 번째 카드(실제 첫 번째 카드)로 설정
-  useEffect(() => {
-    if (carouselRef.current && cardRefs.current[1]) {
-      // 실제 첫 번째 카드(인덱스 1)로 스크롤
-      setTimeout(() => {
-        cardRefs.current[1]?.scrollIntoView({
-          inline: "center",
-          block: "nearest",
-          behavior: "auto",
-        });
-        setCurrentCardIndex(1);
-      }, 100);
-    }
-  }, [breakpoint]);
+  /** ✅ 실제 카드(최대 6개) */
+  const realCards = useMemo(() => trending.slice(0, 6), [trending]);
+  const realLen = realCards.length;
 
-  // IntersectionObserver로 현재 활성 카드 추적
+  /** ✅ 무한 배열: [lastClone, ...real, firstClone, secondClone] */
+  const infiniteCards = useMemo(() => {
+    if (realLen === 0) return [];
+    if (realLen === 1) return [realCards[0]];
+    return [
+      realCards[realLen - 1],
+      ...realCards,
+      realCards[0],
+      realCards[1 % realLen],
+    ];
+  }, [realCards, realLen]);
+
+  /** index(무한배열) -> actual(실제배열 0..len-1) */
+  const getActualIndex = useCallback(
+    (index: number) => {
+      if (realLen <= 0) return 0;
+      if (realLen === 1) return 0;
+      if (index === 0) return realLen - 1;
+      if (index <= realLen) return index - 1;
+      return index - realLen - 1; // len+1=>0, len+2=>1...
+    },
+    [realLen],
+  );
+
+  /** ✅ 중앙으로 보내기 (iOS에서 scrollIntoView보다 안정적) */
+  const centerToIndex = useCallback(
+    (index: number, behavior: ScrollBehavior = "auto") => {
+      const carousel = carouselRef.current;
+      const card = cardRefs.current[index];
+      if (!carousel || !card) return;
+
+      // 일부 모바일 사파리에서 CSS scroll-behavior가 scrollTo behavior를 덮는 경우 방지
+      const prev = carousel.style.scrollBehavior;
+      if (behavior === "auto") carousel.style.scrollBehavior = "auto";
+
+      const left =
+        card.offsetLeft - (carousel.clientWidth - card.clientWidth) / 2;
+      carousel.scrollTo({ left, behavior });
+
+      if (behavior === "auto") {
+        requestAnimationFrame(() => {
+          carousel.style.scrollBehavior = prev;
+        });
+      }
+    },
+    [],
+  );
+
+  /** ✅ 현재 index ref 동기화 */
+  useEffect(() => {
+    currentIndexRef.current = currentCardIndex;
+  }, [currentCardIndex]);
+
+  /** ✅ cardRefs 길이 정리(데이터 바뀔 때) */
+  useEffect(() => {
+    cardRefs.current = cardRefs.current.slice(0, infiniteCards.length);
+  }, [infiniteCards.length]);
+
+  /** ✅ 스크롤 위치 기준으로 “가장 가운데 카드” 찾기 (IO보다 모바일 안정적) */
+  const findClosestIndex = useCallback(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return -1;
+
+    const centerX = carousel.scrollLeft + carousel.clientWidth / 2;
+
+    let bestIdx = -1;
+    let bestDist = Number.POSITIVE_INFINITY;
+
+    for (let i = 0; i < cardRefs.current.length; i += 1) {
+      const el = cardRefs.current[i];
+      if (!el) continue;
+
+      const cardCenter = el.offsetLeft + el.clientWidth / 2;
+      const dist = Math.abs(cardCenter - centerX);
+
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx = i;
+      }
+    }
+    return bestIdx;
+  }, []);
+
+  /** ✅ clone에 도달하면 실제 카드로 순간이동 */
+  const jumpIfClone = useCallback(
+    (idx: number) => {
+      if (realLen < 2) return;
+
+      const lastReal = realLen; // 무한배열에서 실제 마지막 카드 index
+      const firstClone = realLen + 1;
+      const secondClone = realLen + 2;
+
+      let target: number | null = null;
+
+      if (idx === 0)
+        target = lastReal; // 앞 clone(last) -> 실제 마지막
+      else if (idx === firstClone)
+        target = 1; // 뒤 clone(first) -> 실제 첫
+      else if (idx === secondClone) target = 2; // 뒤 clone(second) -> 실제 둘째
+
+      if (target === null) return;
+
+      isJumpingRef.current = true;
+
+      requestAnimationFrame(() => {
+        centerToIndex(target!, "auto");
+        setCurrentCardIndex(target!);
+
+        const actual = getActualIndex(target!);
+        setActiveBackgroundImage(HERO_IMAGES[actual] ?? HERO_IMAGES[0]);
+
+        requestAnimationFrame(() => {
+          isJumpingRef.current = false;
+        });
+      });
+    },
+    [centerToIndex, getActualIndex, HERO_IMAGES, realLen],
+  );
+
+  /** ✅ 초기 위치: “실제 첫 카드”(index 1)를 중앙으로 */
+  useEffect(() => {
+    if (realLen === 0) return;
+
+    requestAnimationFrame(() => {
+      const startIndex = realLen >= 2 ? 1 : 0;
+      centerToIndex(startIndex, "auto");
+      setCurrentCardIndex(startIndex);
+
+      const actual = getActualIndex(startIndex);
+      setActiveBackgroundImage(HERO_IMAGES[actual] ?? HERO_IMAGES[0]);
+    });
+  }, [centerToIndex, getActualIndex, HERO_IMAGES, realLen]);
+
+  /** ✅ 리사이즈(회전/주소창) 시에도 중앙 유지 */
   useEffect(() => {
     const carousel = carouselRef.current;
     if (!carousel) return;
 
-    let rafId: number | null = null;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // requestAnimationFrame으로 상태 업데이트를 다음 프레임으로 지연
-        if (rafId) cancelAnimationFrame(rafId);
-
-        rafId = requestAnimationFrame(() => {
-          // 가장 많이 보이는 카드 찾기
-          let maxRatio = 0;
-          let maxIndex = -1;
-
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-              const index = cardRefs.current.indexOf(
-                entry.target as HTMLDivElement,
-              );
-              if (index !== -1) {
-                maxRatio = entry.intersectionRatio;
-                maxIndex = index;
-              }
-            }
-          });
-
-          if (maxIndex !== -1 && maxIndex !== currentCardIndex) {
-            setCurrentCardIndex(maxIndex);
-
-            // 실제 카드 인덱스 계산
-            let actualIndex = maxIndex - 1;
-            if (actualIndex < 0) actualIndex = 5;
-            if (actualIndex > 5) actualIndex = 0;
-
-            setActiveBackgroundImage(heroImages[actualIndex]);
-          }
-        });
-      },
-      {
-        root: carousel,
-        threshold: [0.5, 0.75, 1.0],
-        rootMargin: "0px",
-      },
-    );
-
-    cardRefs.current.forEach((card) => {
-      if (card) observer.observe(card);
+    const ro = new ResizeObserver(() => {
+      centerToIndex(currentIndexRef.current, "auto");
     });
 
-    return () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      observer.disconnect();
-    };
-  }, [breakpoint, currentCardIndex]);
+    ro.observe(carousel);
+    return () => ro.disconnect();
+  }, [centerToIndex]);
 
-  const gridCols =
-    breakpoint === "desktop" ? 4 : breakpoint === "tablet" ? 3 : 2;
+  /** ✅ 스크롤 중 active index 추적 + 스크롤 멈춘 뒤 clone 점프 */
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    const onScroll = () => {
+      if (isJumpingRef.current) return;
+
+      // rAF로 throttle
+      if (scrollRafRef.current) cancelAnimationFrame(scrollRafRef.current);
+      scrollRafRef.current = requestAnimationFrame(() => {
+        const idx = findClosestIndex();
+        if (idx >= 0 && idx !== currentIndexRef.current) {
+          setCurrentCardIndex(idx);
+          const actual = getActualIndex(idx);
+          setActiveBackgroundImage(HERO_IMAGES[actual] ?? HERO_IMAGES[0]);
+        }
+      });
+
+      // idle(관성 스크롤) 끝난 뒤 clone jump
+      if (scrollIdleTimerRef.current) clearTimeout(scrollIdleTimerRef.current);
+      scrollIdleTimerRef.current = window.setTimeout(() => {
+        const idx = findClosestIndex();
+        if (idx >= 0) jumpIfClone(idx);
+      }, 140);
+    };
+
+    carousel.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      carousel.removeEventListener("scroll", onScroll);
+      if (scrollRafRef.current) cancelAnimationFrame(scrollRafRef.current);
+      if (scrollIdleTimerRef.current) clearTimeout(scrollIdleTimerRef.current);
+    };
+  }, [findClosestIndex, getActualIndex, HERO_IMAGES, jumpIfClone]);
+
+  /** ✅ 캐러셀 스타일 (any 없음) */
+  const carouselStyle: StyleWithVars = {
+    "--peek": "clamp(18px, 6vw, 72px)",
+    "--cardMax": "720px",
+    "--cardH": "clamp(380px, 62vh, 560px)",
+
+    display: "flex",
+    gap: "var(--space-4)",
+    overflowX: "auto",
+    WebkitOverflowScrolling: "touch",
+
+    scrollSnapType: "x mandatory",
+    scrollBehavior: "smooth",
+
+    // ✅ 중앙 틀어짐 방지: padding과 scrollPadding을 같은 값으로
+    padding: "0 var(--peek)",
+    scrollPaddingLeft: "var(--peek)",
+    scrollPaddingRight: "var(--peek)",
+
+    // 스크롤바 숨김(FF/old MS)
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
+  };
+
+  /** grid도 breakpoint 없이 반응형(원하면 min값만 조절) */
+  const responsiveGridStyle: CSSProperties = {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+    gap: "var(--space-4)",
+  };
 
   return (
     <div style={{ paddingBottom: "var(--space-8)" }}>
@@ -135,7 +275,9 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
           style={{
             position: "absolute",
             inset: "-50px",
-            backgroundImage: `url(${activeBackgroundImage})`,
+            backgroundImage: activeBackgroundImage
+              ? `url(${activeBackgroundImage})`
+              : undefined,
             backgroundSize: "cover",
             backgroundPosition: "center",
             opacity: 0.15,
@@ -165,6 +307,7 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
               <TrendingUp size={24} color="var(--color-primary)" />
               <h3 style={{ margin: 0 }}>이번 주 트렌딩</h3>
             </div>
+
             <button
               onClick={() => onNavigate("browse")}
               style={{
@@ -178,12 +321,11 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
                 fontSize: "0.875rem",
               }}
             >
-              전체보기
-              <ChevronRight size={16} />
+              전체보기 <ChevronRight size={16} />
             </button>
           </div>
 
-          {/* Carousel Container with Peek */}
+          {/* Carousel Container */}
           <div
             style={{
               position: "relative",
@@ -193,207 +335,166 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
           >
             <div
               ref={carouselRef}
-              style={{
-                display: "flex",
-                gap: "var(--space-4)",
-                overflowX: "auto",
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
-                padding: "0 16px",
-                paddingRight: "16px",
-                scrollSnapType: "x mandatory",
-                scrollBehavior: "smooth",
-                WebkitOverflowScrolling: "touch",
-              }}
               className="trending-carousel"
+              style={carouselStyle}
             >
-              {(() => {
-                const cards = trending.slice(0, 6);
-                // 무한 반복 효과: 마지막 카드를 앞에, 첫 2개 카드를 뒤에 추가
-                const infiniteCards = [
-                  cards[cards.length - 1],
-                  ...cards,
-                  cards[0],
-                  cards[1],
-                ];
+              {infiniteCards.map((popup, index) => {
+                const actualIndex = getActualIndex(index);
+                const cardImage = HERO_IMAGES[actualIndex] ?? HERO_IMAGES[0];
+                const isActive = index === currentCardIndex;
 
-                return infiniteCards.map((popup, index) => {
-                  // 실제 인덱스 계산
-                  let actualIndex;
-                  if (index === 0) {
-                    actualIndex = cards.length - 1; // 첫 번째는 마지막 카드 복제
-                  } else if (index <= cards.length) {
-                    actualIndex = index - 1; // 실제 카드들
-                  } else {
-                    actualIndex = index - cards.length - 1; // 뒤에 복제된 카드들
-                  }
-                  const cardImage = heroImages[actualIndex];
+                return (
+                  <div
+                    key={`${popup.id}-${index}`}
+                    onClick={() => onNavigate("detail", popup.id)}
+                    ref={(el) => {
+                      cardRefs.current[index] = el;
+                    }}
+                    style={{
+                      position: "relative",
+                      flexShrink: 0,
 
-                  // 현재 활성 카드인지 확인
-                  const isActive = index === currentCardIndex;
+                      // ✅ 폭: 양옆 peek만큼 빼고, 너무 커지면 max 제한
+                      width:
+                        "min(var(--cardMax), calc(100% - (var(--peek) * 2)))",
+                      height: "var(--cardH)",
 
-                  return (
+                      borderRadius: "15px",
+                      overflow: "hidden",
+                      cursor: "pointer",
+
+                      scrollSnapAlign: "center",
+                      scrollSnapStop: "always",
+
+                      transform: isActive ? "scale(1)" : "scale(0.92)",
+                      opacity: isActive ? 1 : 0.5,
+                      transition: "transform 0.3s ease, opacity 0.3s ease",
+                      willChange: "transform, opacity",
+                    }}
+                  >
+                    {/* Background Image */}
                     <div
-                      key={`${popup.id}-${index}`}
-                      onClick={() => onNavigate("detail", popup.id)}
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        backgroundImage: `url(${cardImage})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                    />
+
+                    {/* Bottom Gradient Overlay */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background:
+                          "linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.45) 100%)",
+                      }}
+                    />
+
+                    {/* Content */}
+                    <div
                       style={{
                         position: "relative",
-                        flexShrink: 0,
-                        width:
-                          breakpoint === "mobile"
-                            ? "calc(100% - 64px)"
-                            : breakpoint === "tablet"
-                              ? "calc(100% - 120px)"
-                              : "calc(100% - 200px)",
-                        borderRadius: "32px",
-                        overflow: "hidden",
-                        height:
-                          breakpoint === "mobile"
-                            ? 520
-                            : breakpoint === "tablet"
-                              ? 600
-                              : 680,
-                        cursor: "pointer",
-                        scrollSnapAlign: "center",
-                        scrollSnapStop: "always",
-                        transform: isActive ? "scale(1)" : "scale(0.92)",
-                        opacity: isActive ? 1 : 0.5,
-                        transition: "transform 0.3s ease, opacity 0.3s ease",
-                        willChange: "transform, opacity",
-                      }}
-                      ref={(el) => {
-                        cardRefs.current[index] = el;
+                        height: "100%",
+                        padding: "24px",
+                        paddingBottom: "28px",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
                       }}
                     >
-                      {/* Background Image */}
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backgroundImage: `url(${cardImage})`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center",
-                        }}
-                      />
+                      {/* Top Left Pill */}
+                      <div>
+                        <div
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            padding: "2px 16px",
+                            background: "rgba(0, 0, 0, 0.35)",
+                            border: "2px solid #B0D655",
+                            borderRadius: "50px",
+                            color: "#B0D655",
+                            fontSize: "17px",
+                            fontWeight: 700,
+                          }}
+                        >
+                          오픈 예정
+                        </div>
+                      </div>
 
-                      {/* Bottom Gradient Overlay */}
+                      {/* Bottom */}
                       <div
                         style={{
-                          position: "absolute",
-                          inset: 0,
-                          background:
-                            "linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.45) 100%)",
-                        }}
-                      />
-
-                      {/* Content */}
-                      <div
-                        style={{
-                          position: "relative",
-                          height: "100%",
-                          padding: "24px",
-                          paddingBottom: "28px",
                           display: "flex",
-                          flexDirection: "column",
                           justifyContent: "space-between",
+                          alignItems: "flex-end",
                         }}
                       >
-                        {/* Top Left Pill */}
                         <div>
+                          <h2
+                            style={{
+                              margin: 0,
+                              marginBottom: "16px",
+                              color: "#FFFFFF",
+                              fontSize: "clamp(30px, 7vw, 52px)",
+                              fontWeight: 800,
+                              lineHeight: 1.1,
+                              textShadow: "0 2px 12px rgba(0,0,0,0.3)",
+                            }}
+                          >
+                            {popup.popupName}
+                          </h2>
+
                           <div
                             style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              padding: "8px 16px",
-                              background: "rgba(0, 0, 0, 0.35)",
-                              border: "2px solid #B0D655",
-                              borderRadius: "999px",
-                              color: "#B0D655",
-                              fontSize: "17px",
+                              marginBottom: "6px",
+                              color: "#FFFFFF",
+                              fontSize: "19px",
                               fontWeight: 700,
                             }}
                           >
-                            오픈 예정
+                            {popup.area}
+                          </div>
+
+                          <div
+                            style={{
+                              color: "#B8BABC",
+                              fontSize: "19px",
+                              fontWeight: 600,
+                            }}
+                          >
+                            {new Date(popup.startDate).toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                              },
+                            )}
                           </div>
                         </div>
 
-                        {/* Bottom Content */}
                         <div
                           style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "flex-end",
+                            padding: "8px 14px",
+                            background: "rgba(0, 0, 0, 0.3)",
+                            borderRadius: "999px",
+                            color: "#FFFFFF",
+                            fontSize: "15px",
+                            fontWeight: 600,
+                            flexShrink: 0,
+                            marginLeft: "16px",
                           }}
                         >
-                          {/* Left: Title, Location, Date */}
-                          <div>
-                            <h2
-                              style={{
-                                margin: 0,
-                                marginBottom: "16px",
-                                color: "#FFFFFF",
-                                fontSize:
-                                  breakpoint === "mobile"
-                                    ? "44px"
-                                    : breakpoint === "tablet"
-                                      ? "48px"
-                                      : "52px",
-                                fontWeight: 800,
-                                lineHeight: 1.1,
-                                textShadow: "0 2px 12px rgba(0,0,0,0.3)",
-                              }}
-                            >
-                              {popup.popupName}
-                            </h2>
-                            <div
-                              style={{
-                                marginBottom: "6px",
-                                color: "#FFFFFF",
-                                fontSize: "19px",
-                                fontWeight: 700,
-                              }}
-                            >
-                              {popup.area}
-                            </div>
-                            <div
-                              style={{
-                                color: "#B8BABC",
-                                fontSize: "19px",
-                                fontWeight: 600,
-                              }}
-                            >
-                              {new Date(popup.startDate).toLocaleDateString(
-                                "en-US",
-                                {
-                                  year: "numeric",
-                                  month: "2-digit",
-                                  day: "2-digit",
-                                },
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Right: Page Indicator */}
-                          <div
-                            style={{
-                              padding: "8px 14px",
-                              background: "rgba(0, 0, 0, 0.3)",
-                              borderRadius: "999px",
-                              color: "#FFFFFF",
-                              fontSize: "15px",
-                              fontWeight: 600,
-                              flexShrink: 0,
-                              marginLeft: "16px",
-                            }}
-                          >
-                            {actualIndex + 1} / 6
-                          </div>
+                          {actualIndex + 1} / {Math.max(1, realLen)}
                         </div>
                       </div>
                     </div>
-                  );
-                });
-              })()}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -421,13 +522,7 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
           </div>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
-            gap: "var(--space-4)",
-          }}
-        >
+        <div style={responsiveGridStyle}>
           {endingSoon.map((popup) => (
             <PopupCard
               key={popup.id}
@@ -460,13 +555,7 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
           </div>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
-            gap: "var(--space-4)",
-          }}
-        >
+        <div style={responsiveGridStyle}>
           {seongsuPopups.map((popup) => (
             <PopupCard
               key={popup.id}
@@ -507,13 +596,8 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
                     ? "🍰 음식"
                     : "👗 패션"}
               </h4>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
-                  gap: "var(--space-4)",
-                }}
-              >
+
+              <div style={responsiveGridStyle}>
                 {popups.map((popup) => (
                   <PopupCard
                     key={popup.id}
@@ -523,6 +607,7 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
                 ))}
               </div>
             </div>
+
             {index < Object.entries(categoryPopups).length - 1 && (
               <div
                 style={{
@@ -536,6 +621,7 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
         ))}
       </section>
 
+      {/* Map Banner */}
       <div
         onClick={() => onNavigate("map")}
         style={{
@@ -548,25 +634,12 @@ export function Home({ onNavigate, breakpoint }: HomeProps) {
           gap: "var(--space-4)",
           border: "1px solid rgba(176, 214, 85, 0.2)",
           cursor: "pointer",
-          transition: "transform 0.2s ease, box-shadow 0.2s ease",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "translateY(-2px)";
-          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "none";
         }}
       >
         <img
           src={mapIcon}
           alt="Map"
-          style={{
-            width: "80px",
-            height: "80px",
-            flexShrink: 0,
-          }}
+          style={{ width: "80px", height: "80px", flexShrink: 0 }}
         />
         <div>
           <h4
