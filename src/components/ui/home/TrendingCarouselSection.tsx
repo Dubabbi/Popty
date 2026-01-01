@@ -120,7 +120,6 @@ export function TrendingCarouselSection({
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
-      // ✅ mouse만 커스텀 드래그
       if (e.pointerType !== "mouse") return;
       if (e.button !== 0) return;
 
@@ -200,14 +199,14 @@ export function TrendingCarouselSection({
         <div
           style={{
             position: "absolute",
-            inset: "-50px",
+            inset: "-20px",
             backgroundImage: activeBackgroundImage
               ? `url(${activeBackgroundImage})`
               : undefined,
             backgroundSize: "cover",
             backgroundPosition: "center",
-            opacity: 0.15,
-            filter: "blur(40px)",
+            opacity: 0.3,
+            filter: "blur(18px) saturate(1.5) contrast(1.2)",
             transition: "background-image 0.5s ease, opacity 0.5s ease",
             zIndex: 0,
             pointerEvents: "none",
