@@ -28,7 +28,7 @@ export default function App() {
   };
 
   return (
-    <div className="app-container">
+    <div className="app-container scrollbar-hide">
       <div className={`viewport viewport-${breakpoint}`}>
         {!isDetail && (
           <AppBar
@@ -38,7 +38,7 @@ export default function App() {
           />
         )}
 
-        <main className="main-content">
+        <main className="main-content scrollbar-hide">
           <AppRoutes breakpoint={breakpoint} onNavigate={handleNavigate} />
         </main>
         <ScrollToTopFab scrollSelector=".main-content" />
