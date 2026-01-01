@@ -1,223 +1,161 @@
-import { Bell, Clock, TrendingUp, Heart, Tag } from "lucide-react";
-import { useState } from "react";
+import { Bell, Clock, TrendingUp, Heart, Tag, Check } from "lucide-react";
+import { useMemo, useState } from "react";
 import type { ViewType } from "@/routes/routes";
+import {
+  mockNotifications,
+  type Notification,
+  type NotificationType,
+} from "@/constants/mockNotifications";
 
 interface NotificationsProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
   breakpoint: "mobile" | "tablet" | "desktop";
 }
 
-type NotificationType = "new" | "ending" | "update" | "saved" | "system";
+type Filter = "all" | "unread";
 
-interface Notification {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  time: string;
-  isRead: boolean;
-  popupId?: string;
-  image?: string;
+const typeLabel: Record<NotificationType, string> = {
+  new: "New",
+  ending: "Ending",
+  update: "Update",
+  saved: "Saved",
+  system: "System",
+};
+
+function NotificationIcon({ type }: { type: NotificationType }) {
+  const common = { size: 18, color: "var(--color-text-secondary)" as const };
+  switch (type) {
+    case "new":
+      return <TrendingUp {...common} />;
+    case "ending":
+      return <Clock {...common} />;
+    case "update":
+      return <Bell {...common} />;
+    case "saved":
+      return <Heart {...common} />;
+    case "system":
+      return <Tag {...common} />;
+    default:
+      return <Bell {...common} />;
+  }
 }
-
-const mockNotifications: Notification[] = [
-  {
-    id: "1",
-    type: "new",
-    title: "New Pop-up Near You! 🎉",
-    message: "Sanrio Cafe just opened in Seongsu. Don't miss out!",
-    time: "5 min ago",
-    isRead: false,
-    popupId: "1",
-    image:
-      "https://images.unsplash.com/photo-1706282540364-962e8b1543da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2xvcmZ1bCUyMGFic3RyYWN0JTIwYXJ0JTIwcG9zdGVyfGVufDF8fHx8MTc2NzE2MDAxOHww&ixlib=rb-4.1.0&q=80&w=1080",
-  },
-  {
-    id: "2",
-    type: "ending",
-    title: "Ending Soon! ⏰",
-    message: "BTS Pop-up Store ends in 3 days. Secure your visit!",
-    time: "2 hours ago",
-    isRead: false,
-    popupId: "2",
-    image:
-      "https://images.unsplash.com/photo-1723283126758-28f2a308bc47?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aWJyYW50JTIwZ2VvbWV0cmljJTIwcGF0dGVybnxlbnwxfHx8fDE3NjcxNjY4MDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-  },
-  {
-    id: "3",
-    type: "saved",
-    title: "Saved Pop-up Update 💝",
-    message: "Nike Sneaker Lab has extended their hours this weekend!",
-    time: "5 hours ago",
-    isRead: false,
-    popupId: "3",
-    image:
-      "https://images.unsplash.com/photo-1679294176201-f9b302961f42?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuZW9uJTIwbGlnaHRzJTIwdXJiYW4lMjBuaWdodHxlbnwxfHx8fDE3NjcwNDIyNzJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-  },
-  {
-    id: "4",
-    type: "update",
-    title: "Trending This Week 🔥",
-    message: "Harry Potter Exhibition is trending in Gangnam. Check it out!",
-    time: "1 day ago",
-    isRead: true,
-    popupId: "4",
-    image:
-      "https://images.unsplash.com/photo-1714972692832-618fae83ef30?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYXN0ZWwlMjBncmFkaWVudCUyMG1vZGVybnxlbnwxfHx8fDE3NjcxNjY4MDF8MA&ixlib=rb-4.1.0&q=80&w=1080",
-  },
-  {
-    id: "5",
-    type: "system",
-    title: "New Feature Available! ✨",
-    message: "Try our new AR preview feature in the Map view.",
-    time: "2 days ago",
-    isRead: true,
-  },
-  {
-    id: "6",
-    type: "new",
-    title: "New Category Pop-ups 🎨",
-    message: "5 new Art & Design pop-ups added to your area.",
-    time: "3 days ago",
-    isRead: true,
-  },
-  {
-    id: "7",
-    type: "saved",
-    title: "Reminder: Upcoming Visit 📍",
-    message: "Pokemon Center opens tomorrow. Don't forget to visit!",
-    time: "3 days ago",
-    isRead: true,
-    popupId: "5",
-    image:
-      "https://images.unsplash.com/photo-1686405585580-2a1f5aac9837?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcnRpc3RpYyUyMGNvbG9yZnVsJTIwcGFpbnR8ZW58MXx8fHwxNzY3MTY2ODAxfDA&ixlib=rb-4.1.0&q=80&w=1080",
-  },
-];
 
 export function Notifications({ onNavigate }: NotificationsProps) {
   const [notifications, setNotifications] = useState(mockNotifications);
-  const [filter, setFilter] = useState<"all" | "unread">("all");
+  const [filter, setFilter] = useState<Filter>("all");
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const unreadCount = useMemo(
+    () => notifications.filter((n) => !n.isRead).length,
+    [notifications],
+  );
 
-  const handleNotificationClick = (notification: Notification) => {
+  const filteredNotifications = useMemo(() => {
+    if (filter === "unread") return notifications.filter((n) => !n.isRead);
+    return notifications;
+  }, [filter, notifications]);
+
+  const markAsRead = (id: string) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === notification.id ? { ...n, isRead: true } : n)),
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
     );
-
-    if (notification.popupId) {
-      onNavigate("detail", notification.popupId);
-    }
   };
 
-  const getNotificationIcon = (type: NotificationType) => {
-    switch (type) {
-      case "new":
-        return <TrendingUp size={20} color="var(--color-primary)" />;
-      case "ending":
-        return <Clock size={20} color="var(--color-error)" />;
-      case "update":
-        return <Bell size={20} color="var(--color-accent)" />;
-      case "saved":
-        return <Heart size={20} color="var(--color-pink)" />;
-      case "system":
-        return <Tag size={20} color="var(--color-text-tertiary)" />;
-      default:
-        return <Bell size={20} color="var(--color-text-tertiary)" />;
-    }
+  const markAllAsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
   };
 
-  const filteredNotifications =
-    filter === "unread"
-      ? notifications.filter((n) => !n.isRead)
-      : notifications;
+  const handleClick = (n: Notification) => {
+    markAsRead(n.id);
+    if (n.popupId) onNavigate("detail", n.popupId);
+  };
+
+  const pageBg = "var(--color-gray-50)";
+  const surface = "white";
+  const border = "1px solid var(--color-gray-200)";
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--color-gray-50)" }}>
-      {/* Filter Tabs */}
+    <div style={{ minHeight: "100vh", background: pageBg }}>
+      {/* Top controls (tabs like screenshot) */}
       <div
         style={{
-          background: "white",
-          padding: "var(--space-3) var(--space-4)",
-          borderBottom: "1px solid var(--color-gray-200)",
-          display: "flex",
-          gap: "var(--space-2)",
+          position: "sticky",
+          top: 0,
+          zIndex: 1,
+          background: "rgba(255,255,255,0.85)",
+          borderBottom: border,
         }}
       >
-        <button
-          onClick={() => setFilter("all")}
+        <div
           style={{
-            padding: "8px 20px",
-            borderRadius: "var(--radius-full)",
-            background:
-              filter === "all"
-                ? "var(--color-primary)"
-                : "var(--color-gray-100)",
-            color: filter === "all" ? "white" : "var(--color-text-secondary)",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-            transition: "all 0.2s",
-          }}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setFilter("unread")}
-          style={{
-            padding: "8px 20px",
-            borderRadius: "var(--radius-full)",
-            background:
-              filter === "unread"
-                ? "var(--color-primary)"
-                : "var(--color-gray-100)",
-            color:
-              filter === "unread" ? "white" : "var(--color-text-secondary)",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-            transition: "all 0.2s",
+            padding: "var(--space-3) var(--space-4)",
             display: "flex",
-            alignItems: "center",
-            gap: "var(--space-2)",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            gap: "var(--space-1)",
           }}
         >
-          Unread
-          {unreadCount > 0 && (
-            <span
-              style={{
-                background:
-                  filter === "unread"
-                    ? "rgba(255,255,255,0.3)"
-                    : "var(--color-error)",
-                color: filter === "unread" ? "white" : "white",
-                padding: "2px 8px",
-                borderRadius: "var(--radius-full)",
-                fontSize: "0.75rem",
-                fontWeight: 700,
-              }}
-            >
-              {unreadCount}
-            </span>
-          )}
-        </button>
+          {/* Tabs */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              gap: "15px",
+            }}
+          >
+            <TabButton
+              active={filter === "all"}
+              onClick={() => setFilter("all")}
+              label="전체"
+            />
+
+            <TabButton
+              active={filter === "unread"}
+              onClick={() => setFilter("unread")}
+              label="안 읽음"
+              badge={unreadCount}
+            />
+          </div>
+
+          {/* Right action */}
+          <button
+            onClick={markAllAsRead}
+            disabled={unreadCount === 0}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "7px 12px",
+              borderRadius: "999px",
+              border,
+              background: surface,
+              color: "var(--color-text-secondary)",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              cursor: unreadCount === 0 ? "not-allowed" : "pointer",
+              opacity: unreadCount === 0 ? 0.5 : 1,
+            }}
+          >
+            <Check size={16} />
+            모두 읽음
+          </button>
+        </div>
       </div>
 
-      {/* Notifications List */}
+      {/* List */}
       <div style={{ padding: "var(--space-4)" }}>
         {filteredNotifications.length === 0 ? (
           <div
             style={{
-              background: "white",
+              background: surface,
               borderRadius: "var(--radius-xl)",
               padding: "var(--space-8)",
               textAlign: "center",
+              border,
             }}
           >
             <Bell
-              size={48}
+              size={44}
               color="var(--color-gray-300)"
               style={{ margin: "0 auto var(--space-4)" }}
             />
@@ -226,6 +164,7 @@ export function Notifications({ onNavigate }: NotificationsProps) {
                 margin: 0,
                 marginBottom: "var(--space-2)",
                 color: "var(--color-text-secondary)",
+                fontWeight: 700,
               }}
             >
               No notifications
@@ -235,9 +174,10 @@ export function Notifications({ onNavigate }: NotificationsProps) {
                 margin: 0,
                 fontSize: "0.875rem",
                 color: "var(--color-text-tertiary)",
+                lineHeight: 1.5,
               }}
             >
-              You're all caught up!
+              You're all caught up.
             </p>
           </div>
         ) : (
@@ -248,145 +188,271 @@ export function Notifications({ onNavigate }: NotificationsProps) {
               gap: "var(--space-3)",
             }}
           >
-            {filteredNotifications.map((notification) => (
-              <div
-                key={notification.id}
-                onClick={() => handleNotificationClick(notification)}
-                style={{
-                  background: notification.isRead
-                    ? "white"
-                    : "var(--color-primary-bg)",
-                  borderRadius: "var(--radius-lg)",
-                  padding: "var(--space-4)",
-                  cursor: notification.popupId ? "pointer" : "default",
-                  transition: "all 0.2s",
-                  border: notification.isRead
-                    ? "1px solid var(--color-gray-200)"
-                    : "1px solid var(--color-primary)",
-                  position: "relative",
-                  display: "flex",
-                  gap: "var(--space-3)",
-                }}
-                onMouseEnter={(e) => {
-                  if (notification.popupId) {
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow =
-                      "0 4px 12px rgba(0,0,0,0.08)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (notification.popupId) {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "none";
-                  }
-                }}
-              >
-                {/* Thumbnail or Icon */}
-                <div style={{ flexShrink: 0 }}>
-                  {notification.image ? (
-                    <div
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: "var(--radius-md)",
-                        overflow: "hidden",
-                        background: "var(--color-gray-200)",
-                      }}
-                    >
-                      <img
-                        src={notification.image}
-                        alt=""
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: "var(--radius-md)",
-                        background: "var(--color-gray-100)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {getNotificationIcon(notification.type)}
-                    </div>
-                  )}
-                </div>
+            {filteredNotifications.map((n) => {
+              const isHover = hoveredId === n.id;
+              const isClickable = Boolean(n.popupId);
 
-                {/* Content */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "flex-start",
-                      justifyContent: "space-between",
-                      gap: "var(--space-2)",
-                      marginBottom: "var(--space-1)",
-                    }}
-                  >
-                    <h4
+              return (
+                <button
+                  key={n.id}
+                  type="button"
+                  onClick={() => handleClick(n)}
+                  onMouseEnter={() => setHoveredId(n.id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  disabled={!isClickable}
+                  style={{
+                    textAlign: "left",
+                    width: "100%",
+                    background: surface,
+                    borderRadius: "var(--radius-lg)",
+                    padding: "var(--space-4)",
+                    border,
+                    cursor: isClickable ? "pointer" : "default",
+                    transition: "transform 0.18s ease, box-shadow 0.18s ease",
+                    transform:
+                      isClickable && isHover
+                        ? "translateY(-2px)"
+                        : "translateY(0)",
+                    boxShadow:
+                      isClickable && isHover
+                        ? "0 10px 26px rgba(0,0,0,0.08)"
+                        : "none",
+                    display: "flex",
+                    gap: "var(--space-3)",
+                    opacity: isClickable ? 1 : 0.85,
+                    position: "relative",
+                    outline: "none",
+                  }}
+                >
+                  {/* unread indicator (subtle) */}
+                  {!n.isRead && (
+                    <span
+                      aria-hidden="true"
                       style={{
-                        margin: 0,
-                        fontSize: "0.9375rem",
-                        fontWeight: 600,
+                        position: "absolute",
+                        left: 0,
+                        top: 12,
+                        bottom: 12,
+                        width: 3,
+                        borderRadius: 999,
+                        background: "var(--color-primary)",
+                        opacity: 0.6,
                       }}
-                    >
-                      {notification.title}
-                    </h4>
-                    {!notification.isRead && (
+                    />
+                  )}
+
+                  {/* Thumbnail / Icon */}
+                  <div style={{ flexShrink: 0 }}>
+                    {n.image ? (
                       <div
                         style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: "50%",
-                          background: "var(--color-primary)",
-                          flexShrink: 0,
-                          marginTop: 4,
+                          width: 64,
+                          height: 64,
+                          borderRadius: "var(--radius-md)",
+                          overflow: "hidden",
+                          background: "var(--color-gray-200)",
+                          border: "1px solid var(--color-gray-200)",
                         }}
-                      />
+                      >
+                        <img
+                          src={n.image}
+                          alt=""
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          width: 64,
+                          height: 64,
+                          borderRadius: "var(--radius-md)",
+                          background: "var(--color-gray-100)",
+                          border: "1px solid var(--color-gray-200)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <NotificationIcon type={n.type} />
+                      </div>
                     )}
                   </div>
-                  <p
-                    style={{
-                      margin: 0,
-                      marginBottom: "var(--space-2)",
-                      fontSize: "0.875rem",
-                      color: "var(--color-text-secondary)",
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {notification.message}
-                  </p>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "var(--space-2)",
-                    }}
-                  >
-                    {getNotificationIcon(notification.type)}
-                    <span
+
+                  {/* Content */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
                       style={{
-                        fontSize: "0.75rem",
-                        color: "var(--color-text-tertiary)",
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "space-between",
+                        gap: "var(--space-2)",
+                        marginBottom: 6,
                       }}
                     >
-                      {notification.time}
-                    </span>
+                      <div style={{ minWidth: 0 }}>
+                        <h4
+                          style={{
+                            margin: 0,
+                            fontSize: "0.95rem",
+                            fontWeight: 700,
+                            color: "var(--color-text-primary)",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {n.title}
+                        </h4>
+
+                        <div
+                          style={{
+                            marginTop: 6,
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 8,
+                            color: "var(--color-text-tertiary)",
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                          }}
+                        >
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 6,
+                              padding: "4px 10px",
+                              borderRadius: 999,
+                              border: "1px solid var(--color-gray-200)",
+                              background: "var(--color-gray-50)",
+                              color: "var(--color-text-secondary)",
+                            }}
+                          >
+                            <NotificationIcon type={n.type} />
+                            {typeLabel[n.type]}
+                          </span>
+
+                          <span aria-hidden="true">•</span>
+                          <span>{n.time}</span>
+                        </div>
+                      </div>
+
+                      {!n.isRead && (
+                        <span
+                          aria-label="unread"
+                          style={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            background: "var(--color-primary)",
+                            opacity: 0.85,
+                            flexShrink: 0,
+                            marginTop: 6,
+                          }}
+                        />
+                      )}
+                    </div>
+
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "0.875rem",
+                        color: "var(--color-text-secondary)",
+                        lineHeight: 1.55,
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {n.message}
+                    </p>
                   </div>
-                </div>
-              </div>
-            ))}
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
+
+      {/* focus-visible 스타일 (인라인 한계 보완용) */}
+      <style>
+        {`
+          button:focus-visible {
+            outline: 2px solid rgba(0,0,0,0.18);
+            outline-offset: 2px;
+          }
+        `}
+      </style>
     </div>
+  );
+}
+
+function TabButton({
+  active,
+  onClick,
+  label,
+  badge,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  badge?: number;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        position: "relative",
+        border: "none",
+        background: "transparent",
+        padding: "1px 2px 8px",
+        cursor: "pointer",
+        fontSize: "1rem",
+        fontWeight: 600,
+        letterSpacing: "-0.01em",
+        color: active ? "#B0D655" : "var(--color-text-primary)",
+      }}
+    >
+      <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        {label}
+
+        {typeof badge === "number" && badge > 0 && (
+          <span
+            style={{
+              minWidth: 20,
+              height: 18,
+              padding: "0 6px",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 999,
+              background: "var(--color-gray-200)",
+              color: "var(--color-text-primary)",
+              fontSize: "0.75rem",
+              fontWeight: 800,
+            }}
+          >
+            {badge}
+          </span>
+        )}
+      </span>
+
+      <span
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 2,
+          background: active ? "#B0D655" : "transparent",
+        }}
+      />
+    </button>
   );
 }
