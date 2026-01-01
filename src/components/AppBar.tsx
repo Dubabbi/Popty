@@ -1,4 +1,6 @@
 import { Search, Bell, Calendar } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import type { ReactNode, CSSProperties } from "react";
 import type { ViewType } from "@/routes/routes";
 import LogoImg from "@/assets/logo.svg";
 
@@ -8,7 +10,137 @@ interface AppBarProps {
   onNavigate: (view: ViewType) => void;
 }
 
-export function AppBar({ currentView, onNavigate }: AppBarProps) {
+const HOME_TRENDING_SENTINEL_ID = "home-trending-sentinel";
+const APPBAR_HEIGHT = 73;
+
+export function AppBar(props: AppBarProps) {
+  return props.currentView === "home" ? (
+    <HomeAppBar {...props} />
+  ) : (
+    <DefaultAppBar {...props} />
+  );
+}
+
+function HomeAppBar({ onNavigate }: AppBarProps) {
+  const [isTransparent, setIsTransparent] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    let raf: number | null = null;
+    let cleanup: (() => void) | null = null;
+
+    const setup = () => {
+      if (cancelled) return;
+
+      const sentinel = document.getElementById(HOME_TRENDING_SENTINEL_ID);
+      const scroller = document.querySelector<HTMLElement>(".main-content");
+
+      if (!sentinel || !scroller) {
+        raf = requestAnimationFrame(setup);
+        return;
+      }
+
+      const compute = () => {
+        const top = sentinel.getBoundingClientRect().top;
+        const next = top > APPBAR_HEIGHT;
+        setIsTransparent((prev) => (prev === next ? prev : next));
+      };
+
+      let ticking = false;
+      const onScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          compute();
+        });
+      };
+
+      requestAnimationFrame(compute);
+
+      scroller.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll);
+
+      cleanup = () => {
+        scroller.removeEventListener("scroll", onScroll);
+        window.removeEventListener("resize", onScroll);
+      };
+    };
+
+    setup();
+
+    return () => {
+      cancelled = true;
+      if (raf) cancelAnimationFrame(raf);
+      cleanup?.();
+    };
+  }, []);
+
+  const headerStyle = useMemo<CSSProperties>(() => {
+    return {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 100,
+      minHeight: `${APPBAR_HEIGHT}px`,
+      padding: "var(--space-4)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      transition: "background 0.25s ease, border-color 0.25s ease",
+      background: isTransparent ? "transparent" : "white",
+      borderBottom: isTransparent
+        ? "1px solid transparent"
+        : "1px solid var(--color-gray-200)",
+    };
+  }, [isTransparent]);
+
+  return (
+    <>
+      <header style={headerStyle}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "var(--space-3)",
+          }}
+        >
+          <img src={LogoImg} alt="Logo" style={{ width: "40px" }} />
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "var(--space-3)",
+          }}
+        >
+          <IconButton
+            ariaLabel="Calendar"
+            onClick={() => onNavigate("calendar")}
+          >
+            <Calendar size={20} color="var(--color-text-secondary)" />
+          </IconButton>
+
+          <IconButton ariaLabel="Search" onClick={() => onNavigate("search")}>
+            <Search size={20} color="var(--color-text-secondary)" />
+          </IconButton>
+
+          <IconButton
+            ariaLabel="Notifications"
+            onClick={() => onNavigate("notifications")}
+            hasDot
+          >
+            <Bell size={20} color="var(--color-text-secondary)" />
+          </IconButton>
+        </div>
+      </header>
+    </>
+  );
+}
+
+function DefaultAppBar({ onNavigate }: AppBarProps) {
   return (
     <header
       style={{
@@ -21,140 +153,81 @@ export function AppBar({ currentView, onNavigate }: AppBarProps) {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        minHeight: "60px",
+        minHeight: `${APPBAR_HEIGHT}px`,
       }}
     >
-      {currentView === "home" ? (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "var(--space-3)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <img src={LogoImg} style={{ width: "40px" }} />
-          </div>
-        </div>
-      ) : (
-        <div
-          onClick={() => onNavigate("home")}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            cursor: "pointer",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <img src={LogoImg} style={{ width: "40px" }} />
-          </div>
-        </div>
-      )}
+      <div
+        onClick={() => onNavigate("home")}
+        style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+      >
+        <img src={LogoImg} alt="Logo" style={{ width: "40px" }} />
+      </div>
 
       <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--space-3)",
-        }}
+        style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}
       >
-        {currentView === "home" && (
-          <>
-            <button
-              onClick={() => onNavigate("calendar")}
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: "var(--radius-full)",
-                background: "var(--color-gray-100)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                border: "none",
-                cursor: "pointer",
-                transition: "all 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "var(--color-gray-200)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "var(--color-gray-100)";
-              }}
-            >
-              <Calendar size={20} color="var(--color-text-secondary)" />
-            </button>
-            <button
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: "var(--radius-full)",
-                background: "var(--color-gray-100)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                border: "none",
-                cursor: "pointer",
-                transition: "all 0.2s",
-              }}
-              onClick={() => onNavigate("search")}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "var(--color-gray-200)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "var(--color-gray-100)";
-              }}
-            >
-              <Search size={20} color="var(--color-text-secondary)" />
-            </button>
-          </>
-        )}
-        <button
+        <IconButton
+          ariaLabel="Notifications"
           onClick={() => onNavigate("notifications")}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: "var(--radius-full)",
-            background: "var(--color-gray-100)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            border: "none",
-            cursor: "pointer",
-            position: "relative",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "var(--color-gray-200)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "var(--color-gray-100)";
-          }}
+          hasDot
         >
           <Bell size={20} color="var(--color-text-secondary)" />
-          <div
-            style={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: "var(--color-error)",
-              border: "2px solid white",
-            }}
-          />
-        </button>
+        </IconButton>
       </div>
     </header>
+  );
+}
+
+function IconButton({
+  children,
+  onClick,
+  ariaLabel,
+  hasDot,
+}: {
+  children: ReactNode;
+  onClick: () => void;
+  ariaLabel: string;
+  hasDot?: boolean;
+}) {
+  return (
+    <button
+      aria-label={ariaLabel}
+      onClick={onClick}
+      style={{
+        width: 40,
+        height: 40,
+        borderRadius: "var(--radius-full)",
+        background: "var(--color-gray-100)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        border: "none",
+        cursor: "pointer",
+        position: "relative",
+        transition: "all 0.2s",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = "var(--color-gray-200)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "var(--color-gray-100)";
+      }}
+    >
+      {children}
+      {hasDot && (
+        <span
+          style={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            width: 8,
+            height: 8,
+            borderRadius: "50%",
+            background: "var(--color-error)",
+            border: "2px solid white",
+          }}
+        />
+      )}
+    </button>
   );
 }

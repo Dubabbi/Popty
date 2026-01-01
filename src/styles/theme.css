@@ -1,9 +1,9 @@
 @theme {
   /* Primary Brand Colors */
-  --color-primary: #ff8ba0;
-  --color-primary-light: #ffb3c1;
-  --color-primary-dark: #ff6b85;
-  --color-primary-bg: #fff5f7;
+  --color-primary: #b0d655;
+  --color-primary-light: #d9f95f;
+  --color-primary-dark: #83b43a;
+  --color-primary-bg: #f3ffc7;
 
   /* Accent & CTA */
   --color-accent: #6b8aff;

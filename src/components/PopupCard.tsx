@@ -5,8 +5,8 @@ import {
   formatDateRange,
   isOpenToday,
 } from "@/data/popups";
-import { imageMapping } from "@/data/imageMapping";
-import { Badge } from "@/components/Badge";
+import { imageMapping } from "../data/imageMapping";
+import { Badge } from "./Badge";
 import { useState } from "react";
 
 interface PopupCardProps {
@@ -45,17 +45,14 @@ export function PopupCard({
           borderRadius: "var(--radius-lg)",
           overflow: "hidden",
           cursor: "pointer",
-          boxShadow: "var(--shadow-sm)",
           transition: "all 0.2s",
           padding: "var(--space-4)",
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = "translateY(-2px)";
-          e.currentTarget.style.boxShadow = "var(--shadow-md)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "var(--shadow-sm)";
         }}
       >
         <img
@@ -184,19 +181,17 @@ export function PopupCard({
       onClick={onClick}
       style={{
         background: "white",
-        borderRadius: "var(--radius-lg)",
+        borderRadius: "12px",
         overflow: "hidden",
         cursor: "pointer",
-        boxShadow: "var(--shadow-sm)",
-        transition: "all 0.2s",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        border: "1px solid rgba(0, 0, 0, 0.04)",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.boxShadow = "var(--shadow-lg)";
+        e.currentTarget.style.borderColor = "var(--color-primary)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+        e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.04)";
       }}
     >
       <div style={{ position: "relative" }}>
@@ -205,7 +200,7 @@ export function PopupCard({
           alt={popup.popupName}
           style={{
             width: "100%",
-            height: 180,
+            height: 140,
             objectFit: "cover",
           }}
         />
@@ -215,8 +210,8 @@ export function PopupCard({
             position: "absolute",
             top: "var(--space-2)",
             right: "var(--space-2)",
-            width: 36,
-            height: 36,
+            width: 32,
+            height: 32,
             borderRadius: "var(--radius-full)",
             background: "rgba(255, 255, 255, 0.95)",
             backdropFilter: "blur(10px)",
@@ -225,11 +220,11 @@ export function PopupCard({
             alignItems: "center",
             justifyContent: "center",
             cursor: "pointer",
-            boxShadow: "var(--shadow-md)",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           }}
         >
           <Bookmark
-            size={18}
+            size={16}
             fill={saved ? "var(--color-primary)" : "none"}
             color={saved ? "var(--color-primary)" : "var(--color-gray-600)"}
           />
@@ -252,16 +247,24 @@ export function PopupCard({
         </div>
       </div>
 
-      <div style={{ padding: "var(--space-4)" }}>
-        <h4 style={{ margin: 0, marginBottom: "var(--space-1)" }}>
+      <div style={{ padding: "var(--space-3)" }}>
+        <h4
+          style={{
+            margin: 0,
+            marginBottom: "var(--space-1)",
+            fontSize: "0.9375rem",
+            lineHeight: "1.3",
+          }}
+        >
           {popup.popupName}
         </h4>
         <p
           style={{
             margin: 0,
-            marginBottom: "var(--space-3)",
-            fontSize: "0.875rem",
+            marginBottom: "var(--space-2)",
+            fontSize: "0.8125rem",
             color: "var(--color-text-tertiary)",
+            lineHeight: "1.4",
           }}
         >
           {popup.brandName}
@@ -272,11 +275,11 @@ export function PopupCard({
             display: "flex",
             alignItems: "center",
             gap: "var(--space-1)",
-            marginBottom: "var(--space-2)",
-            fontSize: "0.875rem",
+            marginBottom: "var(--space-1)",
+            fontSize: "0.8125rem",
           }}
         >
-          <Clock size={14} color="var(--color-text-tertiary)" />
+          <Clock size={12} color="var(--color-text-tertiary)" />
           <span style={{ color: "var(--color-text-secondary)" }}>
             {formatDateRange(popup.startDate, popup.endDate)}
           </span>
@@ -287,11 +290,11 @@ export function PopupCard({
             display: "flex",
             alignItems: "center",
             gap: "var(--space-1)",
-            marginBottom: "var(--space-3)",
-            fontSize: "0.875rem",
+            marginBottom: "var(--space-2)",
+            fontSize: "0.8125rem",
           }}
         >
-          <MapPin size={14} color="var(--color-text-tertiary)" />
+          <MapPin size={12} color="var(--color-text-tertiary)" />
           <span style={{ color: "var(--color-text-secondary)" }}>
             {popup.area}
           </span>
@@ -304,8 +307,8 @@ export function PopupCard({
             <span
               key={index}
               style={{
-                fontSize: "0.75rem",
-                padding: "var(--space-1) var(--space-2)",
+                fontSize: "0.6875rem",
+                padding: "2px var(--space-2)",
                 background: "var(--color-gray-100)",
                 color: "var(--color-text-secondary)",
                 borderRadius: "var(--radius-sm)",
