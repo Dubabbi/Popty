@@ -23,7 +23,6 @@ html {
 }
 
 body {
-  font-size: 62.5%;
   color: var(--color-text-primary);
   background: var(--color-bg);
   -webkit-font-smoothing: antialiased;

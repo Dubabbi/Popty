@@ -365,9 +365,8 @@ export function TrendingCarouselSection({
                               margin: 0,
                               marginBottom: "16px",
                               color: "#FFFFFF",
-                              fontSize: "clamp(30px, 7vw, 52px)",
-                              fontWeight: 800,
-                              lineHeight: 1.1,
+                              fontSize: "1.5rem",
+                              fontWeight: 600,
                               textShadow: "0 2px 12px rgba(0,0,0,0.3)",
                             }}
                           >
@@ -377,9 +376,9 @@ export function TrendingCarouselSection({
                           <div
                             style={{
                               marginBottom: "6px",
-                              color: "#FFFFFF",
-                              fontSize: "19px",
-                              fontWeight: 700,
+                              color: "#eeeeee",
+                              fontSize: "1.1rem",
+                              fontWeight: 600,
                             }}
                           >
                             {popup.area}
@@ -388,7 +387,7 @@ export function TrendingCarouselSection({
                           <div
                             style={{
                               color: "#B8BABC",
-                              fontSize: "19px",
+                              fontSize: "0.8rem",
                               fontWeight: 600,
                             }}
                           >
@@ -405,12 +404,12 @@ export function TrendingCarouselSection({
 
                         <div
                           style={{
-                            padding: "8px 14px",
+                            padding: "5px 14px",
                             background: "rgba(0, 0, 0, 0.3)",
-                            borderRadius: "999px",
+                            borderRadius: "15px",
                             color: "#FFFFFF",
-                            fontSize: "15px",
-                            fontWeight: 600,
+                            fontSize: "0.8rem",
+                            fontWeight: 500,
                             flexShrink: 0,
                             marginLeft: "16px",
                           }}
