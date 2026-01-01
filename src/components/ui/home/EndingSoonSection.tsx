@@ -10,7 +10,9 @@ export function EndingSoonSection({ onNavigate }: EndingSoonSectionProps) {
   const endingSoon = getEndingSoonPopups();
 
   return (
-    <section style={{ padding: "0 var(--space-4) var(--space-6)" }}>
+    <section
+      style={{ padding: "0 var(--space-4) var(--space-6)", marginTop: "20px" }}
+    >
       <PopupGrid
         popups={endingSoon}
         onClickPopup={(id) => onNavigate("detail", id)}

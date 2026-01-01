@@ -1,15 +1,15 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import type { ViewType } from "./routes";
+import type { ViewType } from "@/routes/routes";
 
-import { Home } from "../components/Home";
-import { Browse } from "../components/Browse";
-import { Calendar } from "../components/Calendar";
-import { MapView } from "../components/MapView";
-import { Saved } from "../components/Saved";
-import { My } from "../components/My";
-import { PopupDetail } from "../components/PopupDetail";
-import { Notifications } from "../components/Notifications";
-import { Search } from "../components/Search";
+import { Home } from "@/components/Home";
+import { Browse } from "@/components/Browse";
+import { Calendar } from "@/components/Calendar";
+import { MapView } from "@/components/MapView";
+import { Saved } from "@/components/Saved";
+import { My } from "@/components/My";
+import { PopupDetail } from "@/components/PopupDetail";
+import { Notifications } from "@/components/Notifications";
+import { Search } from "@/components/Search";
 
 type Breakpoint = "mobile" | "tablet" | "desktop";
 
@@ -21,10 +21,7 @@ type AppRoutesProps = {
 export function AppRoutes({ breakpoint, onNavigate }: AppRoutesProps) {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={<Home onNavigate={onNavigate} breakpoint={breakpoint} />}
-      />
+      <Route path="/" element={<Home onNavigate={onNavigate} />} />
       <Route
         path="/browse"
         element={<Browse onNavigate={onNavigate} breakpoint={breakpoint} />}
