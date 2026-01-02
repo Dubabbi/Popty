@@ -123,7 +123,7 @@ export function DynamicPopup({ onAllow }: DynamicPopupProps) {
               lineHeight: 1.4,
             }}
           >
-            PopUp!이 재밌는 팝업 스토어를
+            Popty!가 재밌는 팝업 스토어를
             <br />
             찾아드릴게요 ✨
           </div>

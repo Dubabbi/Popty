@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import type { ViewType } from "@/routes/routes";
 
 import { Home } from "@/components/Home";
@@ -12,6 +12,7 @@ import { Notifications } from "@/components/Notifications";
 import { Search } from "@/components/Search";
 import { Capsule } from "@/components/Capsule";
 import { Roadmap } from "@/components/ui/roadmap/Roadmap";
+import { NotFound } from "@/components/ui/error/NotFound";
 
 type Breakpoint = "mobile" | "tablet" | "desktop";
 
@@ -65,7 +66,10 @@ export function AppRoutes({ breakpoint, onNavigate }: AppRoutesProps) {
         path="/search"
         element={<Search onNavigate={onNavigate} breakpoint={breakpoint} />}
       />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route
+        path="*"
+        element={<NotFound onNavigate={onNavigate} breakpoint={breakpoint} />}
+      />
     </Routes>
   );
 }

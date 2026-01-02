@@ -1,5 +1,12 @@
 interface MascotProps {
-  pose: "welcome" | "recommend" | "explore" | "reminder" | "empty" | "success";
+  pose:
+    | "welcome"
+    | "recommend"
+    | "explore"
+    | "reminder"
+    | "empty"
+    | "success"
+    | "confused";
   size?: "small" | "medium" | "large";
 }
 
@@ -184,7 +191,37 @@ export function Mascot({ pose, size = "medium" }: MascotProps) {
             />
           </>
         )}
-
+        {pose === "confused" && (
+          <>
+            {/* Question mark with tilt */}
+            <path
+              d="M 47 36 Q 47 33 50 33 Q 53 33 53 36 Q 53 38.5 50 40 L 50 43"
+              stroke="white"
+              strokeWidth="2.5"
+              fill="none"
+              strokeLinecap="round"
+              opacity="0.9"
+            />
+            <circle cx="50" cy="47" r="1.5" fill="white" opacity="0.9" />
+            {/* Swirly confusion marks */}
+            <path
+              d="M 40 32 Q 38 30 36 32"
+              stroke="white"
+              strokeWidth="1.5"
+              fill="none"
+              strokeLinecap="round"
+              opacity="0.6"
+            />
+            <path
+              d="M 60 32 Q 62 30 64 32"
+              stroke="white"
+              strokeWidth="1.5"
+              fill="none"
+              strokeLinecap="round"
+              opacity="0.6"
+            />
+          </>
+        )}
         {/* Bottom shadow */}
         <ellipse cx="50" cy="77" rx="10" ry="3" fill="#000000" opacity="0.1" />
       </svg>
