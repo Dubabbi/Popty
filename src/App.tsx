@@ -35,19 +35,22 @@ export default function App() {
     setShowConfetti(true);
     setshowDynamic(false);
 
-    // 3초 후 콘페티 제거
     setTimeout(() => {
       setShowConfetti(false);
     }, 3000);
   };
   return (
     <div className="app-container scrollbar-hide">
-      <div className={`viewport viewport-${breakpoint}`}>
+      <div
+        style={{ paddingBottom: "90px" }}
+        className={`viewport viewport-${breakpoint}`}
+      >
         {!isDetail && (
           <AppBar
             title={toTitle(currentView)}
             currentView={currentView}
             onNavigate={handleNavigate}
+            breakpoint={breakpoint}
           />
         )}
 

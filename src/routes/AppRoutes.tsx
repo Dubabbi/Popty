@@ -41,7 +41,10 @@ export function AppRoutes({ breakpoint, onNavigate }: AppRoutesProps) {
         element={<Roadmap onNavigate={onNavigate} breakpoint={breakpoint} />}
       />
       <Route path="/saved" element={<Saved onNavigate={onNavigate} />} />
-      <Route path="/my" element={<My />} />
+      <Route
+        path="/my"
+        element={<My onNavigate={onNavigate} breakpoint={breakpoint} />}
+      />
       <Route
         path="/capsule"
         element={<Capsule onNavigate={onNavigate} breakpoint={breakpoint} />}
