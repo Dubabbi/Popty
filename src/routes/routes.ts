@@ -8,7 +8,8 @@ export type ViewType =
   | "capsule"
   | "detail"
   | "notifications"
-  | "search";
+  | "search"
+  | "roadmap";
 
 export const VIEW_PATH: Record<Exclude<ViewType, "detail">, string> = {
   home: "/",
@@ -20,6 +21,7 @@ export const VIEW_PATH: Record<Exclude<ViewType, "detail">, string> = {
   notifications: "/notifications",
   capsule: "/capsule",
   search: "/search",
+  roadmap: "/roadmap",
 };
 
 export function toTitle(view: ViewType) {
@@ -42,6 +44,7 @@ export function getCurrentView(pathname: string): ViewType {
     "notifications",
     "search",
     "capsule",
+    "roadmap",
   ];
 
   return allowed.includes(key) ? key : "home";

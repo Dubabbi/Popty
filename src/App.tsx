@@ -6,6 +6,7 @@ import { ScrollToTopFab } from "@/components/scroll-to-top/ScrollToTopFab";
 import { AppRoutes } from "@/routes/AppRoutes";
 import { DynamicPopup } from "@/components/ui/popup-modal/DynamicPopup";
 import { Confetti } from "@/components/ui/popup-modal/Confetti";
+import { BottomNav } from "@/components/BottomNav";
 import {
   VIEW_PATH,
   getCurrentView,
@@ -56,8 +57,10 @@ export default function App() {
         <ScrollToTopFab scrollSelector=".main-content" />
         {showDynamic && <DynamicPopup onAllow={handleAllowPopup} />}
 
-        {/* Confetti */}
         {showConfetti && <Confetti />}
+        {currentView !== "detail" && breakpoint !== "desktop" && (
+          <BottomNav currentView={currentView} onNavigate={handleNavigate} />
+        )}
       </div>
     </div>
   );

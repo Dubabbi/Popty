@@ -11,6 +11,7 @@ import { PopupDetail } from "@/components/PopupDetail";
 import { Notifications } from "@/components/Notifications";
 import { Search } from "@/components/Search";
 import { Capsule } from "@/components/Capsule";
+import { Roadmap } from "@/components/ui/roadmap/Roadmap";
 
 type Breakpoint = "mobile" | "tablet" | "desktop";
 
@@ -34,6 +35,10 @@ export function AppRoutes({ breakpoint, onNavigate }: AppRoutesProps) {
       <Route
         path="/map"
         element={<MapView onNavigate={onNavigate} breakpoint={breakpoint} />}
+      />
+      <Route
+        path="/roadmap"
+        element={<Roadmap onNavigate={onNavigate} breakpoint={breakpoint} />}
       />
       <Route path="/saved" element={<Saved onNavigate={onNavigate} />} />
       <Route path="/my" element={<My />} />
