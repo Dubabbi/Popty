@@ -116,6 +116,35 @@ function HomeAppBar({ onNavigate }: AppBarProps) {
             gap: "var(--space-3)",
           }}
         >
+          <button
+            onClick={() => onNavigate("capsule")}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: "var(--radius-full)",
+              background: "linear-gradient(135deg, #D9F95F 0%, #B8E64C 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.2s",
+              boxShadow: "0 2px 8px rgba(217, 249, 95, 0.3)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "scale(1.1)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 12px rgba(217, 249, 95, 0.5)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow =
+                "0 2px 8px rgba(217, 249, 95, 0.3)";
+            }}
+            aria-label="캡슐 뽑기"
+          >
+            <span style={{ fontSize: "1.2rem" }}>🎁</span>
+          </button>
           <IconButton
             ariaLabel="Calendar"
             onClick={() => onNavigate("calendar")}

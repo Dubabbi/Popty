@@ -89,7 +89,6 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
     }
   };
 
-  // ✅ unused-vars 경고 제거: type 파라미터 제거
   const handleReminder = () => {
     setReminderSet(true);
     setShowReminderModal(false);

@@ -87,7 +87,6 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
     );
   };
 
-  // ✅ 1번 방식: 그리드가 너무 넓어지지 않도록 maxWidth 제한 + 가운데 정렬
   const calendarMaxWidth =
     breakpoint === "desktop" ? 720 : breakpoint === "tablet" ? 600 : "100%";
 
