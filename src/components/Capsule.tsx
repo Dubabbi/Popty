@@ -117,6 +117,7 @@ export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
           "linear-gradient(180deg, #6B8AFF 0%, #8BA3FF 50%, #A3B9FF 100%)",
         position: "relative",
         overflow: "hidden",
+        paddingTop: "70px",
       }}
     >
       <AnimatedBackground bg={bg} capsuleColors={capsuleColors} />

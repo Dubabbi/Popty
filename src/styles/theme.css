@@ -5,6 +5,12 @@
   --color-primary-dark: #83b43a;
   --color-primary-bg: #f3ffc7;
 
+  /* Secondary Brand Colors */
+  --color-secondary: #ff8ba0;
+  --color-secondary-light: #ffb3c1;
+  --color-secondary-dark: #ff6b85;
+  --color-secondary-bg: #fff5f7;
+
   /* Accent & CTA */
   --color-accent: #6b8aff;
   --color-accent-light: #a3b9ff;

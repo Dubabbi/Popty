@@ -10,7 +10,7 @@ interface CalendarProps {
 }
 
 export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
-  const [currentMonth, setCurrentMonth] = useState(new Date(2025, 0, 1)); // January 2025
+  const [currentMonth, setCurrentMonth] = useState(() => new Date(2025, 11, 1)); // 2025-12
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const getDaysInMonth = (date: Date) => {

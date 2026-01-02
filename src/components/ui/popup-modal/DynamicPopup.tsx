@@ -65,8 +65,8 @@ export function DynamicPopup({ onAllow }: DynamicPopupProps) {
               width: 8,
               height: 8,
               borderRadius: "50%",
-              background: "var(--color-primary)",
-              boxShadow: "0 0 8px var(--color-primary)",
+              background: "var(--color-secondary)",
+              boxShadow: "0 0 8px var(--color-secondary)",
             }}
           />
           <div
@@ -92,7 +92,7 @@ export function DynamicPopup({ onAllow }: DynamicPopupProps) {
               margin: "0 auto 16px",
               borderRadius: 16,
               background:
-                "linear-gradient(135deg, var(--color-primary) 0%, #b8e858 100%)",
+                "linear-gradient(135deg, var(--color-secondary) 0%, #b8e858 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -163,7 +163,7 @@ export function DynamicPopup({ onAllow }: DynamicPopupProps) {
                 height: 44,
                 borderRadius: 12,
                 border: "none",
-                background: "var(--color-primary)",
+                background: "var(--color-secondary)",
                 color: "#000000",
                 fontSize: 15,
                 cursor: "pointer",
