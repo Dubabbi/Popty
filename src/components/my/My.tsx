@@ -11,7 +11,7 @@ import {
   Award,
   Heart,
 } from "lucide-react";
-import { Mascot } from "./Mascot";
+import { Mascot } from "@/components/Mascot";
 import type { ViewType } from "@/routes/routes";
 
 interface MyProps {
@@ -29,6 +29,7 @@ export function My({ onNavigate }: MyProps) {
       description: "내 정보 수정하기",
       color: "#FFB6D9",
       gradient: "linear-gradient(135deg, #FFB6D9 0%, #FF8BA0 100%)",
+      action: () => onNavigate("profile-edit"),
     },
     {
       icon: Bell,
@@ -37,6 +38,7 @@ export function My({ onNavigate }: MyProps) {
       color: "#A3B9FF",
       gradient: "linear-gradient(135deg, #C4E5FF 0%, #A3B9FF 100%)",
       badge: "3",
+      action: () => onNavigate("notification-settings"),
     },
     {
       icon: MapPin,
@@ -52,6 +54,7 @@ export function My({ onNavigate }: MyProps) {
       description: "새로운 팝업 정보 공유",
       color: "#FFD4B8",
       gradient: "linear-gradient(135deg, #FFE4D4 0%, #FFD4B8 100%)",
+      action: () => onNavigate("report-popup"),
     },
     {
       icon: Settings,
@@ -59,6 +62,7 @@ export function My({ onNavigate }: MyProps) {
       description: "앱 환경 설정",
       color: "#D4C4FF",
       gradient: "linear-gradient(135deg, #E4D4FF 0%, #D4C4FF 100%)",
+      action: () => onNavigate("settings"),
     },
     {
       icon: HelpCircle,
@@ -66,6 +70,7 @@ export function My({ onNavigate }: MyProps) {
       description: "FAQ 및 문의하기",
       color: "#B8F0D9",
       gradient: "linear-gradient(135deg, #C8FFE9 0%, #B8F0D9 100%)",
+      action: () => onNavigate("help"),
     },
   ];
 

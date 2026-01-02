@@ -6,13 +6,18 @@ import { Browse } from "@/components/Browse";
 import { Calendar } from "@/components/Calendar";
 import { MapView } from "@/components/ui/map/MapView";
 import { Saved } from "@/components/Saved";
-import { My } from "@/components/My";
+import { My } from "@/components/my/My";
 import { PopupDetail } from "@/components/PopupDetail";
 import { Notifications } from "@/components/Notifications";
 import { Search } from "@/components/Search";
 import { Capsule } from "@/components/Capsule";
 import { Roadmap } from "@/components/ui/roadmap/Roadmap";
 import { NotFound } from "@/components/ui/error/NotFound";
+import { Help } from "@/components/my/Help";
+import { Settings } from "@/components/my/Settings";
+import { NotificationSettings } from "@/components/my/NotificationSettings";
+import { ProfileEdit } from "@/components/my/Profileedit";
+import { ReportPopup } from "@/components/my/ReportPopup";
 
 type Breakpoint = "mobile" | "tablet" | "desktop";
 
@@ -45,6 +50,35 @@ export function AppRoutes({ breakpoint, onNavigate }: AppRoutesProps) {
       <Route
         path="/my"
         element={<My onNavigate={onNavigate} breakpoint={breakpoint} />}
+      />
+      <Route
+        path="/my/profile-edit"
+        element={
+          <ProfileEdit onNavigate={onNavigate} breakpoint={breakpoint} />
+        }
+      />
+      <Route
+        path="/my/notification-settings"
+        element={
+          <NotificationSettings
+            onNavigate={onNavigate}
+            breakpoint={breakpoint}
+          />
+        }
+      />
+      <Route
+        path="/my/report-popup"
+        element={
+          <ReportPopup onNavigate={onNavigate} breakpoint={breakpoint} />
+        }
+      />
+      <Route
+        path="/my/settings"
+        element={<Settings onNavigate={onNavigate} breakpoint={breakpoint} />}
+      />
+      <Route
+        path="/my/help"
+        element={<Help onNavigate={onNavigate} breakpoint={breakpoint} />}
       />
       <Route
         path="/capsule"
