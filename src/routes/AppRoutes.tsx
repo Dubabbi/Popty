@@ -4,7 +4,7 @@ import type { ViewType } from "@/routes/routes";
 import { Home } from "@/components/Home";
 import { Browse } from "@/components/Browse";
 import { Calendar } from "@/components/Calendar";
-import { MapView } from "@/components/MapView";
+import { MapView } from "@/components/ui/map/MapView";
 import { Saved } from "@/components/Saved";
 import { My } from "@/components/My";
 import { PopupDetail } from "@/components/PopupDetail";
