@@ -5,6 +5,7 @@ export type ViewType =
   | "map"
   | "saved"
   | "my"
+  | "capsule"
   | "detail"
   | "notifications"
   | "search";
@@ -17,6 +18,7 @@ export const VIEW_PATH: Record<Exclude<ViewType, "detail">, string> = {
   saved: "/saved",
   my: "/my",
   notifications: "/notifications",
+  capsule: "/capsule",
   search: "/search",
 };
 
@@ -39,6 +41,7 @@ export function getCurrentView(pathname: string): ViewType {
     "my",
     "notifications",
     "search",
+    "capsule",
   ];
 
   return allowed.includes(key) ? key : "home";

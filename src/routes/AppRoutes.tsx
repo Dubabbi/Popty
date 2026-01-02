@@ -10,6 +10,7 @@ import { My } from "@/components/My";
 import { PopupDetail } from "@/components/PopupDetail";
 import { Notifications } from "@/components/Notifications";
 import { Search } from "@/components/Search";
+import { Capsule } from "@/components/Capsule";
 
 type Breakpoint = "mobile" | "tablet" | "desktop";
 
@@ -36,6 +37,10 @@ export function AppRoutes({ breakpoint, onNavigate }: AppRoutesProps) {
       />
       <Route path="/saved" element={<Saved onNavigate={onNavigate} />} />
       <Route path="/my" element={<My />} />
+      <Route
+        path="/capsule"
+        element={<Capsule onNavigate={onNavigate} breakpoint={breakpoint} />}
+      />
       <Route
         path="/detail/:popupId"
         element={
