@@ -9,7 +9,6 @@ export function DynamicPopup({ onAllow }: DynamicPopupProps) {
   const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
-    // 0.5초 후 확장
     const timer = setTimeout(() => {
       setIsExpanded(true);
     }, 500);
@@ -51,7 +50,6 @@ export function DynamicPopup({ onAllow }: DynamicPopupProps) {
       }}
     >
       {!isExpanded ? (
-        // Compact State - Pill Shape
         <div
           style={{
             width: "100%",
@@ -81,14 +79,12 @@ export function DynamicPopup({ onAllow }: DynamicPopupProps) {
           </div>
         </div>
       ) : (
-        // Expanded State - Full Content
         <div
           style={{
             padding: "24px 20px 20px",
             animation: "slideDown 0.4s ease-out 0.2s backwards",
           }}
         >
-          {/* Icon */}
           <div
             style={{
               width: 56,
@@ -107,7 +103,6 @@ export function DynamicPopup({ onAllow }: DynamicPopupProps) {
             🎉
           </div>
 
-          {/* Title */}
           <div
             style={{
               fontSize: 17,
@@ -119,7 +114,6 @@ export function DynamicPopup({ onAllow }: DynamicPopupProps) {
             팝업을 허용하시겠습니까?
           </div>
 
-          {/* Subtitle */}
           <div
             style={{
               fontSize: 13,
@@ -134,7 +128,6 @@ export function DynamicPopup({ onAllow }: DynamicPopupProps) {
             찾아드릴게요 ✨
           </div>
 
-          {/* Buttons */}
           <div
             style={{
               display: "flex",
