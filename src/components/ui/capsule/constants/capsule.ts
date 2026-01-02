@@ -24,3 +24,23 @@ export const categories = [
   "Food",
   "Fashion",
 ] as const;
+
+export const capsuleColorMap: Record<number, string> = {
+  1: capsuleColors[2], // Mint
+  2: capsuleColors[4], // Peach
+  3: capsuleColors[1], // Sky
+  4: capsuleColors[0], // Pink
+  5: capsuleColors[5], // Purple
+  6: capsuleColors[0], // Candy Stripe Pink
+  7: capsuleColors[3], // Yellow
+  8: capsuleColors[5], // Lavender
+  9: capsuleColors[0], // Large Pink
+  10: capsuleColors[1], // Sky
+  11: capsuleColors[5], // Candy Stripe Lavender
+  12: capsuleColors[2], // Mint
+  13: capsuleColors[4], // Peach
+  14: capsuleColors[3], // Yellow
+  15: capsuleColors[2], // Candy Stripe Mint
+};
+
+export type CapsuleCategory = (typeof categories)[number];

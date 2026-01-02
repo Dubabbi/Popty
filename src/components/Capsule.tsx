@@ -1,23 +1,26 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { popupsData } from "@/data/popups";
 import { Sparkles, Gift } from "lucide-react";
 import { CapsuleMachineSVG } from "@/components/CapsuleMachine";
+
 import type {
   CapsuleMascot,
   CapsuleProps,
   CapsuleResult,
 } from "@/components/ui/capsule/types/capsule";
-import type { BubbleBg, StarBg } from "@/components/ui/capsule/types/capsule";
 
 import { mascots } from "@/components/ui/capsule/types/capsule";
 
 import {
   capsuleColors,
+  capsuleColorMap,
   messages,
   categories,
 } from "@/components/ui/capsule/constants/capsule";
 
-import { randFloat, randInt } from "@/components/ui/capsule/utils/capsule";
+import { useCryptoSeededRng } from "@/hooks/useCryptoSeededRng";
+import { useCapsuleBackground } from "@/hooks/useCapsuleBackground";
+import { generateCapsuleResult } from "@/components/ui/capsule/utils/generateCapsuleResult";
 
 export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
   const [tickets, setTickets] = useState(5);
@@ -27,6 +30,7 @@ export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
   const [phase, setPhase] = useState<
     "lobby" | "pulling" | "falling" | "reveal" | "result"
   >("lobby");
+
   const [currentResult, setCurrentResult] = useState<CapsuleResult | null>(
     null,
   );
@@ -42,108 +46,13 @@ export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
   const [fallingCapsule, setFallingCapsule] = useState(-1);
   const [fallingColor, setFallingColor] = useState("");
 
-  const rngRef = useRef<number>(0x1234abcd);
-
-  useEffect(() => {
-    try {
-      const c = globalThis.crypto;
-      if (c && "getRandomValues" in c) {
-        const buf = new Uint32Array(1);
-        c.getRandomValues(buf);
-        rngRef.current = buf[0] || 0x1234abcd;
-      }
-    } catch {
-      //
-    }
-  }, []);
-
-  const randIntFromRef = (min: number, max: number) => {
-    const out = randInt(rngRef.current, min, max);
-    rngRef.current = out.seed;
-    return out.value;
-  };
-  const shuffleWithRef = <T,>(arr: T[]) => {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = randIntFromRef(0, i);
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  };
-
-  const bg = useMemo(() => {
-    type BubbleAcc = { seed: number; list: BubbleBg[] };
-    type StarAcc = { seed: number; list: StarBg[] };
-
-    const bubbleRes = Array.from({ length: 30 }, (_, i) => i).reduce<BubbleAcc>(
-      (acc) => {
-        const r1 = randFloat(acc.seed, 100, 250);
-        const r2 = randFloat(r1.seed, 100, 250);
-        const r3 = randFloat(r2.seed, 0, 100);
-        const r4 = randFloat(r3.seed, 0, 100);
-        const r5 = randFloat(r4.seed, 15, 30);
-        const r6 = randFloat(r5.seed, 0, 5);
-
-        const bubble: BubbleBg = {
-          w: r1.value,
-          h: r2.value,
-          left: r3.value,
-          top: r4.value,
-          duration: r5.value,
-          delay: r6.value,
-        };
-
-        return { seed: r6.seed, list: [...acc.list, bubble] };
-      },
-      { seed: 0x9e3779b9, list: [] },
-    );
-
-    const starRes = Array.from({ length: 50 }, (_, i) => i).reduce<StarAcc>(
-      (acc) => {
-        const r1 = randFloat(acc.seed, 0, 100);
-        const r2 = randFloat(r1.seed, 0, 100);
-        const r3 = randFloat(r2.seed, 0.3, 0.8);
-        const r4 = randFloat(r3.seed, 2, 5);
-        const r5 = randFloat(r4.seed, 0, 2);
-
-        const star: StarBg = {
-          left: r1.value,
-          top: r2.value,
-          opacity: r3.value,
-          duration: r4.value,
-          delay: r5.value,
-        };
-
-        return { seed: r5.seed, list: [...acc.list, star] };
-      },
-      { seed: bubbleRes.seed, list: [] },
-    );
-
-    return { bubbles: bubbleRes.list, stars: starRes.list };
-  }, []);
+  const { nextInt, shuffle } = useCryptoSeededRng(0x1234abcd);
+  const bg = useCapsuleBackground(0x9e3779b9);
 
   const handlePull = () => {
     if (todayPulls <= 0 || tickets <= 0) return;
 
-    const randomCapsule = randIntFromRef(1, 15);
-
-    const capsuleColorMap: Record<number, string> = {
-      1: capsuleColors[2], // Mint
-      2: capsuleColors[4], // Peach
-      3: capsuleColors[1], // Sky
-      4: capsuleColors[0], // Pink
-      5: capsuleColors[5], // Purple
-      6: capsuleColors[0], // Candy Stripe Pink
-      7: capsuleColors[3], // Yellow
-      8: capsuleColors[5], // Lavender
-      9: capsuleColors[0], // Large Pink
-      10: capsuleColors[1], // Sky
-      11: capsuleColors[5], // Candy Stripe Lavender
-      12: capsuleColors[2], // Mint
-      13: capsuleColors[4], // Peach
-      14: capsuleColors[3], // Yellow
-      15: capsuleColors[2], // Candy Stripe Mint
-    };
+    const randomCapsule = nextInt(1, 15);
     const selectedColor = capsuleColorMap[randomCapsule] || capsuleColors[0];
     setFallingColor(selectedColor);
 
@@ -156,57 +65,36 @@ export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
     }, 1200);
 
     setTimeout(() => setPhase("reveal"), 2000);
+
     setTimeout(() => {
-      const result = generateResult();
+      const result = generateCapsuleResult({
+        nextInt,
+        shuffle,
+        mascots,
+        categories,
+        messages,
+        popupsData,
+      });
+
       setCurrentResult(result);
       setPhase("result");
       setTickets((prev) => prev - 1);
       setTodayPulls((prev) => prev - 1);
 
-      if (!collection.includes(result.mascot)) {
-        setCollection((prev) => [...prev, result.mascot]);
-      }
+      setCollection((prev) =>
+        prev.includes(result.mascot) ? prev : [...prev, result.mascot],
+      );
 
       setFallingCapsule(-1);
     }, 2500);
   };
 
-  // 랜덤 결과 생성
-  const generateResult = (): CapsuleResult => {
-    const mascotKeys = Object.keys(mascots) as CapsuleMascot[];
-    const randomMascot = mascotKeys[randIntFromRef(0, mascotKeys.length - 1)];
-    const mascotData = mascots[randomMascot];
-
-    const randomCategory = categories[randIntFromRef(0, categories.length - 1)];
-
-    const categoryPopups = popupsData.filter(
-      (p) => p.category === randomCategory,
-    );
-
-    const selectedPopups = shuffleWithRef(categoryPopups)
-      .slice(0, 3)
-      .map((p) => p.id);
-
-    const randomMessage = messages[randIntFromRef(0, messages.length - 1)];
-
-    return {
-      mascot: randomMascot,
-      mascotName: mascotData.name,
-      message: randomMessage,
-      popups: selectedPopups.length > 0 ? selectedPopups : ["1", "2", "3"],
-      color: mascotData.color,
-      gradient: mascotData.gradient,
-    };
-  };
-
-  // 다시 뽑기
   const handleReset = () => {
     setPhase("lobby");
     setCurrentResult(null);
     setSelectedPopup(null);
   };
 
-  // 카드 선택
   const handleCardSelect = (popupId: string) => {
     setSelectedPopup(popupId);
     setTimeout(() => {
