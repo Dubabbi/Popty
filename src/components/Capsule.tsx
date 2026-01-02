@@ -1,128 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { type ViewType } from "@/routes/routes";
 import { popupsData } from "@/data/popups";
 import { Sparkles, Gift } from "lucide-react";
 import { CapsuleMachineSVG } from "@/components/CapsuleMachine";
-
-interface CapsuleProps {
-  onNavigate: (view: ViewType, popupId?: string) => void;
-  breakpoint: "mobile" | "tablet" | "desktop";
-}
-
-type CapsuleMascot = "ganadi" | "poppy" | "lucky" | "sparkle" | "coco" | "momo";
-
-interface CapsuleResult {
-  mascot: CapsuleMascot;
-  mascotName: string;
-  message: string;
-  popups: string[]; // popup IDs
-  color: string;
-  gradient: string;
-}
-
-const mascots: Record<
+import type {
   CapsuleMascot,
-  { name: string; emoji: string; color: string; gradient: string }
-> = {
-  ganadi: {
-    name: "가나디",
-    emoji: "🐰",
-    color: "#FF8BA0",
-    gradient: "linear-gradient(135deg, #FF8BA0 0%, #FFB3C1 100%)",
-  },
-  poppy: {
-    name: "포피",
-    emoji: "🎀",
-    color: "#6B8AFF",
-    gradient: "linear-gradient(135deg, #6B8AFF 0%, #A3B9FF 100%)",
-  },
-  lucky: {
-    name: "럭키",
-    emoji: "🍀",
-    color: "#B8F0D9",
-    gradient: "linear-gradient(135deg, #B8F0D9 0%, #4ADE80 100%)",
-  },
-  sparkle: {
-    name: "스파클",
-    emoji: "✨",
-    color: "#FFF4C4",
-    gradient: "linear-gradient(135deg, #FFF4C4 0%, #FBBF24 100%)",
-  },
-  coco: {
-    name: "코코",
-    emoji: "🍫",
-    color: "#FFD4B8",
-    gradient: "linear-gradient(135deg, #FFD4B8 0%, #FFA07A 100%)",
-  },
-  momo: {
-    name: "모모",
-    emoji: "🍑",
-    color: "#D4C4FF",
-    gradient: "linear-gradient(135deg, #D4C4FF 0%, #B497FF 100%)",
-  },
-};
+  CapsuleProps,
+  CapsuleResult,
+} from "@/components/ui/capsule/types/capsule";
+import type { BubbleBg, StarBg } from "@/components/ui/capsule/types/capsule";
 
-const capsuleColors = [
-  "#FF8BA0",
-  "#6B8AFF",
-  "#B8F0D9",
-  "#FFF4C4",
-  "#FFD4B8",
-  "#D4C4FF",
-];
+import { mascots } from "@/components/ui/capsule/types/capsule";
 
-const messages = [
-  "오늘은 이곳이 당신을 기다려요!",
-  "새로운 경험이 당신을 반겨요!",
-  "특별한 순간을 만날 시간이에요!",
-  "행운의 팝업을 발견했어요!",
-  "이번 주 놓치면 안 되는 곳!",
-  "당신의 취향 저격 팝업!",
-];
+import {
+  capsuleColors,
+  messages,
+  categories,
+} from "@/components/ui/capsule/constants/capsule";
 
-/** =========================
- *  Math.random 대체 (seed RNG)
- *  ========================= */
-function nextSeed(seed: number) {
-  let x = seed | 0;
-  x ^= x << 13;
-  x ^= x >>> 17;
-  x ^= x << 5;
-  return x | 0;
-}
-
-function rand01(seed: number) {
-  const s = nextSeed(seed);
-  return { seed: s, value: (s >>> 0) / 4294967296 }; // [0,1)
-}
-
-function randFloat(seed: number, min: number, max: number) {
-  const r = rand01(seed);
-  return { seed: r.seed, value: min + (max - min) * r.value };
-}
-
-function randInt(seed: number, min: number, max: number) {
-  const r = rand01(seed);
-  const value = Math.floor(r.value * (max - min + 1)) + min;
-  return { seed: r.seed, value };
-}
-
-type BubbleBg = {
-  w: number;
-  h: number;
-  left: number;
-  top: number;
-  duration: number;
-  delay: number;
-};
-
-type StarBg = {
-  left: number;
-  top: number;
-  opacity: number;
-  duration: number;
-  delay: number;
-};
+import { randFloat, randInt } from "@/components/ui/capsule/utils/capsule";
 
 export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
   const [tickets, setTickets] = useState(5);
@@ -142,13 +37,11 @@ export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
     "lucky",
   ]);
 
-  // ✅ unused-vars 해결: isHandlePulled / capsulePosition 제거
   const [showProbability, setShowProbability] = useState(false);
   const [isMixing, setIsMixing] = useState(false);
   const [fallingCapsule, setFallingCapsule] = useState(-1);
   const [fallingColor, setFallingColor] = useState("");
 
-  // RNG seed (ref로 보관 → 렌더/리렌더와 무관)
   const rngRef = useRef<number>(0x1234abcd);
 
   useEffect(() => {
@@ -160,7 +53,7 @@ export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
         rngRef.current = buf[0] || 0x1234abcd;
       }
     } catch {
-      // fallback: 그대로 둠
+      //
     }
   }, []);
 
@@ -284,21 +177,12 @@ export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
     const randomMascot = mascotKeys[randIntFromRef(0, mascotKeys.length - 1)];
     const mascotData = mascots[randomMascot];
 
-    const categories = [
-      "Character",
-      "Goods",
-      "Exhibition",
-      "Beauty",
-      "Food",
-      "Fashion",
-    ] as const;
     const randomCategory = categories[randIntFromRef(0, categories.length - 1)];
 
     const categoryPopups = popupsData.filter(
       (p) => p.category === randomCategory,
     );
 
-    // ✅ Math.random sort 제거 → 셔플
     const selectedPopups = shuffleWithRef(categoryPopups)
       .slice(0, 3)
       .map((p) => p.id);
@@ -912,7 +796,6 @@ export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
                 {mascots[currentResult.mascot].emoji}
               </div>
 
-              {/* Particle Effect (✅ Math.random 제거) */}
               {[...Array(12)].map((_, i) => (
                 <div
                   key={i}
