@@ -37,7 +37,7 @@ function CapsuleAppBar({ onNavigate }: AppBarProps) {
           ? scroller.scrollTop
           : window.scrollY || document.documentElement.scrollTop || 0;
 
-        const next = y <= 0;
+        const next = y <= 12;
         setIsTransparent((prev) => (prev === next ? prev : next));
       };
 
@@ -87,6 +87,8 @@ function CapsuleAppBar({ onNavigate }: AppBarProps) {
   }, []);
 
   const headerStyle = useMemo<CSSProperties>(() => {
+    const glassBg = isTransparent ? "none" : "rgba(255, 255, 255, 0.82)";
+
     return {
       position: "fixed",
       top: 0,
@@ -98,11 +100,16 @@ function CapsuleAppBar({ onNavigate }: AppBarProps) {
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      transition: "background 0.25s ease, border-color 0.25s ease",
-      background: isTransparent ? "transparent" : "white",
+      transition:
+        "background 0.25s ease, border-color 0.25s ease, backdrop-filter 0.25s ease",
+
+      background: glassBg,
+
+      backdropFilter: isTransparent ? "none" : "blur(14px)",
+
       borderBottom: isTransparent
         ? "1px solid transparent"
-        : "1px solid var(--color-gray-200)",
+        : "1px solid rgba(0,0,0,0.06)",
     };
   }, [isTransparent]);
 
