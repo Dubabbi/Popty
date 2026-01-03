@@ -14,8 +14,8 @@ import { Toast, type ToastType } from "@/components/Toast";
 export function ReportPopup({ onNavigate }: ReportPopupProps) {
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -79,8 +79,8 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
           <DateInputs
             startDate={startDate}
             endDate={endDate}
-            onStartChange={(e) => setStartDate(e.target.value)}
-            onEndChange={(e) => setEndDate(e.target.value)}
+            onStartChange={setStartDate}
+            onEndChange={setEndDate}
           />
 
           <CategorySelector
