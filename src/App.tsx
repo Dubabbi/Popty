@@ -1,6 +1,6 @@
 import { matchPath, useLocation } from "react-router-dom";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
-import { AppBar } from "@/components/AppBar";
+import { AppBar } from "@/components/appbar";
 import { ScrollToTopFab } from "@/components/scroll-to-top/ScrollToTopFab";
 import { AppRoutes } from "@/routes/AppRoutes";
 import { BottomNav } from "@/components/BottomNav";
@@ -18,13 +18,11 @@ export default function App() {
   const isDetail = matchPath("/detail/:popupId", pathname) !== null;
 
   const viewPaths = Object.values(VIEW_PATH) as readonly string[];
-  const isKnownRoute =
-    pathname === "/" || isDetail || viewPaths.includes(pathname);
+  const isKnownRoute = pathname === "/" || isDetail || viewPaths.includes(pathname);
 
   const isNotFound = !isKnownRoute;
 
-  const showBottomNav =
-    breakpoint !== "desktop" && !isNotFound && currentView !== "detail";
+  const showBottomNav = breakpoint !== "desktop" && !isNotFound && currentView !== "detail";
 
   return (
     <div className="app-container scrollbar-hide">
@@ -50,9 +48,7 @@ export default function App() {
         <ScrollToTopFab scrollSelector=".main-content" />
         <PopupGate />
 
-        {showBottomNav && (
-          <BottomNav currentView={currentView} onNavigate={onNavigate} />
-        )}
+        {showBottomNav && <BottomNav currentView={currentView} onNavigate={onNavigate} />}
       </div>
     </div>
   );

@@ -104,13 +104,12 @@ export function NotificationSettings() {
           style={{
             width: 56,
             height: 56,
-            borderRadius: "var(--radius-lg)",
+            borderRadius: "var(--radius-md)",
             background: "white",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
-            boxShadow: "0 2px 12px rgba(0, 0, 0, 0.08)",
           }}
         >
           <Bell size={28} color="#000" strokeWidth={2.5} />
