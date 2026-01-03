@@ -1,12 +1,19 @@
 import { Home, Calendar, Map, User, Route } from "lucide-react";
 import type { ViewType } from "@/routes/routes";
+import {
+  getEffectivePath,
+  isMyRootRoute,
+  isMySubRoute,
+  isHomeRoute,
+} from "@/components/appbar/utils/path";
 
 interface BottomNavProps {
   currentView: ViewType;
   onNavigate: (view: ViewType) => void;
+  pathname?: string;
 }
 
-export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
+export function BottomNav({ currentView, onNavigate, pathname }: BottomNavProps) {
   const navItems = [
     { view: "home" as ViewType, icon: Home, label: "홈" },
     { view: "calendar" as ViewType, icon: Calendar, label: "캘린더" },
@@ -15,6 +22,8 @@ export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
     { view: "my" as ViewType, icon: User, label: "내 정보" },
   ];
 
+  const path = getEffectivePath(pathname);
+  const isMy = isMyRootRoute(path) || isMySubRoute(path);
   return (
     <nav
       style={{
@@ -34,7 +43,8 @@ export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
       }}
     >
       {navItems.map(({ view, icon: Icon, label }) => {
-        const isActive = currentView === view;
+        const isActive =
+          view === "my" ? isMy : view === "home" ? isHomeRoute(path) : currentView === view;
 
         return (
           <button
@@ -57,7 +67,6 @@ export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
             }}
             aria-label={label}
           >
-            {/* 활성 표시 - 아이콘 위 점 */}
             {isActive && (
               <div
                 style={{
@@ -73,7 +82,6 @@ export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
                 }}
               />
             )}
-
             {/* 아이콘 컨테이너 */}
             <div
               style={{
@@ -92,12 +100,9 @@ export function BottomNav({ currentView, onNavigate }: BottomNavProps) {
                 size={20}
                 color={isActive ? "#000" : "#999"}
                 strokeWidth={isActive ? 2.5 : 2}
-                style={{
-                  transition: "all 0.3s ease",
-                }}
+                style={{ transition: "all 0.3s ease" }}
               />
             </div>
-
             {/* 라벨 */}
             <span
               style={{
