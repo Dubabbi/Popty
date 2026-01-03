@@ -1,14 +1,8 @@
 import { useState } from "react";
-import { Camera, Mail, User, MapPin, Save, ChevronLeft } from "lucide-react";
+import { Camera, Mail, User, MapPin, Save } from "lucide-react";
 import { Mascot } from "@/components/Mascot";
-import type { ViewType } from "@/routes/routes";
 
-interface ProfileEditProps {
-  onNavigate: (view: ViewType) => void;
-  breakpoint: "mobile" | "tablet" | "desktop";
-}
-
-export function ProfileEdit({ onNavigate }: ProfileEditProps) {
+export function ProfileEdit() {
   const [name, setName] = useState("팝업 탐험가");
   const [email, setEmail] = useState("popup.lover@email.com");
   const [location, setLocation] = useState("서울, 대한민국");
@@ -33,46 +27,6 @@ export function ProfileEdit({ onNavigate }: ProfileEditProps) {
         paddingBottom: "var(--space-8)",
       }}
     >
-      {/* Header */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #FFF5F7 0%, #F0E7FF 100%)",
-          padding: "var(--space-4)",
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-          borderBottom: "1px solid rgba(0, 0, 0, 0.04)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <button
-            onClick={() => onNavigate("my")}
-            style={{
-              background: "white",
-              border: "none",
-              borderRadius: "var(--radius-lg)",
-              width: 40,
-              height: 40,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-            }}
-          >
-            <ChevronLeft size={20} color="#333" />
-          </button>
-          <h3 style={{ margin: 0 }}>프로필 편집</h3>
-          <div style={{ width: 40 }} />
-        </div>
-      </div>
-
       {/* Avatar Section */}
       <div
         style={{
@@ -171,8 +125,7 @@ export function ProfileEdit({ onNavigate }: ProfileEditProps) {
                   width: 40,
                   height: 40,
                   borderRadius: "var(--radius-md)",
-                  background:
-                    "linear-gradient(135deg, #FFB6D9 0%, #FF8BA0 100%)",
+                  background: "linear-gradient(135deg, #FFB6D9 0%, #FF8BA0 100%)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -196,8 +149,7 @@ export function ProfileEdit({ onNavigate }: ProfileEditProps) {
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = "#FFB6D9";
-                  e.currentTarget.style.boxShadow =
-                    "0 0 0 4px rgba(255, 182, 217, 0.1)";
+                  e.currentTarget.style.boxShadow = "0 0 0 4px rgba(255, 182, 217, 0.1)";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.08)";
@@ -235,8 +187,7 @@ export function ProfileEdit({ onNavigate }: ProfileEditProps) {
                   width: 40,
                   height: 40,
                   borderRadius: "var(--radius-md)",
-                  background:
-                    "linear-gradient(135deg, #C4E5FF 0%, #A3B9FF 100%)",
+                  background: "linear-gradient(135deg, #C4E5FF 0%, #A3B9FF 100%)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -260,8 +211,7 @@ export function ProfileEdit({ onNavigate }: ProfileEditProps) {
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = "#A3B9FF";
-                  e.currentTarget.style.boxShadow =
-                    "0 0 0 4px rgba(163, 185, 255, 0.1)";
+                  e.currentTarget.style.boxShadow = "0 0 0 4px rgba(163, 185, 255, 0.1)";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.08)";
@@ -299,8 +249,7 @@ export function ProfileEdit({ onNavigate }: ProfileEditProps) {
                   width: 40,
                   height: 40,
                   borderRadius: "var(--radius-md)",
-                  background:
-                    "linear-gradient(135deg, #D9F95F 0%, #B8E04F 100%)",
+                  background: "linear-gradient(135deg, #D9F95F 0%, #B8E04F 100%)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -324,8 +273,7 @@ export function ProfileEdit({ onNavigate }: ProfileEditProps) {
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = "#D9F95F";
-                  e.currentTarget.style.boxShadow =
-                    "0 0 0 4px rgba(217, 249, 95, 0.1)";
+                  e.currentTarget.style.boxShadow = "0 0 0 4px rgba(217, 249, 95, 0.1)";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.08)";
@@ -366,8 +314,7 @@ export function ProfileEdit({ onNavigate }: ProfileEditProps) {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = "#D9F95F";
-                e.currentTarget.style.boxShadow =
-                  "0 0 0 4px rgba(217, 249, 95, 0.1)";
+                e.currentTarget.style.boxShadow = "0 0 0 4px rgba(217, 249, 95, 0.1)";
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.08)";

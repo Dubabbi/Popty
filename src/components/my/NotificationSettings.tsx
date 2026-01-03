@@ -1,24 +1,10 @@
 import { useState } from "react";
-import {
-  ChevronLeft,
-  Bell,
-  MapPin,
-  Calendar,
-  Star,
-  Gift,
-  MessageSquare,
-  Sparkles,
-} from "lucide-react";
-import type { ViewType } from "@/routes/routes";
-
-interface NotificationSettingsProps {
-  onNavigate: (view: ViewType) => void;
-  breakpoint: "mobile" | "tablet" | "desktop";
-}
+import type { LucideIcon } from "lucide-react";
+import { Bell, MapPin, Calendar, Star, Gift, MessageSquare, Sparkles } from "lucide-react";
 
 interface NotificationItem {
   id: string;
-  icon: any;
+  icon: LucideIcon;
   label: string;
   description: string;
   enabled: boolean;
@@ -26,10 +12,7 @@ interface NotificationItem {
   gradient: string;
 }
 
-export function NotificationSettings({
-  onNavigate,
-  breakpoint,
-}: NotificationSettingsProps) {
+export function NotificationSettings() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
       id: "new-popup",
@@ -89,9 +72,7 @@ export function NotificationSettings({
 
   const toggleNotification = (id: string) => {
     setNotifications((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, enabled: !item.enabled } : item,
-      ),
+      prev.map((item) => (item.id === id ? { ...item, enabled: !item.enabled } : item))
     );
   };
 
@@ -105,46 +86,6 @@ export function NotificationSettings({
         paddingBottom: "var(--space-8)",
       }}
     >
-      {/* Header */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #E7F5FF 0%, #F0E7FF 100%)",
-          padding: "var(--space-4)",
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-          borderBottom: "1px solid rgba(0, 0, 0, 0.04)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <button
-            onClick={() => onNavigate("my")}
-            style={{
-              background: "white",
-              border: "none",
-              borderRadius: "var(--radius-lg)",
-              width: 40,
-              height: 40,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-            }}
-          >
-            <ChevronLeft size={20} color="#333" />
-          </button>
-          <h3 style={{ margin: 0 }}>알림 설정</h3>
-          <div style={{ width: 40 }} />
-        </div>
-      </div>
-
       {/* Status Card */}
       <div
         style={{
@@ -175,9 +116,7 @@ export function NotificationSettings({
           <Bell size={28} color="#000" strokeWidth={2.5} />
         </div>
         <div style={{ flex: 1 }}>
-          <h4
-            style={{ margin: 0, marginBottom: "var(--space-1)", color: "#000" }}
-          >
+          <h4 style={{ margin: 0, marginBottom: "var(--space-1)", color: "#000" }}>
             {enabledCount}개 활성화
           </h4>
           <p
@@ -239,9 +178,7 @@ export function NotificationSettings({
                     width: 48,
                     height: 48,
                     borderRadius: "var(--radius-lg)",
-                    background: item.enabled
-                      ? item.gradient
-                      : "rgba(0, 0, 0, 0.04)",
+                    background: item.enabled ? item.gradient : "rgba(0, 0, 0, 0.04)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -251,9 +188,7 @@ export function NotificationSettings({
                 >
                   <Icon
                     size={22}
-                    color={
-                      item.enabled ? "white" : "var(--color-text-tertiary)"
-                    }
+                    color={item.enabled ? "white" : "var(--color-text-tertiary)"}
                     strokeWidth={2.5}
                   />
                 </div>
@@ -264,9 +199,7 @@ export function NotificationSettings({
                       fontWeight: 600,
                       marginBottom: "2px",
                       fontSize: "0.938rem",
-                      color: item.enabled
-                        ? "#000"
-                        : "var(--color-text-tertiary)",
+                      color: item.enabled ? "#000" : "var(--color-text-tertiary)",
                     }}
                   >
                     {item.label}
@@ -289,9 +222,7 @@ export function NotificationSettings({
                     width: 52,
                     height: 30,
                     borderRadius: "var(--radius-full)",
-                    background: item.enabled
-                      ? item.gradient
-                      : "rgba(0, 0, 0, 0.1)",
+                    background: item.enabled ? item.gradient : "rgba(0, 0, 0, 0.1)",
                     border: "none",
                     cursor: "pointer",
                     position: "relative",

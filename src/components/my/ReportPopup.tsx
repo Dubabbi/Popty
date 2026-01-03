@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronLeft, MapPin, Send } from "lucide-react";
+import { MapPin, Send } from "lucide-react";
 import { Mascot } from "@/components/Mascot";
 import type { ViewType } from "@/routes/routes";
 
@@ -130,46 +130,6 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
         paddingBottom: "var(--space-8)",
       }}
     >
-      {/* Header */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #FFE4D4 0%, #FFD4B8 100%)",
-          padding: "var(--space-4)",
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-          borderBottom: "1px solid rgba(0, 0, 0, 0.04)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <button
-            onClick={() => onNavigate("my")}
-            style={{
-              background: "white",
-              border: "none",
-              borderRadius: "var(--radius-lg)",
-              width: 40,
-              height: 40,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-            }}
-          >
-            <ChevronLeft size={20} color="#333" />
-          </button>
-          <h3 style={{ margin: 0 }}>팝업 제보하기</h3>
-          <div style={{ width: 40 }} />
-        </div>
-      </div>
-
       {/* Intro Card */}
       <div
         style={{
@@ -197,9 +157,7 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
           <Mascot pose="explore" size="medium" />
         </div>
         <div>
-          <h4 style={{ margin: 0, marginBottom: "var(--space-1)" }}>
-            새로운 팝업을 발견하셨나요?
-          </h4>
+          <h4 style={{ margin: 0, marginBottom: "var(--space-1)" }}>새로운 팝업을 발견하셨나요?</h4>
           <p
             style={{
               margin: 0,
@@ -251,8 +209,7 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = "#FFD4B8";
-                e.currentTarget.style.boxShadow =
-                  "0 0 0 4px rgba(255, 212, 184, 0.1)";
+                e.currentTarget.style.boxShadow = "0 0 0 4px rgba(255, 212, 184, 0.1)";
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.08)";
@@ -303,8 +260,7 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = "#FFD4B8";
-                  e.currentTarget.style.boxShadow =
-                    "0 0 0 4px rgba(255, 212, 184, 0.1)";
+                  e.currentTarget.style.boxShadow = "0 0 0 4px rgba(255, 212, 184, 0.1)";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.08)";
@@ -350,8 +306,7 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = "#FFD4B8";
-                  e.currentTarget.style.boxShadow =
-                    "0 0 0 4px rgba(255, 212, 184, 0.1)";
+                  e.currentTarget.style.boxShadow = "0 0 0 4px rgba(255, 212, 184, 0.1)";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.08)";
@@ -387,8 +342,7 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = "#FFD4B8";
-                  e.currentTarget.style.boxShadow =
-                    "0 0 0 4px rgba(255, 212, 184, 0.1)";
+                  e.currentTarget.style.boxShadow = "0 0 0 4px rgba(255, 212, 184, 0.1)";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.08)";
@@ -427,16 +381,12 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
                     padding: "var(--space-3)",
                     border: `2px solid ${category === cat.id ? cat.color : "rgba(0, 0, 0, 0.08)"}`,
                     borderRadius: "var(--radius-lg)",
-                    background:
-                      category === cat.id ? cat.color + "15" : "white",
+                    background: category === cat.id ? cat.color + "15" : "white",
                     fontSize: "0.875rem",
                     fontWeight: 600,
                     cursor: "pointer",
                     transition: "all 0.3s ease",
-                    color:
-                      category === cat.id
-                        ? cat.color
-                        : "var(--color-text-secondary)",
+                    color: category === cat.id ? cat.color : "var(--color-text-secondary)",
                   }}
                 >
                   {cat.label}
@@ -477,8 +427,7 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = "#FFD4B8";
-                e.currentTarget.style.boxShadow =
-                  "0 0 0 4px rgba(255, 212, 184, 0.1)";
+                e.currentTarget.style.boxShadow = "0 0 0 4px rgba(255, 212, 184, 0.1)";
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.08)";

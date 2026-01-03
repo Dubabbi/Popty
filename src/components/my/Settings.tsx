@@ -1,27 +1,28 @@
 import { useState } from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Globe,
-  Moon,
-  MapPin,
-  Trash2,
-  LogOut,
-} from "lucide-react";
-import type { ViewType } from "@/routes/routes";
+import { ChevronRight, Globe, Moon, MapPin, Trash2, LogOut } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-interface SettingsProps {
-  onNavigate: (view: ViewType) => void;
-  breakpoint: "mobile" | "tablet" | "desktop";
-}
+type SettingItem = {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  color: string;
+  onClick: () => void;
+  danger?: boolean;
+};
 
-export function Settings({ onNavigate }: SettingsProps) {
+type SettingsGroup = {
+  title: string;
+  items: SettingItem[];
+};
+
+export function Settings() {
   const [language, setLanguage] = useState("ko");
   const [theme, setTheme] = useState("light");
   const [mapStyle, setMapStyle] = useState("default");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const settingsGroups = [
+  const settingsGroups: SettingsGroup[] = [
     {
       title: "표시",
       items: [
@@ -49,8 +50,7 @@ export function Settings({ onNavigate }: SettingsProps) {
           label: "지도 스타일",
           value: mapStyle === "default" ? "기본" : "미니멀",
           color: "#D9F95F",
-          onClick: () =>
-            setMapStyle(mapStyle === "default" ? "minimal" : "default"),
+          onClick: () => setMapStyle(mapStyle === "default" ? "minimal" : "default"),
         },
       ],
     },
@@ -89,53 +89,10 @@ export function Settings({ onNavigate }: SettingsProps) {
         paddingBottom: "var(--space-8)",
       }}
     >
-      {/* Header */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #E4D4FF 0%, #D4C4FF 100%)",
-          padding: "var(--space-4)",
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-          borderBottom: "1px solid rgba(0, 0, 0, 0.04)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <button
-            onClick={() => onNavigate("my")}
-            style={{
-              background: "white",
-              border: "none",
-              borderRadius: "var(--radius-lg)",
-              width: 40,
-              height: 40,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-            }}
-          >
-            <ChevronLeft size={20} color="#333" />
-          </button>
-          <h3 style={{ margin: 0 }}>설정</h3>
-          <div style={{ width: 40 }} />
-        </div>
-      </div>
-
       {/* Settings Groups */}
       <div style={{ padding: "var(--space-4)" }}>
         {settingsGroups.map((group, idx) => (
-          <div
-            key={group.title}
-            style={{ marginTop: idx > 0 ? "var(--space-6)" : 0 }}
-          >
+          <div key={group.title} style={{ marginTop: idx > 0 ? "var(--space-6)" : 0 }}>
             <h4
               style={{
                 marginBottom: "var(--space-3)",
@@ -171,8 +128,7 @@ export function Settings({ onNavigate }: SettingsProps) {
                       gap: "var(--space-3)",
                       padding: "var(--space-4)",
                       border: "none",
-                      borderTop:
-                        itemIdx > 0 ? "1px solid rgba(0, 0, 0, 0.04)" : "none",
+                      borderTop: itemIdx > 0 ? "1px solid rgba(0, 0, 0, 0.04)" : "none",
                       background: "transparent",
                       cursor: "pointer",
                       transition: "all 0.3s ease",
@@ -228,11 +184,7 @@ export function Settings({ onNavigate }: SettingsProps) {
                       </div>
                     )}
 
-                    <ChevronRight
-                      size={20}
-                      color="var(--color-gray-300)"
-                      strokeWidth={2}
-                    />
+                    <ChevronRight size={20} color="var(--color-gray-300)" strokeWidth={2} />
                   </button>
                 );
               })}
@@ -303,9 +255,7 @@ export function Settings({ onNavigate }: SettingsProps) {
               animation: "slideUp 0.3s ease-out",
             }}
           >
-            <h3 style={{ margin: 0, marginBottom: "var(--space-2)" }}>
-              로그아웃 하시겠어요?
-            </h3>
+            <h3 style={{ margin: 0, marginBottom: "var(--space-2)" }}>로그아웃 하시겠어요?</h3>
             <p
               style={{
                 margin: 0,
@@ -347,8 +297,7 @@ export function Settings({ onNavigate }: SettingsProps) {
                 style={{
                   flex: 1,
                   padding: "var(--space-3)",
-                  background:
-                    "linear-gradient(135deg, #FF6B85 0%, #FF8BA0 100%)",
+                  background: "linear-gradient(135deg, #FF6B85 0%, #FF8BA0 100%)",
                   border: "none",
                   borderRadius: "var(--radius-lg)",
                   fontSize: "0.938rem",

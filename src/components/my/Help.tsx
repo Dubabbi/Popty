@@ -1,19 +1,6 @@
 import { useState } from "react";
-import {
-  ChevronLeft,
-  ChevronDown,
-  MessageCircle,
-  Mail,
-  Phone,
-  ExternalLink,
-} from "lucide-react";
+import { ChevronDown, MessageCircle, Mail, Phone, ExternalLink } from "lucide-react";
 import { Mascot } from "@/components/Mascot";
-import type { ViewType } from "@/routes/routes";
-
-interface HelpProps {
-  onNavigate: (view: ViewType) => void;
-  breakpoint: "mobile" | "tablet" | "desktop";
-}
 
 interface FAQ {
   question: string;
@@ -21,7 +8,7 @@ interface FAQ {
   category: string;
 }
 
-export function Help({ onNavigate }: HelpProps) {
+export function Help() {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<"faq" | "contact">("faq");
 
@@ -59,8 +46,7 @@ export function Help({ onNavigate }: HelpProps) {
     {
       category: "계정",
       question: "프로필 정보를 변경하려면?",
-      answer:
-        "마이페이지 > 프로필 편집에서 이름, 이메일, 위치 등의 정보를 수정할 수 있습니다.",
+      answer: "마이페이지 > 프로필 편집에서 이름, 이메일, 위치 등의 정보를 수정할 수 있습니다.",
     },
     {
       category: "일반",
@@ -76,16 +62,11 @@ export function Help({ onNavigate }: HelpProps) {
     },
   ];
 
-  const categories = [
-    "전체",
-    ...Array.from(new Set(faqs.map((f) => f.category))),
-  ];
+  const categories = ["전체", ...Array.from(new Set(faqs.map((f) => f.category)))];
   const [selectedCategory, setSelectedCategory] = useState("전체");
 
   const filteredFAQs =
-    selectedCategory === "전체"
-      ? faqs
-      : faqs.filter((faq) => faq.category === selectedCategory);
+    selectedCategory === "전체" ? faqs : faqs.filter((faq) => faq.category === selectedCategory);
 
   const contactMethods = [
     {
@@ -119,46 +100,6 @@ export function Help({ onNavigate }: HelpProps) {
         paddingBottom: "var(--space-8)",
       }}
     >
-      {/* Header */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #C8FFE9 0%, #B8F0D9 100%)",
-          padding: "var(--space-4)",
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-          borderBottom: "1px solid rgba(0, 0, 0, 0.04)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <button
-            onClick={() => onNavigate("my")}
-            style={{
-              background: "white",
-              border: "none",
-              borderRadius: "var(--radius-lg)",
-              width: 40,
-              height: 40,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-            }}
-          >
-            <ChevronLeft size={20} color="#333" />
-          </button>
-          <h3 style={{ margin: 0 }}>도움말</h3>
-          <div style={{ width: 40 }} />
-        </div>
-      </div>
-
       {/* Intro Card */}
       <div
         style={{
@@ -187,9 +128,7 @@ export function Help({ onNavigate }: HelpProps) {
           <Mascot pose="recommend" size="large" />
         </div>
         <div>
-          <h4 style={{ margin: 0, marginBottom: "var(--space-1)" }}>
-            무엇을 도와드릴까요?
-          </h4>
+          <h4 style={{ margin: 0, marginBottom: "var(--space-1)" }}>무엇을 도와드릴까요?</h4>
           <p
             style={{
               margin: 0,
@@ -232,8 +171,7 @@ export function Help({ onNavigate }: HelpProps) {
               fontWeight: 600,
               cursor: "pointer",
               transition: "all 0.3s ease",
-              boxShadow:
-                activeTab === "faq" ? "0 2px 8px rgba(0, 0, 0, 0.08)" : "none",
+              boxShadow: activeTab === "faq" ? "0 2px 8px rgba(0, 0, 0, 0.08)" : "none",
             }}
           >
             자주 묻는 질문
@@ -250,10 +188,7 @@ export function Help({ onNavigate }: HelpProps) {
               fontWeight: 600,
               cursor: "pointer",
               transition: "all 0.3s ease",
-              boxShadow:
-                activeTab === "contact"
-                  ? "0 2px 8px rgba(0, 0, 0, 0.08)"
-                  : "none",
+              boxShadow: activeTab === "contact" ? "0 2px 8px rgba(0, 0, 0, 0.08)" : "none",
             }}
           >
             문의하기
@@ -291,10 +226,7 @@ export function Help({ onNavigate }: HelpProps) {
                   cursor: "pointer",
                   whiteSpace: "nowrap",
                   transition: "all 0.3s ease",
-                  color:
-                    selectedCategory === cat
-                      ? "#000"
-                      : "var(--color-text-secondary)",
+                  color: selectedCategory === cat ? "#000" : "var(--color-text-secondary)",
                 }}
               >
                 {cat}
@@ -321,9 +253,7 @@ export function Help({ onNavigate }: HelpProps) {
                     border: `2px solid ${isExpanded ? "#D9F95F" : "rgba(0, 0, 0, 0.04)"}`,
                     overflow: "hidden",
                     transition: "all 0.3s ease",
-                    boxShadow: isExpanded
-                      ? "0 4px 16px rgba(217, 249, 95, 0.2)"
-                      : "none",
+                    boxShadow: isExpanded ? "0 4px 16px rgba(217, 249, 95, 0.2)" : "none",
                   }}
                 >
                   <button
@@ -356,9 +286,7 @@ export function Help({ onNavigate }: HelpProps) {
                       >
                         {faq.category}
                       </div>
-                      <div style={{ fontWeight: 600, fontSize: "0.938rem" }}>
-                        {faq.question}
-                      </div>
+                      <div style={{ fontWeight: 600, fontSize: "0.938rem" }}>{faq.question}</div>
                     </div>
                     <ChevronDown
                       size={20}

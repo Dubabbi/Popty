@@ -1,11 +1,4 @@
-import {
-  Search,
-  Bell,
-  Calendar,
-  Map,
-  User,
-  Route as RouteIcon,
-} from "lucide-react";
+import { Search, Bell, Calendar, Map, User, Route as RouteIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode, CSSProperties } from "react";
 import type { ViewType } from "@/routes/routes";
@@ -15,17 +8,38 @@ interface AppBarProps {
   title: string;
   currentView: ViewType;
   onNavigate: (view: ViewType) => void;
-
-  // ✅ 추가: App.tsx에서 내려줄 breakpoint
+  pathname?: string;
   breakpoint: "mobile" | "tablet" | "desktop";
 }
 
 const HOME_TRENDING_SENTINEL_ID = "home-trending-sentinel";
 const APPBAR_HEIGHT = 73;
 
+function getEffectivePath(explicit?: string) {
+  if (explicit) return explicit;
+  if (typeof window === "undefined") return "";
+  const { hash, pathname } = window.location;
+  if (hash && hash.startsWith("#/")) return hash.slice(1);
+  return pathname || "";
+}
+
+function normalizePath(path: string) {
+  return path.split("?")[0].split("#")[0].replace(/\/+$/, "");
+}
+
+function isMyRoute(path?: string) {
+  const p = normalizePath(getEffectivePath(path));
+  return /(^|\/)my(\/|$)/.test(p);
+}
+
 export function AppBar(props: AppBarProps) {
-  if (props.currentView === "home") return <HomeAppBar {...props} />;
+  const path = getEffectivePath(props.pathname);
+
+  if (isMyRoute(path)) return <DefaultAppBar {...props} />;
+
   if (props.currentView === "capsule") return <CapsuleAppBar {...props} />;
+  if (props.currentView === "home") return <HomeAppBar {...props} />;
+
   return <DefaultAppBar {...props} />;
 }
 
@@ -110,13 +124,10 @@ function CapsuleAppBar({ onNavigate }: AppBarProps) {
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      transition:
-        "background 0.25s ease, border-color 0.25s ease, backdrop-filter 0.25s ease",
+      transition: "background 0.25s ease, border-color 0.25s ease, backdrop-filter 0.25s ease",
       background: glassBg,
       backdropFilter: isTransparent ? "none" : "blur(14px)",
-      borderBottom: isTransparent
-        ? "1px solid transparent"
-        : "1px solid rgba(0,0,0,0.06)",
+      borderBottom: isTransparent ? "1px solid transparent" : "1px solid rgba(0,0,0,0.06)",
     };
   }, [isTransparent]);
 
@@ -129,14 +140,8 @@ function CapsuleAppBar({ onNavigate }: AppBarProps) {
         <img src={LogoImg} alt="Logo" style={{ width: "40px" }} />
       </div>
 
-      <div
-        style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}
-      >
-        <IconButton
-          ariaLabel="Notifications"
-          onClick={() => onNavigate("notifications")}
-          hasDot
-        >
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+        <IconButton ariaLabel="Notifications" onClick={() => onNavigate("notifications")} hasDot>
           <Bell size={20} color="var(--color-text-secondary)" />
         </IconButton>
       </div>
@@ -213,9 +218,7 @@ function HomeAppBar({ onNavigate, breakpoint }: AppBarProps) {
       justifyContent: "space-between",
       transition: "background 0.25s ease, border-color 0.25s ease",
       background: isTransparent ? "transparent" : "white",
-      borderBottom: isTransparent
-        ? "1px solid transparent"
-        : "1px solid var(--color-gray-200)",
+      borderBottom: isTransparent ? "1px solid transparent" : "1px solid var(--color-gray-200)",
     };
   }, [isTransparent]);
 
@@ -223,15 +226,11 @@ function HomeAppBar({ onNavigate, breakpoint }: AppBarProps) {
 
   return (
     <header style={headerStyle}>
-      <div
-        style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}
-      >
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
         <img src={LogoImg} alt="Logo" style={{ width: "40px" }} />
       </div>
 
-      <div
-        style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}
-      >
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
         <button
           onClick={() => onNavigate("capsule")}
           style={{
@@ -249,48 +248,32 @@ function HomeAppBar({ onNavigate, breakpoint }: AppBarProps) {
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = "scale(1.1)";
-            e.currentTarget.style.boxShadow =
-              "0 4px 12px rgba(217, 249, 95, 0.5)";
+            e.currentTarget.style.boxShadow = "0 4px 12px rgba(217, 249, 95, 0.5)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = "scale(1)";
-            e.currentTarget.style.boxShadow =
-              "0 2px 8px rgba(217, 249, 95, 0.3)";
+            e.currentTarget.style.boxShadow = "0 2px 8px rgba(217, 249, 95, 0.3)";
           }}
           aria-label="캡슐 뽑기"
         >
           <span style={{ fontSize: "1.2rem" }}>🎁</span>
         </button>
 
-        {/* ✅ 데스크탑에서만 4개 추가 (기본적으로 캘린더는 숨김) */}
         {isDesktop && (
           <>
-            <IconButton
-              ariaLabel="Calendar"
-              onClick={() => onNavigate("calendar")}
-            >
+            <IconButton ariaLabel="Calendar" onClick={() => onNavigate("calendar")}>
               <Calendar size={20} color="var(--color-text-secondary)" />
             </IconButton>
 
-            {/* 아래 3개는 ViewType에 실제 키가 다를 수 있어서 캐스팅 처리 */}
-            <IconButton
-              ariaLabel="Map"
-              onClick={() => onNavigate("map" as ViewType)}
-            >
+            <IconButton ariaLabel="Map" onClick={() => onNavigate("map" as ViewType)}>
               <Map size={20} color="var(--color-text-secondary)" />
             </IconButton>
 
-            <IconButton
-              ariaLabel="Roadmap"
-              onClick={() => onNavigate("roadmap" as ViewType)}
-            >
+            <IconButton ariaLabel="Roadmap" onClick={() => onNavigate("roadmap" as ViewType)}>
               <RouteIcon size={20} color="var(--color-text-secondary)" />
             </IconButton>
 
-            <IconButton
-              ariaLabel="My Page"
-              onClick={() => onNavigate("mypage" as ViewType)}
-            >
+            <IconButton ariaLabel="My Page" onClick={() => onNavigate("my" as ViewType)}>
               <User size={20} color="var(--color-text-secondary)" />
             </IconButton>
           </>
@@ -300,11 +283,7 @@ function HomeAppBar({ onNavigate, breakpoint }: AppBarProps) {
           <Search size={20} color="var(--color-text-secondary)" />
         </IconButton>
 
-        <IconButton
-          ariaLabel="Notifications"
-          onClick={() => onNavigate("notifications")}
-          hasDot
-        >
+        <IconButton ariaLabel="Notifications" onClick={() => onNavigate("notifications")} hasDot>
           <Bell size={20} color="var(--color-text-secondary)" />
         </IconButton>
       </div>
@@ -335,14 +314,8 @@ function DefaultAppBar({ onNavigate }: AppBarProps) {
         <img src={LogoImg} alt="Logo" style={{ width: "40px" }} />
       </div>
 
-      <div
-        style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}
-      >
-        <IconButton
-          ariaLabel="Notifications"
-          onClick={() => onNavigate("notifications")}
-          hasDot
-        >
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+        <IconButton ariaLabel="Notifications" onClick={() => onNavigate("notifications")} hasDot>
           <Bell size={20} color="var(--color-text-secondary)" />
         </IconButton>
       </div>

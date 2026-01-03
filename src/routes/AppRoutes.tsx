@@ -16,7 +16,7 @@ import { NotFound } from "@/components/ui/error/NotFound";
 import { Help } from "@/components/my/Help";
 import { Settings } from "@/components/my/Settings";
 import { NotificationSettings } from "@/components/my/NotificationSettings";
-import { ProfileEdit } from "@/components/my/Profileedit";
+import { ProfileEdit } from "@/components/my/ProfileEdit";
 import { ReportPopup } from "@/components/my/ReportPopup";
 
 type Breakpoint = "mobile" | "tablet" | "desktop";
@@ -30,80 +30,40 @@ export function AppRoutes({ breakpoint, onNavigate }: AppRoutesProps) {
   return (
     <Routes>
       <Route path="/" element={<Home onNavigate={onNavigate} />} />
-      <Route
-        path="/browse"
-        element={<Browse onNavigate={onNavigate} breakpoint={breakpoint} />}
-      />
+      <Route path="/browse" element={<Browse onNavigate={onNavigate} breakpoint={breakpoint} />} />
       <Route
         path="/calendar"
         element={<Calendar onNavigate={onNavigate} breakpoint={breakpoint} />}
       />
-      <Route
-        path="/map"
-        element={<MapView onNavigate={onNavigate} breakpoint={breakpoint} />}
-      />
+      <Route path="/map" element={<MapView onNavigate={onNavigate} breakpoint={breakpoint} />} />
       <Route
         path="/roadmap"
         element={<Roadmap onNavigate={onNavigate} breakpoint={breakpoint} />}
       />
       <Route path="/saved" element={<Saved onNavigate={onNavigate} />} />
-      <Route
-        path="/my"
-        element={<My onNavigate={onNavigate} breakpoint={breakpoint} />}
-      />
-      <Route
-        path="/my/profile-edit"
-        element={
-          <ProfileEdit onNavigate={onNavigate} breakpoint={breakpoint} />
-        }
-      />
-      <Route
-        path="/my/notification-settings"
-        element={
-          <NotificationSettings
-            onNavigate={onNavigate}
-            breakpoint={breakpoint}
-          />
-        }
-      />
+      <Route path="/my" element={<My onNavigate={onNavigate} breakpoint={breakpoint} />} />
+      <Route path="/my/profile-edit" element={<ProfileEdit />} />
+      <Route path="/my/notification-settings" element={<NotificationSettings />} />
       <Route
         path="/my/report-popup"
-        element={
-          <ReportPopup onNavigate={onNavigate} breakpoint={breakpoint} />
-        }
+        element={<ReportPopup onNavigate={onNavigate} breakpoint={breakpoint} />}
       />
-      <Route
-        path="/my/settings"
-        element={<Settings onNavigate={onNavigate} breakpoint={breakpoint} />}
-      />
-      <Route
-        path="/my/help"
-        element={<Help onNavigate={onNavigate} breakpoint={breakpoint} />}
-      />
+      <Route path="/my/settings" element={<Settings />} />
+      <Route path="/my/help" element={<Help />} />
       <Route
         path="/capsule"
         element={<Capsule onNavigate={onNavigate} breakpoint={breakpoint} />}
       />
       <Route
         path="/detail/:popupId"
-        element={
-          <PopupDetail onNavigate={onNavigate} breakpoint={breakpoint} />
-        }
+        element={<PopupDetail onNavigate={onNavigate} breakpoint={breakpoint} />}
       />
       <Route
         path="/notifications"
-        element={
-          <Notifications onNavigate={onNavigate} breakpoint={breakpoint} />
-        }
+        element={<Notifications onNavigate={onNavigate} breakpoint={breakpoint} />}
       />
-      <Route
-        path="/search"
-        element={<Search onNavigate={onNavigate} breakpoint={breakpoint} />}
-      />
-      <Route
-        path="*"
-        element={<NotFound onNavigate={onNavigate} breakpoint={breakpoint} />}
-      />
+      <Route path="/search" element={<Search onNavigate={onNavigate} breakpoint={breakpoint} />} />
+      <Route path="*" element={<NotFound onNavigate={onNavigate} breakpoint={breakpoint} />} />
     </Routes>
   );
 }
