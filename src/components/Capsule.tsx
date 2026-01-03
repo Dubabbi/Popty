@@ -32,20 +32,14 @@ export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
   const [todayPulls, setTodayPulls] = useState(3);
   const maxDailyPulls = 3;
 
-  const [phase, setPhase] = useState<
-    "lobby" | "pulling" | "falling" | "reveal" | "result"
-  >("lobby");
-
-  const [currentResult, setCurrentResult] = useState<CapsuleResult | null>(
-    null,
+  const [phase, setPhase] = useState<"lobby" | "pulling" | "falling" | "reveal" | "result">(
+    "lobby"
   );
+
+  const [currentResult, setCurrentResult] = useState<CapsuleResult | null>(null);
   const [selectedPopup, setSelectedPopup] = useState<string | null>(null);
 
-  const [collection, setCollection] = useState<CapsuleMascot[]>([
-    "ganadi",
-    "poppy",
-    "lucky",
-  ]);
+  const [collection, setCollection] = useState<CapsuleMascot[]>(["ganadi", "poppy", "lucky"]);
 
   const [showProbability, setShowProbability] = useState(false);
   const [isMixing, setIsMixing] = useState(false);
@@ -87,9 +81,7 @@ export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
       setTickets((prev) => prev - 1);
       setTodayPulls((prev) => prev - 1);
 
-      setCollection((prev) =>
-        prev.includes(result.mascot) ? prev : [...prev, result.mascot],
-      );
+      setCollection((prev) => (prev.includes(result.mascot) ? prev : [...prev, result.mascot]));
 
       setFallingCapsule(-1);
     }, 2500);
@@ -113,8 +105,7 @@ export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
     <div
       style={{
         minHeight: "100%",
-        background:
-          "linear-gradient(180deg, #6B8AFF 0%, #8BA3FF 50%, #A3B9FF 100%)",
+        background: "linear-gradient(180deg, #6B8AFF 0%, #8BA3FF 50%, #A3B9FF 100%)",
         position: "relative",
         overflow: "hidden",
         paddingTop: "70px",
@@ -127,7 +118,6 @@ export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
           position: "relative",
           zIndex: 1,
           padding: "var(--space-6)",
-          minHeight: "100vh",
         }}
       >
         {phase === "lobby" && (
@@ -164,10 +154,7 @@ export function Capsule({ onNavigate, breakpoint }: CapsuleProps) {
       {phase === "pulling" && <PullingOverlay />}
 
       {phase === "falling" && (
-        <FallingOverlay
-          fallingColor={fallingColor}
-          capsuleColors={capsuleColors}
-        />
+        <FallingOverlay fallingColor={fallingColor} capsuleColors={capsuleColors} />
       )}
 
       {phase === "reveal" && currentResult && (
