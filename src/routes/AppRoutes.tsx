@@ -6,18 +6,18 @@ import { Browse } from "@/components/Browse";
 import { Calendar } from "@/components/Calendar";
 import { MapView } from "@/components/ui/map/MapView";
 import { Saved } from "@/components/Saved";
-import { My } from "@/components/my/My";
 import { PopupDetail } from "@/components/PopupDetail";
 import { Notifications } from "@/components/Notifications";
 import { Search } from "@/components/Search";
 import { Capsule } from "@/components/Capsule";
 import { Roadmap } from "@/components/ui/roadmap/Roadmap";
 import { NotFound } from "@/components/ui/error/NotFound";
-import { Help } from "@/components/my/Help";
-import { Settings } from "@/components/my/Settings";
-import { NotificationSettings } from "@/components/my/NotificationSettings";
-import { ProfileEdit } from "@/components/my/ProfileEdit";
-import { ReportPopup } from "@/components/my/ReportPopup";
+import { My } from "@/components/my";
+import { Help } from "@/components/my";
+import { Settings } from "@/components/my";
+import { NotificationSettings } from "@/components/my";
+import { ProfileEdit } from "@/components/my";
+import { ReportPopup } from "@/components/my";
 
 type Breakpoint = "mobile" | "tablet" | "desktop";
 
