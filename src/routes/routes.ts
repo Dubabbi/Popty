@@ -14,6 +14,7 @@ export type ViewType =
   | "notification-settings"
   | "report-popup"
   | "settings"
+  | "login"
   | "help";
 
 export const VIEW_PATH: Record<Exclude<ViewType, "detail">, string> = {
@@ -32,6 +33,7 @@ export const VIEW_PATH: Record<Exclude<ViewType, "detail">, string> = {
   "report-popup": "/my/report-popup",
   settings: "/my/settings",
   help: "/my/help",
+  login: "/login",
 };
 
 export function toTitle(view: ViewType) {
@@ -60,6 +62,7 @@ export function getCurrentView(pathname: string): ViewType {
     "report-popup",
     "settings",
     "help",
+    "login",
   ];
 
   return allowed.includes(key) ? key : "home";

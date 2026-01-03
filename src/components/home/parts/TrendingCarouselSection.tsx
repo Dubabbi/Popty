@@ -4,7 +4,6 @@ import { HERO_IMAGES } from "@/constants/heroImages";
 import { getTrendingPopups } from "@/data/popups";
 import type { ViewType } from "@/routes/routes";
 import { useInfiniteCarousel } from "@/hooks/useInfiniteCarousel";
-import { carouselStyle } from "@/utils/homeStyles";
 
 type TrendingPopup = ReturnType<typeof getTrendingPopups>[number];
 
@@ -15,9 +14,14 @@ interface TrendingCarouselSectionProps {
 const APPBAR_HEIGHT = 60;
 const DRAG_THRESHOLD_PX = 10;
 
-export function TrendingCarouselSection({
-  onNavigate,
-}: TrendingCarouselSectionProps) {
+const SIDE_PADDING = 20;
+const GAP = 12;
+const CARD_HEIGHT = 430;
+const CARD_MAX_WIDTH = 340;
+const INACTIVE_SCALE = 0.92;
+const INACTIVE_OPACITY = 0.55;
+
+export function TrendingCarouselSection({ onNavigate }: TrendingCarouselSectionProps) {
   const trending = getTrendingPopups();
 
   const {
@@ -32,7 +36,7 @@ export function TrendingCarouselSection({
     items: trending,
     images: HERO_IMAGES,
     maxRealItems: 6,
-    idleMs: 140,
+    idleMs: 300,
   });
 
   const pointerDownRef = useRef(false);
@@ -115,7 +119,7 @@ export function TrendingCarouselSection({
         requestAnimationFrame(() => snapToClosestCard(el));
       }
     },
-    [carouselRef, snapToClosestCard],
+    [carouselRef, snapToClosestCard]
   );
 
   const handlePointerDown = useCallback(
@@ -132,7 +136,7 @@ export function TrendingCarouselSection({
       startXRef.current = e.clientX;
       startScrollLeftRef.current = el.scrollLeft;
     },
-    [carouselRef],
+    [carouselRef]
   );
 
   const handlePointerMove = useCallback(
@@ -152,7 +156,7 @@ export function TrendingCarouselSection({
 
       el.scrollLeft = startScrollLeftRef.current - dx;
     },
-    [carouselRef, beginDragging],
+    [carouselRef, beginDragging]
   );
 
   const handlePointerUp = useCallback(
@@ -162,7 +166,7 @@ export function TrendingCarouselSection({
       if (draggingRef.current) endDragging(e.pointerId);
       else pointerDownRef.current = false;
     },
-    [endDragging],
+    [endDragging]
   );
 
   const handlePointerCancel = useCallback(
@@ -172,7 +176,7 @@ export function TrendingCarouselSection({
       if (draggingRef.current) endDragging(e.pointerId);
       pointerDownRef.current = false;
     },
-    [endDragging],
+    [endDragging]
   );
 
   const handlePointerLeave = useCallback(
@@ -182,7 +186,7 @@ export function TrendingCarouselSection({
       if (draggingRef.current) endDragging(e.pointerId);
       pointerDownRef.current = false;
     },
-    [endDragging],
+    [endDragging]
   );
 
   if (realLen <= 0) return null;
@@ -191,7 +195,7 @@ export function TrendingCarouselSection({
     <>
       <section
         style={{
-          padding: `calc(var(--space-6) + ${APPBAR_HEIGHT}px) var(--space-4) var(--space-6)`,
+          padding: `calc(var(--space-6) + ${APPBAR_HEIGHT}px) 0 var(--space-6)`,
           position: "relative",
           overflow: "hidden",
         }}
@@ -199,10 +203,8 @@ export function TrendingCarouselSection({
         <div
           style={{
             position: "absolute",
-            inset: "-20px",
-            backgroundImage: activeBackgroundImage
-              ? `url(${activeBackgroundImage})`
-              : undefined,
+            inset: -20,
+            backgroundImage: activeBackgroundImage ? `url(${activeBackgroundImage})` : undefined,
             backgroundSize: "cover",
             backgroundPosition: "center",
             opacity: 0.3,
@@ -210,10 +212,14 @@ export function TrendingCarouselSection({
             transition: "background-image 0.5s ease, opacity 0.5s ease",
             zIndex: 0,
             pointerEvents: "none",
+            transform: "translateZ(0)",
+            WebkitTransform: "translateZ(0)",
+            backfaceVisibility: "hidden",
           }}
         />
 
         <div style={{ position: "relative", zIndex: 1 }}>
+          {/* 헤더 */}
           <div
             style={{
               display: "flex",
@@ -222,13 +228,7 @@ export function TrendingCarouselSection({
               marginBottom: "var(--space-4)",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "var(--space-2)",
-              }}
-            >
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
               <TrendingUp size={24} color="var(--color-primary)" />
               <h3 style={{ margin: 0 }}>이번 주 트렌딩</h3>
             </div>
@@ -250,177 +250,186 @@ export function TrendingCarouselSection({
             </button>
           </div>
 
+          {/* 캐러샐 */}
           <div
+            ref={carouselRef}
+            className="trending-carousel scrollbar-hide"
             style={{
-              position: "relative",
-              margin: "0 -16px",
-              overflow: "visible",
+              display: "flex",
+              gap: `${GAP}px`,
+              overflowX: "auto",
+              overflowY: "hidden",
+              WebkitOverflowScrolling: "touch",
+              overscrollBehaviorX: "contain",
+              scrollSnapType: "x mandatory",
+              scrollPaddingLeft: `${SIDE_PADDING}px`,
+              scrollPaddingRight: `${SIDE_PADDING}px`,
+              padding: `0 ${SIDE_PADDING}px`,
+              transform: "translateZ(0)",
+              WebkitTransform: "translateZ(0)",
+              backfaceVisibility: "hidden",
             }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerCancel}
+            onPointerLeave={handlePointerLeave}
+            onDragStart={(e) => e.preventDefault()}
           >
-            <div
-              ref={carouselRef}
-              className="trending-carousel"
-              style={{
-                ...carouselStyle,
-                cursor: "default",
-                WebkitOverflowScrolling: "touch",
-                overscrollBehaviorX: "contain",
-              }}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerUp}
-              onPointerCancel={handlePointerCancel}
-              onPointerLeave={handlePointerLeave}
-              onDragStart={(e) => e.preventDefault()}
-            >
-              {infiniteItems.map((popup, index) => {
-                const actualIndex = getActualIndex(index);
-                const cardImage = HERO_IMAGES[actualIndex] ?? HERO_IMAGES[0];
-                const isActive = index === currentIndex;
+            {infiniteItems.map((popup, index) => {
+              const actualIndex = getActualIndex(index);
+              const cardImage = HERO_IMAGES[actualIndex] ?? HERO_IMAGES[0];
+              const isActive = index === currentIndex;
 
-                return (
+              return (
+                <div
+                  key={`${popup.id}-${index}`}
+                  ref={setItemRef(index)}
+                  onClick={() => {
+                    if (Date.now() < blockClickUntilRef.current) return;
+                    onNavigate("detail", popup.id);
+                  }}
+                  style={{
+                    position: "relative",
+                    flex: "0 0 auto",
+                    width: `min(${CARD_MAX_WIDTH}px, calc(100% - ${SIDE_PADDING * 2}px))`,
+                    height: `${CARD_HEIGHT}px`,
+                    borderRadius: 15,
+                    overflow: "hidden",
+                    cursor: "pointer",
+                    scrollSnapAlign: "center",
+                    scrollSnapStop: "always",
+                    opacity: isActive ? 1 : INACTIVE_OPACITY,
+                    transform: `translateZ(0) scale(${isActive ? 1 : INACTIVE_SCALE})`,
+                    WebkitTransform: `translateZ(0) scale(${isActive ? 1 : INACTIVE_SCALE})`,
+                    transition: "transform 0.28s ease, opacity 0.28s ease",
+                    willChange: "transform, opacity",
+                    isolation: "isolate",
+                    backfaceVisibility: "hidden",
+                    contain: "paint",
+
+                    background: "rgba(0,0,0,0.08)",
+                  }}
+                >
                   <div
-                    key={`${popup.id}-${index}`}
-                    ref={setItemRef(index)}
-                    onClick={() => {
-                      if (Date.now() < blockClickUntilRef.current) return;
-                      onNavigate("detail", popup.id);
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      backgroundImage: `url(${cardImage})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      zIndex: 0,
+                      pointerEvents: "none",
                     }}
+                  />
+
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background:
+                        "linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.45) 100%)",
+                      zIndex: 1,
+                      pointerEvents: "none",
+                    }}
+                  />
+
+                  <div
                     style={{
                       position: "relative",
-                      flexShrink: 0,
-                      width:
-                        "min(var(--cardMax), calc(100% - (var(--peek) * 2)))",
-                      height: "var(--cardH)",
-                      borderRadius: "15px",
-                      overflow: "hidden",
-                      cursor: "pointer",
-                      scrollSnapAlign: "center",
-                      scrollSnapStop: "always",
-                      transform: isActive ? "scale(1)" : "scale(0.92)",
-                      opacity: isActive ? 1 : 0.5,
-                      transition: "transform 0.3s ease, opacity 0.3s ease",
-                      willChange: "transform, opacity",
+                      zIndex: 2,
+                      height: "100%",
+                      padding: 24,
+                      paddingBottom: 28,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
                     }}
                   >
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        backgroundImage: `url(${cardImage})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                      }}
-                    />
+                    <div>
+                      <div
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          padding: "2px 16px",
+                          background: "rgba(0, 0, 0, 0.35)",
+                          border: "2px solid #B0D655",
+                          borderRadius: 50,
+                          color: "#B0D655",
+                          fontSize: 17,
+                          fontWeight: 700,
+                        }}
+                      >
+                        오픈 예정
+                      </div>
+                    </div>
 
                     <div
                       style={{
-                        position: "absolute",
-                        inset: 0,
-                        background:
-                          "linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.45) 100%)",
-                      }}
-                    />
-
-                    <div
-                      style={{
-                        position: "relative",
-                        height: "100%",
-                        padding: "24px",
-                        paddingBottom: "28px",
                         display: "flex",
-                        flexDirection: "column",
                         justifyContent: "space-between",
+                        alignItems: "flex-end",
                       }}
                     >
                       <div>
-                        <div
+                        <h2
                           style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            padding: "2px 16px",
-                            background: "rgba(0, 0, 0, 0.35)",
-                            border: "2px solid #B0D655",
-                            borderRadius: "50px",
-                            color: "#B0D655",
-                            fontSize: "17px",
-                            fontWeight: 700,
+                            margin: 0,
+                            marginBottom: 16,
+                            color: "#FFFFFF",
+                            fontSize: "1.5rem",
+                            fontWeight: 600,
+                            textShadow: "0 2px 12px rgba(0,0,0,0.3)",
                           }}
                         >
-                          오픈 예정
+                          {popup.popupName}
+                        </h2>
+
+                        <div
+                          style={{
+                            marginBottom: 6,
+                            color: "#eeeeee",
+                            fontSize: "1.1rem",
+                            fontWeight: 600,
+                          }}
+                        >
+                          {popup.area}
+                        </div>
+
+                        <div
+                          style={{
+                            color: "#B8BABC",
+                            fontSize: "0.8rem",
+                            fontWeight: 600,
+                          }}
+                        >
+                          {new Date(popup.startDate).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })}
                         </div>
                       </div>
 
                       <div
                         style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "flex-end",
+                          padding: "5px 14px",
+                          background: "rgba(0, 0, 0, 0.3)",
+                          borderRadius: 15,
+                          color: "#FFFFFF",
+                          fontSize: "0.8rem",
+                          fontWeight: 500,
+                          flexShrink: 0,
+                          marginLeft: 16,
                         }}
                       >
-                        <div>
-                          <h2
-                            style={{
-                              margin: 0,
-                              marginBottom: "16px",
-                              color: "#FFFFFF",
-                              fontSize: "1.5rem",
-                              fontWeight: 600,
-                              textShadow: "0 2px 12px rgba(0,0,0,0.3)",
-                            }}
-                          >
-                            {popup.popupName}
-                          </h2>
-
-                          <div
-                            style={{
-                              marginBottom: "6px",
-                              color: "#eeeeee",
-                              fontSize: "1.1rem",
-                              fontWeight: 600,
-                            }}
-                          >
-                            {popup.area}
-                          </div>
-
-                          <div
-                            style={{
-                              color: "#B8BABC",
-                              fontSize: "0.8rem",
-                              fontWeight: 600,
-                            }}
-                          >
-                            {new Date(popup.startDate).toLocaleDateString(
-                              "en-US",
-                              {
-                                year: "numeric",
-                                month: "2-digit",
-                                day: "2-digit",
-                              },
-                            )}
-                          </div>
-                        </div>
-
-                        <div
-                          style={{
-                            padding: "5px 14px",
-                            background: "rgba(0, 0, 0, 0.3)",
-                            borderRadius: "15px",
-                            color: "#FFFFFF",
-                            fontSize: "0.8rem",
-                            fontWeight: 500,
-                            flexShrink: 0,
-                            marginLeft: "16px",
-                          }}
-                        >
-                          {actualIndex + 1} / {Math.max(1, realLen)}
-                        </div>
+                        {actualIndex + 1} / {Math.max(1, realLen)}
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
