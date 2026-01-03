@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import type { ViewType } from "@/routes/routes";
 
-import { Home } from "@/components/Home";
+import { Home } from "@/components/home/Home";
 import { Browse } from "@/components/Browse";
 import { Calendar } from "@/components/Calendar";
 import { MapView } from "@/components/ui/map/MapView";
