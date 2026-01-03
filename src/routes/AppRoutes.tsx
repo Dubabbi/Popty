@@ -18,7 +18,7 @@ import { Settings } from "@/components/my";
 import { NotificationSettings } from "@/components/my";
 import { ProfileEdit } from "@/components/my";
 import { ReportPopup } from "@/components/my";
-import { Login } from "@/components/login/login";
+import { Login } from "@/components/login/Login";
 
 type Breakpoint = "mobile" | "tablet" | "desktop";
 
