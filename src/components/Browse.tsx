@@ -2,7 +2,7 @@ import { useState } from "react";
 import { SlidersHorizontal, Grid3x3, List as ListIcon } from "lucide-react";
 import { PopupCard } from "@/components/PopupCard";
 import { FilterChip } from "@/components/FilterChip";
-import { FilterModal } from "@/components/FilterModal";
+import { FilterModal } from "@/components/home/parts/FilterModal";
 import { popupsData } from "@/data/popups";
 import { Mascot } from "@/components/Mascot";
 import type { ViewType } from "@/routes/routes";
@@ -19,18 +19,12 @@ export function Browse({ onNavigate, breakpoint }: BrowseProps) {
   const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const gridCols =
-    breakpoint === "desktop" ? 3 : breakpoint === "tablet" ? 2 : 1;
+  const gridCols = breakpoint === "desktop" ? 3 : breakpoint === "tablet" ? 2 : 1;
 
   // Simulated filter
   const filteredPopups = popupsData.filter((popup) => {
-    if (selectedArea.length > 0 && !selectedArea.includes(popup.area))
-      return false;
-    if (
-      selectedCategory.length > 0 &&
-      !selectedCategory.includes(popup.category)
-    )
-      return false;
+    if (selectedArea.length > 0 && !selectedArea.includes(popup.area)) return false;
+    if (selectedCategory.length > 0 && !selectedCategory.includes(popup.category)) return false;
     return true;
   });
 
@@ -103,9 +97,7 @@ export function Browse({ onNavigate, breakpoint }: BrowseProps) {
                 key={area}
                 label={area}
                 selected
-                onRemove={() =>
-                  setSelectedArea(selectedArea.filter((a) => a !== area))
-                }
+                onRemove={() => setSelectedArea(selectedArea.filter((a) => a !== area))}
               />
             ))}
             {selectedCategory.map((cat) => (
@@ -113,9 +105,7 @@ export function Browse({ onNavigate, breakpoint }: BrowseProps) {
                 key={cat}
                 label={cat}
                 selected
-                onRemove={() =>
-                  setSelectedCategory(selectedCategory.filter((c) => c !== cat))
-                }
+                onRemove={() => setSelectedCategory(selectedCategory.filter((c) => c !== cat))}
               />
             ))}
           </div>
@@ -135,18 +125,13 @@ export function Browse({ onNavigate, breakpoint }: BrowseProps) {
                 padding: "var(--space-2)",
                 borderRadius: "var(--radius-md)",
                 border: "none",
-                background:
-                  layout === "grid" ? "var(--color-primary-bg)" : "transparent",
+                background: layout === "grid" ? "var(--color-primary-bg)" : "transparent",
                 cursor: "pointer",
               }}
             >
               <Grid3x3
                 size={20}
-                color={
-                  layout === "grid"
-                    ? "var(--color-primary)"
-                    : "var(--color-gray-400)"
-                }
+                color={layout === "grid" ? "var(--color-primary)" : "var(--color-gray-400)"}
               />
             </button>
             <button
@@ -155,18 +140,13 @@ export function Browse({ onNavigate, breakpoint }: BrowseProps) {
                 padding: "var(--space-2)",
                 borderRadius: "var(--radius-md)",
                 border: "none",
-                background:
-                  layout === "list" ? "var(--color-primary-bg)" : "transparent",
+                background: layout === "list" ? "var(--color-primary-bg)" : "transparent",
                 cursor: "pointer",
               }}
             >
               <ListIcon
                 size={20}
-                color={
-                  layout === "list"
-                    ? "var(--color-primary)"
-                    : "var(--color-gray-400)"
-                }
+                color={layout === "list" ? "var(--color-primary)" : "var(--color-gray-400)"}
               />
             </button>
           </div>
@@ -241,8 +221,7 @@ export function Browse({ onNavigate, breakpoint }: BrowseProps) {
           <div
             style={{
               display: layout === "grid" ? "grid" : "flex",
-              gridTemplateColumns:
-                layout === "grid" ? `repeat(${gridCols}, 1fr)` : undefined,
+              gridTemplateColumns: layout === "grid" ? `repeat(${gridCols}, 1fr)` : undefined,
               flexDirection: layout === "list" ? "column" : undefined,
               gap: "var(--space-4)",
             }}

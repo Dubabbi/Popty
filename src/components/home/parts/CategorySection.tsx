@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Mascot } from "@/components/Mascot";
 import { popupsData } from "@/data/popups";
 import type { ViewType } from "@/routes/routes";
-import { PopupGrid } from "@/components/ui/home/PopupGrid";
+import { PopupGrid } from "@/components/home/parts/PopupGrid";
 
 interface CategorySectionProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
@@ -11,21 +11,15 @@ interface CategorySectionProps {
 export function CategorySection({ onNavigate }: CategorySectionProps) {
   const categoryPopups = useMemo(
     () => ({
-      Character: popupsData
-        .filter((p) => p.category === "Character")
-        .slice(0, 3),
+      Character: popupsData.filter((p) => p.category === "Character").slice(0, 3),
       Food: popupsData.filter((p) => p.category === "Food").slice(0, 3),
       Fashion: popupsData.filter((p) => p.category === "Fashion").slice(0, 3),
     }),
-    [],
+    []
   );
 
   const label = (category: string) =>
-    category === "Character"
-      ? "🎀 캐릭터"
-      : category === "Food"
-        ? "🍰 음식"
-        : "👗 패션";
+    category === "Character" ? "🎀 캐릭터" : category === "Food" ? "🍰 음식" : "👗 패션";
 
   return (
     <section>
@@ -54,10 +48,7 @@ export function CategorySection({ onNavigate }: CategorySectionProps) {
               {label(category)}
             </h4>
 
-            <PopupGrid
-              popups={popups}
-              onClickPopup={(id) => onNavigate("detail", id)}
-            />
+            <PopupGrid popups={popups} onClickPopup={(id) => onNavigate("detail", id)} />
           </div>
 
           {index < Object.entries(categoryPopups).length - 1 && (

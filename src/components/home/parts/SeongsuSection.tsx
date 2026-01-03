@@ -1,16 +1,14 @@
 import { MapPin } from "lucide-react";
 import { popupsData } from "@/data/popups";
 import type { ViewType } from "@/routes/routes";
-import { PopupGrid } from "@/components/ui/home/PopupGrid";
+import { PopupGrid } from "@/components/home/parts/PopupGrid";
 
 interface SeongsuSectionProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
 }
 
 export function SeongsuSection({ onNavigate }: SeongsuSectionProps) {
-  const seongsuPopups = popupsData
-    .filter((p) => p.area === "Seongsu")
-    .slice(0, 4);
+  const seongsuPopups = popupsData.filter((p) => p.area === "Seongsu").slice(0, 4);
 
   return (
     <section style={{ padding: "0 var(--space-4) var(--space-6)" }}>
@@ -34,10 +32,7 @@ export function SeongsuSection({ onNavigate }: SeongsuSectionProps) {
         </div>
       </div>
 
-      <PopupGrid
-        popups={seongsuPopups}
-        onClickPopup={(id) => onNavigate("detail", id)}
-      />
+      <PopupGrid popups={seongsuPopups} onClickPopup={(id) => onNavigate("detail", id)} />
     </section>
   );
 }

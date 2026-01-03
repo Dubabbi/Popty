@@ -1,9 +1,9 @@
 import type { ViewType } from "@/routes/routes";
-import { MapBanner } from "@/components/ui/home/MapBanner";
-import { TrendingCarouselSection } from "@/components/ui/home/TrendingCarouselSection";
-import { EndingSoonSection } from "@/components/ui/home/EndingSoonSection";
-import { SeongsuSection } from "@/components/ui/home/SeongsuSection";
-import { CategorySection } from "@/components/ui/home/CategorySection";
+import { MapBanner } from "@/components/home/parts/MapBanner";
+import { TrendingCarouselSection } from "@/components/home/parts/TrendingCarouselSection";
+import { EndingSoonSection } from "@/components/home/parts/EndingSoonSection";
+import { SeongsuSection } from "@/components/home/parts/SeongsuSection";
+import { CategorySection } from "@/components/home/parts/CategorySection";
 
 interface HomeProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
