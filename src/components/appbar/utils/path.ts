@@ -10,7 +10,12 @@ export function normalizePath(path: string) {
   return path.split("?")[0].split("#")[0].replace(/\/+$/, "");
 }
 
-export function isMyRoute(path?: string) {
+export function isMyRootRoute(path?: string) {
   const p = normalizePath(getEffectivePath(path));
-  return /(^|\/)my(\/|$)/.test(p);
+  return p === "/my" || p === "my";
+}
+
+export function isMySubRoute(path?: string) {
+  const p = normalizePath(getEffectivePath(path));
+  return /(^|\/)my\/.+/.test(p);
 }
