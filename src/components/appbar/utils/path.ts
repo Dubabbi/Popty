@@ -19,3 +19,8 @@ export function isMySubRoute(path?: string) {
   const p = normalizePath(getEffectivePath(path));
   return /(^|\/)my\/.+/.test(p);
 }
+
+export function isHomeRoute(path?: string) {
+  const p = normalizePath(getEffectivePath(path));
+  return p === "" || p === "/" || p === "/home" || p === "home";
+}
