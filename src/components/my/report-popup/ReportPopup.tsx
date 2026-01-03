@@ -9,6 +9,7 @@ import { DateInputs } from "@/components/my/report-popup/parts/DateInputs";
 import { CategorySelector } from "@/components/my/report-popup/parts/CategorySelector";
 import { DescriptionTextArea } from "@/components/my/report-popup/parts/DescriptionTextArea";
 import { SubmitButton } from "@/components/my/report-popup/parts/SubmitButton";
+import { Toast, type ToastType } from "@/components/Toast";
 
 export function ReportPopup({ onNavigate }: ReportPopupProps) {
   const [title, setTitle] = useState("");
@@ -20,11 +21,25 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState("");
+  const [toastType, setToastType] = useState<ToastType>("info");
+
   const handleSubmit = () => {
-    if (!title || !location || !startDate || !endDate || !category) {
-      alert("필수 정보를 모두 입력해주세요!");
+    const missing: string[] = [];
+    if (!title) missing.push("팝업 이름");
+    if (!location) missing.push("위치");
+    if (!startDate) missing.push("시작일");
+    if (!endDate) missing.push("종료일");
+    if (!category) missing.push("카테고리");
+
+    if (missing.length) {
+      setToastMsg(`${missing.join(", ")} 입력이 필요해요`);
+      setToastType("error");
+      setToastOpen(true);
       return;
     }
+
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
@@ -42,7 +57,6 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
         paddingBottom: "var(--space-8)",
       }}
     >
-      {/* Intro Card */}
       <IntroCard />
 
       {/* Form */}
@@ -85,6 +99,15 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
 
         <SubmitButton isSubmitting={isSubmitting} onClick={handleSubmit} />
       </div>
+
+      {toastOpen && (
+        <Toast
+          message={toastMsg}
+          type={toastType}
+          duration={2200}
+          onClose={() => setToastOpen(false)}
+        />
+      )}
     </div>
   );
 }
