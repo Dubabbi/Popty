@@ -3,9 +3,9 @@ import type { FAQ } from "@/components/my/types/help";
 export const FAQS: FAQ[] = [
   {
     category: "일반",
-    question: "PopUp!은 무엇인가요?",
+    question: "Popty!는 무엇인가요?",
     answer:
-      "PopUp!은 전국의 팝업스토어 정보를 한눈에 확인하고, 나만의 팝업 여행을 계획할 수 있는 서비스입니다. 실시간으로 업데이트되는 팝업 정보를 확인하고, 관심 있는 팝업을 저장해보세요!",
+      "Popty!는 전국의 팝업스토어 정보를 한눈에 확인하고, 나만의 팝업 여행을 계획할 수 있는 서비스입니다. 실시간으로 업데이트되는 팝업 정보를 확인하고, 관심 있는 팝업을 저장해보세요!",
   },
   {
     category: "기능",
