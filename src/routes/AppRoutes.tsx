@@ -18,6 +18,7 @@ import { Settings } from "@/components/my";
 import { NotificationSettings } from "@/components/my";
 import { ProfileEdit } from "@/components/my";
 import { ReportPopup } from "@/components/my";
+import { Login } from "@/components/login/Login";
 
 type Breakpoint = "mobile" | "tablet" | "desktop";
 
@@ -54,6 +55,7 @@ export function AppRoutes({ breakpoint, onNavigate }: AppRoutesProps) {
         path="/capsule"
         element={<Capsule onNavigate={onNavigate} breakpoint={breakpoint} />}
       />
+      <Route path="/login" element={<Login onLogin={() => onNavigate("home")} />} />
       <Route
         path="/detail/:popupId"
         element={<PopupDetail onNavigate={onNavigate} breakpoint={breakpoint} />}

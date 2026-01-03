@@ -55,18 +55,14 @@ export function CollectionPreview({ mascots, collection }: Props) {
               key={mascotKey}
               style={{
                 aspectRatio: "1",
-                background: isCollected
-                  ? mascot.gradient
-                  : "rgba(255,255,255,0.1)",
+                background: isCollected ? mascot.gradient : "rgba(255,255,255,0.1)",
                 borderRadius: "var(--radius-lg)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: "1.8rem",
                 border: "2px solid rgba(255,255,255,0.2)",
-                boxShadow: isCollected
-                  ? `0 4px 12px ${mascot.color}40`
-                  : "none",
+                boxShadow: isCollected ? `0 4px 12px ${mascot.color}40` : "none",
                 filter: isCollected ? "none" : "grayscale(1) opacity(0.3)",
                 transition: "all 0.3s ease",
               }}

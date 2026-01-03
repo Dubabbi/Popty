@@ -57,9 +57,7 @@ export function LobbyView({
     >
       {/* Header */}
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: "3rem", marginBottom: "var(--space-2)" }}>
-          🎰
-        </div>
+        <div style={{ fontSize: "3rem", marginBottom: "var(--space-2)" }}>🎰</div>
         <h1
           style={{
             color: "white",
@@ -150,7 +148,6 @@ export function LobbyView({
           margin: "0 auto",
           width: "100%",
           maxWidth: 440,
-          height: 600,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -193,8 +190,7 @@ export function LobbyView({
             gap: "var(--space-2)",
           }}
           onMouseDown={(e) => {
-            if (!isPullDisabled)
-              e.currentTarget.style.transform = "scale(0.96)";
+            if (!isPullDisabled) e.currentTarget.style.transform = "scale(0.96)";
           }}
           onMouseUp={(e) => {
             e.currentTarget.style.transform = "scale(1)";
@@ -224,17 +220,14 @@ export function LobbyView({
             padding: "var(--space-5)",
             cursor: !isTenPullDisabled ? "pointer" : "not-allowed",
             transition: "all 0.3s ease",
-            boxShadow: !isTenPullDisabled
-              ? "0 8px 20px rgba(107,138,255,0.3)"
-              : "none",
+            boxShadow: !isTenPullDisabled ? "0 8px 20px rgba(107,138,255,0.3)" : "none",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             gap: "var(--space-2)",
           }}
           onMouseDown={(e) => {
-            if (!isTenPullDisabled)
-              e.currentTarget.style.transform = "scale(0.96)";
+            if (!isTenPullDisabled) e.currentTarget.style.transform = "scale(0.96)";
           }}
           onMouseUp={(e) => {
             e.currentTarget.style.transform = "scale(1)";
