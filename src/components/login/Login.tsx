@@ -1,9 +1,43 @@
+import { useState } from "react";
+import { signInWithKakao } from "@/apis/auth/kakaoLogin";
+
 interface LoginProps {
-  onLogin: () => void;
+  onLogin?: () => void;
   breakpoint?: "mobile" | "tablet" | "desktop";
 }
 
+function getErrorMessage(err: unknown) {
+  if (err instanceof Error) return err.message;
+  if (typeof err === "string") return err;
+
+  if (typeof err === "object" && err !== null && "message" in err) {
+    const msg = (err as { message?: unknown }).message;
+    if (typeof msg === "string") return msg;
+  }
+  return "로그인에 실패했어요. 다시 시도해주세요.";
+}
+
 export function Login({ onLogin }: LoginProps) {
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleKakaoLogin = async () => {
+    setErrorMsg(null);
+    setLoading(true);
+
+    try {
+      await signInWithKakao();
+
+      onLogin?.();
+    } catch (err: unknown) {
+      console.error(err);
+      setErrorMsg(getErrorMessage(err));
+    } finally {
+      // 리다이렉트가 안 일어난 케이스(에러 등) 대비
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       style={{
@@ -31,15 +65,13 @@ export function Login({ onLogin }: LoginProps) {
       >
         {/* Top Left Triangle */}
         <path
-          d="M0 80 L0 150 L70 80 Z"
+          d="M0 40 L0 100 L70 40 Z"
           fill="#FF7B6B"
-          style={{
-            animation: "shapeFloatTL 6s ease-in-out infinite",
-          }}
+          style={{ animation: "shapeFloatTL 6s ease-in-out infinite" }}
         />
 
         {/* Top Right Pencil Shape */}
-        <g transform="translate(280, 80)">
+        <g transform="translate(280, 20)">
           <rect
             x="0"
             y="20"
@@ -47,9 +79,7 @@ export function Login({ onLogin }: LoginProps) {
             height="120"
             rx="4"
             fill="#FFB3A7"
-            style={{
-              animation: "shapeFloatTR 7s ease-in-out infinite",
-            }}
+            style={{ animation: "shapeFloatTR 7s ease-in-out infinite" }}
           />
           <path d="M 20,20 L 45,0 L 70,20 Z" fill="#FF7B6B" />
         </g>
@@ -102,9 +132,7 @@ export function Login({ onLogin }: LoginProps) {
           strokeWidth="3"
           fill="none"
           opacity="0.6"
-          style={{
-            animation: "pathDraw 2s ease-out both",
-          }}
+          style={{ animation: "pathDraw 2s ease-out both" }}
         />
       </svg>
 
@@ -175,9 +203,26 @@ export function Login({ onLogin }: LoginProps) {
             animation: "fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both",
           }}
         >
+          {/* (옵션) 에러 메시지 */}
+          {errorMsg && (
+            <div
+              style={{
+                padding: "12px 14px",
+                borderRadius: 12,
+                background: "#FFF2F0",
+                color: "#D92D20",
+                fontSize: 13,
+                fontWeight: 600,
+              }}
+            >
+              {errorMsg}
+            </div>
+          )}
+
           {/* Kakao Login */}
           <button
-            onClick={onLogin}
+            onClick={handleKakaoLogin}
+            disabled={loading}
             style={{
               width: "100%",
               height: 56,
@@ -188,10 +233,12 @@ export function Login({ onLogin }: LoginProps) {
               alignItems: "center",
               justifyContent: "center",
               gap: "var(--space-2)",
-              cursor: "pointer",
+              cursor: loading ? "not-allowed" : "pointer",
               transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+              opacity: loading ? 0.7 : 1,
             }}
             onMouseEnter={(e) => {
+              if (loading) return;
               e.currentTarget.style.transform = "translateY(-2px)";
               e.currentTarget.style.boxShadow = "0 8px 16px rgba(254, 229, 0, 0.3)";
             }}
@@ -210,20 +257,16 @@ export function Login({ onLogin }: LoginProps) {
               />
             </svg>
             <span
-              style={{
-                fontSize: "0.938rem",
-                fontWeight: 700,
-                color: "#000000",
-                opacity: 0.85,
-              }}
+              style={{ fontSize: "0.938rem", fontWeight: 700, color: "#000000", opacity: 0.85 }}
             >
-              카카오로 시작하기
+              {loading ? "로그인 중..." : "카카오로 시작하기"}
             </span>
           </button>
 
-          {/* Apple Login */}
+          {/* Apple Login (2차) */}
           <button
-            onClick={onLogin}
+            onClick={() => alert("Apple 로그인은 2차에서 추가해도 돼요!")}
+            disabled
             style={{
               width: "100%",
               height: 56,
@@ -234,16 +277,8 @@ export function Login({ onLogin }: LoginProps) {
               alignItems: "center",
               justifyContent: "center",
               gap: "var(--space-2)",
-              cursor: "pointer",
-              transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 8px 16px rgba(0, 0, 0, 0.3)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "none";
+              cursor: "not-allowed",
+              opacity: 0.5,
             }}
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -252,13 +287,7 @@ export function Login({ onLogin }: LoginProps) {
                 fill="white"
               />
             </svg>
-            <span
-              style={{
-                fontSize: "0.938rem",
-                fontWeight: 700,
-                color: "#FFFFFF",
-              }}
-            >
+            <span style={{ fontSize: "0.938rem", fontWeight: 700, color: "#FFFFFF" }}>
               Apple로 시작하기
             </span>
           </button>
@@ -285,52 +314,24 @@ export function Login({ onLogin }: LoginProps) {
 
       <style>{`
         @keyframes fadeUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
-
         @keyframes shapeFloatTL {
-          0%, 100% {
-            transform: translate(0, 0);
-          }
-          50% {
-            transform: translate(10px, 15px);
-          }
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(10px, 15px); }
         }
-
         @keyframes shapeFloatTR {
-          0%, 100% {
-            transform: rotate(0deg);
-          }
-          50% {
-            transform: rotate(3deg);
-          }
+          0%, 100% { transform: rotate(0deg); }
+          50% { transform: rotate(3deg); }
         }
-
         @keyframes rotate {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
-
         @keyframes pathDraw {
-          from {
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
-          }
-          to {
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 0;
-          }
+          from { stroke-dasharray: 1000; stroke-dashoffset: 1000; }
+          to { stroke-dasharray: 1000; stroke-dashoffset: 0; }
         }
       `}</style>
     </div>

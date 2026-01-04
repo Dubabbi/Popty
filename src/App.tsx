@@ -17,12 +17,18 @@ export default function App() {
   const currentView = getCurrentView(pathname);
   const isDetail = matchPath("/detail/:popupId", pathname) !== null;
 
+  const isAuthRoute =
+    matchPath("/login", pathname) !== null ||
+    matchPath("/auth/callback", pathname) !== null ||
+    matchPath("/onboarding/*", pathname) !== null;
+
   const viewPaths = Object.values(VIEW_PATH) as readonly string[];
   const isKnownRoute = pathname === "/" || isDetail || viewPaths.includes(pathname);
 
   const isNotFound = !isKnownRoute;
 
-  const showBottomNav = breakpoint !== "desktop" && !isNotFound && currentView !== "detail";
+  const showBottomNav =
+    breakpoint !== "desktop" && !isNotFound && !isAuthRoute && currentView !== "detail";
 
   return (
     <div className="app-container scrollbar-hide">
@@ -30,7 +36,7 @@ export default function App() {
         style={showBottomNav ? { paddingBottom: "90px" } : undefined}
         className={`viewport viewport-${breakpoint}`}
       >
-        {!isDetail && !isNotFound && (
+        {!isDetail && !isNotFound && !isAuthRoute && (
           <AppBar
             title={toTitle(currentView)}
             currentView={currentView}
