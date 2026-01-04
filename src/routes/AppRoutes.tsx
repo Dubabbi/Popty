@@ -19,6 +19,7 @@ import { NotificationSettings } from "@/components/my";
 import { ProfileEdit } from "@/components/my";
 import { ReportPopup } from "@/components/my";
 import { Login } from "@/components/login/Login";
+import AuthCallback from "@/components/auth/AuthCallback";
 
 type Breakpoint = "mobile" | "tablet" | "desktop";
 
@@ -45,6 +46,7 @@ export function AppRoutes({ breakpoint, onNavigate }: AppRoutesProps) {
       <Route path="/my" element={<My onNavigate={onNavigate} breakpoint={breakpoint} />} />
       <Route path="/my/profile-edit" element={<ProfileEdit />} />
       <Route path="/my/notification-settings" element={<NotificationSettings />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
       <Route
         path="/my/report-popup"
         element={<ReportPopup onNavigate={onNavigate} breakpoint={breakpoint} />}
