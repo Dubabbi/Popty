@@ -1,6 +1,7 @@
 import { Search as SearchIcon, X, MapPin, Calendar, Heart } from "lucide-react";
 import { useState } from "react";
 import type { ViewType } from "@/routes/routes";
+import { useRecentKeywords } from "@/apis/popup/useRecentKeywords";
 
 interface SearchProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
@@ -108,8 +109,9 @@ export function Search({ onNavigate }: SearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<PopupResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const recent = useRecentKeywords(5);
   const [savedItems, setSavedItems] = useState<Set<string>>(
-    new Set(mockResults.filter((r) => r.isSaved).map((r) => r.id)),
+    new Set(mockResults.filter((r) => r.isSaved).map((r) => r.id))
   );
 
   const handleSearch = (query: string) => {
@@ -122,7 +124,7 @@ export function Search({ onNavigate }: SearchProps) {
           (result) =>
             result.title.toLowerCase().includes(query.toLowerCase()) ||
             result.category.toLowerCase().includes(query.toLowerCase()) ||
-            result.location.toLowerCase().includes(query.toLowerCase()),
+            result.location.toLowerCase().includes(query.toLowerCase())
         );
         setResults(filtered);
         setIsSearching(false);
@@ -157,8 +159,7 @@ export function Search({ onNavigate }: SearchProps) {
   };
 
   const showEmptyState = searchQuery.length === 0;
-  const showNoResults =
-    searchQuery.length > 0 && results.length === 0 && !isSearching;
+  const showNoResults = searchQuery.length > 0 && results.length === 0 && !isSearching;
 
   return (
     <div style={{ background: "white", padding: "var(--space-4)" }}>
@@ -225,6 +226,7 @@ export function Search({ onNavigate }: SearchProps) {
       {showEmptyState && (
         <>
           {/* Recent Searches */}
+          {/* Recent Searches */}
           <div style={{ marginBottom: "var(--space-6)" }}>
             <h2
               style={{
@@ -235,15 +237,63 @@ export function Search({ onNavigate }: SearchProps) {
             >
               최근 검색어
             </h2>
-            <p
-              style={{
-                margin: 0,
-                color: "var(--color-text-tertiary)",
-                fontSize: "0.9375rem",
-              }}
-            >
-              No recent search history.
-            </p>
+
+            {recent.isLoading ? (
+              <p
+                style={{
+                  margin: 0,
+                  color: "var(--color-text-tertiary)",
+                  fontSize: "0.9375rem",
+                }}
+              >
+                Loading...
+              </p>
+            ) : (recent.data?.length ?? 0) === 0 ? (
+              <p
+                style={{
+                  margin: 0,
+                  color: "var(--color-text-tertiary)",
+                  fontSize: "0.9375rem",
+                }}
+              >
+                No recent search history.
+              </p>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "var(--space-2)",
+                }}
+              >
+                {recent.data!.map((item) => (
+                  <button
+                    key={item.keyword}
+                    onClick={() => handleQuickSearch(item.keyword)}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 0,
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "var(--space-2)",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: "var(--color-text-primary)",
+                        fontSize: "0.9375rem",
+                        flex: 1,
+                      }}
+                    >
+                      {item.keyword}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Popular Searches */}
@@ -281,10 +331,7 @@ export function Search({ onNavigate }: SearchProps) {
                 >
                   <span
                     style={{
-                      color:
-                        index < 3
-                          ? "var(--color-primary)"
-                          : "var(--color-text-tertiary)",
+                      color: index < 3 ? "var(--color-primary)" : "var(--color-text-tertiary)",
                       fontSize: "0.9375rem",
                       fontWeight: 600,
                       minWidth: "16px",
@@ -465,8 +512,7 @@ export function Search({ onNavigate }: SearchProps) {
                 fontSize: "0.875rem",
               }}
             >
-              {results.length} {results.length === 1 ? "result" : "results"} for
-              "{searchQuery}"
+              {results.length} {results.length === 1 ? "result" : "results"} for "{searchQuery}"
             </p>
           </div>
 
@@ -491,8 +537,7 @@ export function Search({ onNavigate }: SearchProps) {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 8px 24px rgba(0,0,0,0.12)";
+                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.12)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "translateY(0)";
@@ -540,9 +585,7 @@ export function Search({ onNavigate }: SearchProps) {
                           marginBottom: "var(--space-2)",
                         }}
                       >
-                        <h3
-                          style={{ margin: 0, marginBottom: "var(--space-1)" }}
-                        >
+                        <h3 style={{ margin: 0, marginBottom: "var(--space-1)" }}>
                           {result.title}
                         </h3>
                         <button
@@ -565,11 +608,7 @@ export function Search({ onNavigate }: SearchProps) {
                                 ? "var(--color-error)"
                                 : "var(--color-text-tertiary)"
                             }
-                            fill={
-                              savedItems.has(result.id)
-                                ? "var(--color-error)"
-                                : "none"
-                            }
+                            fill={savedItems.has(result.id) ? "var(--color-error)" : "none"}
                           />
                         </button>
                       </div>
@@ -621,10 +660,7 @@ export function Search({ onNavigate }: SearchProps) {
                           gap: "var(--space-2)",
                         }}
                       >
-                        <Calendar
-                          size={14}
-                          color="var(--color-text-tertiary)"
-                        />
+                        <Calendar size={14} color="var(--color-text-tertiary)" />
                         <span
                           style={{
                             fontSize: "0.8125rem",
