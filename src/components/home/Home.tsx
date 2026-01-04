@@ -4,12 +4,14 @@ import { TrendingCarouselSection } from "@/components/home/parts/trending/Trendi
 import { EndingSoonSection } from "@/components/home/parts/EndingSoonSection";
 import { SeongsuSection } from "@/components/home/parts/SeongsuSection";
 import { CategorySection } from "@/components/home/parts/CategorySection";
+import { useSupabaseDebug } from "@/supabase/useSupabaseDebug";
 
 interface HomeProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
 }
 
 export function Home({ onNavigate }: HomeProps) {
+  useSupabaseDebug({ enabled: true });
   return (
     <div className="pb-8">
       <TrendingCarouselSection onNavigate={onNavigate} />
