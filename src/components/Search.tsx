@@ -2,6 +2,8 @@ import { Search as SearchIcon, X, MapPin, Calendar, Heart } from "lucide-react";
 import { useState } from "react";
 import type { ViewType } from "@/routes/routes";
 import { useRecentKeywords } from "@/apis/popup/useRecentKeywords";
+import type { KeyboardEvent } from "react";
+import { useLogRecentKeyword } from "@/apis/popup/useLogRecentKeyword";
 
 interface SearchProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
@@ -110,6 +112,7 @@ export function Search({ onNavigate }: SearchProps) {
   const [results, setResults] = useState<PopupResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const recent = useRecentKeywords(5);
+  const logRecent = useLogRecentKeyword();
   const [savedItems, setSavedItems] = useState<Set<string>>(
     new Set(mockResults.filter((r) => r.isSaved).map((r) => r.id))
   );
@@ -142,6 +145,7 @@ export function Search({ onNavigate }: SearchProps) {
   };
 
   const handleQuickSearch = (query: string) => {
+    logRecent.mutate(query);
     handleSearch(query);
   };
 
@@ -185,6 +189,11 @@ export function Search({ onNavigate }: SearchProps) {
           placeholder="Search pop-ups or categories!"
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
+          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+            if (e.key === "Enter") {
+              logRecent.mutate(searchQuery);
+            }
+          }}
           autoFocus
           style={{
             width: "100%",
