@@ -74,12 +74,6 @@ export function useSupabaseDebug(options: Options = {}) {
         return;
       }
 
-      // 4) 최근 검색어 기록 (RPC)
-      const kw = `테스트-${Date.now()}`;
-      const logKw = await supabase.rpc("log_recent_keyword", { p_keyword: kw });
-      if (cancelled) return;
-      console.log("rpc log_recent_keyword:", kw, logKw.error);
-
       // 5) 최근 검색어 조회
       const recent = await supabase
         .from("user_recent_keywords")
