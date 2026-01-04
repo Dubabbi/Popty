@@ -23,21 +23,19 @@ export default function AuthCallback() {
         return;
       }
 
-      // ✅ 온보딩 여부: RPC로 조회
       const { data: rows, error: rpcError } = await supabase.rpc("get_my_onboarding_state");
       if (cancelled) return;
 
       if (rpcError) {
         console.error("get_my_onboarding_state error:", rpcError);
-        // 실패 시 기본은 홈으로 (원하면 /login으로 보내도 됨)
-        navigate("/", { replace: true });
+        navigate("/login", { replace: true });
         return;
       }
 
       const onboarded = (rows as OnboardingStateRow[] | null)?.[0]?.onboarded ?? false;
 
       if (onboarded) navigate("/", { replace: true });
-      else navigate("/onboarding", { replace: true }); // ✅ 첫 로그인
+      else navigate("/onboarding", { replace: true });
     })();
 
     return () => {

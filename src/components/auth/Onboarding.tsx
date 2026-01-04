@@ -103,12 +103,9 @@ export default function Onboarding() {
 
     setSubmitting(true);
     try {
-      const payload = items.map((c) => ({
-        categoryCode: c.code,
-        name: c.name_ko,
-      }));
-
-      const { error } = await supabase.rpc("set_my_tags_v2", { p_tags: payload });
+      const { error } = await supabase.rpc("set_my_categories", {
+        p_codes: items.map((i) => i.code),
+      });
       if (error) throw error;
 
       navigate("/", { replace: true });
@@ -172,7 +169,7 @@ export default function Onboarding() {
       border: "none",
       background: "transparent",
       padding: 0,
-      fontSize: 13,
+      fontSize: 16,
       fontWeight: 600,
       lineHeight: "19px",
       color: "#ff7651",
