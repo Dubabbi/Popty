@@ -2,6 +2,11 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/supabase/client";
 
+type OnboardingStateRow = {
+  user_id: string;
+  onboarded: boolean;
+};
+
 export default function AuthCallback() {
   const navigate = useNavigate();
 
@@ -18,23 +23,21 @@ export default function AuthCallback() {
         return;
       }
 
-      const userId = data.session.user.id;
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("onboarded")
-        .eq("id", userId)
-        .single();
-
+      // ✅ 온보딩 여부: RPC로 조회
+      const { data: rows, error: rpcError } = await supabase.rpc("get_my_onboarding_state");
       if (cancelled) return;
 
-      if (profileError) {
-        console.error("profile fetch error:", profileError);
+      if (rpcError) {
+        console.error("get_my_onboarding_state error:", rpcError);
+        // 실패 시 기본은 홈으로 (원하면 /login으로 보내도 됨)
         navigate("/", { replace: true });
         return;
       }
 
-      if (profile?.onboarded) navigate("/", { replace: true });
-      else navigate("/onboarding/tags", { replace: true });
+      const onboarded = (rows as OnboardingStateRow[] | null)?.[0]?.onboarded ?? false;
+
+      if (onboarded) navigate("/", { replace: true });
+      else navigate("/onboarding", { replace: true }); // ✅ 첫 로그인
     })();
 
     return () => {
@@ -106,7 +109,6 @@ export default function AuthCallback() {
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* 접근성: 모션 줄이기 */
         @media (prefers-reduced-motion: reduce) {
           .authcb__spinnerWrap { animation: none; }
           .authcb__spinner { animation: none; }

@@ -15,6 +15,7 @@ export type ViewType =
   | "report-popup"
   | "settings"
   | "login"
+  | "onboarding"
   | "help";
 
 export const VIEW_PATH: Record<Exclude<ViewType, "detail">, string> = {
@@ -34,6 +35,7 @@ export const VIEW_PATH: Record<Exclude<ViewType, "detail">, string> = {
   settings: "/my/settings",
   help: "/my/help",
   login: "/login",
+  onboarding: "onboarding",
 };
 
 export function toTitle(view: ViewType) {
