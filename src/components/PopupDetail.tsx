@@ -22,7 +22,7 @@ import { Badge } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { Mascot } from "@/components/Mascot";
 import type { ViewType } from "@/routes/routes";
-
+import { useBookmarkToggle } from "@/apis/bookmark/useBookmarkToggle";
 import { usePopupDetailQuery } from "@/apis/popup/popupDetail";
 
 interface PopupDetailProps {
@@ -57,7 +57,7 @@ function instagramLabel(url: string) {
 export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
   const { popupId } = useParams<{ popupId: string }>();
 
-  const [saved, setSaved] = useState(false);
+  const bookmarkToggle = useBookmarkToggle();
   const [reminderSet, setReminderSet] = useState(false);
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -121,12 +121,10 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
   const isFree = isFreePriceText(popup.priceText);
 
   const images = popup.images.length > 0 ? popup.images : [DEFAULT_THUMB];
+  const saved = popup.bookmarked;
 
   const handleSave = () => {
-    setSaved((prev) => !prev);
-    if (!saved) {
-      // 로직 추가
-    }
+    bookmarkToggle.mutate({ popupId: popup.id, next: !saved });
   };
 
   const handleReminder = () => {
@@ -195,6 +193,8 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
               borderRadius: "var(--radius-full)",
               background: saved ? "var(--color-primary-bg)" : "var(--color-gray-100)",
               border: "none",
+              opacity: bookmarkToggle.isPending ? 0.6 : 1,
+              pointerEvents: bookmarkToggle.isPending ? "none" : "auto",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
