@@ -10,41 +10,80 @@ import { CategorySelector } from "@/components/my/report-popup/parts/CategorySel
 import { DescriptionTextArea } from "@/components/my/report-popup/parts/DescriptionTextArea";
 import { SubmitButton } from "@/components/my/report-popup/parts/SubmitButton";
 import { Toast, type ToastType } from "@/components/Toast";
+import { useCreatePopupReportMutation } from "@/apis/auth/popup-reports";
+
+const MAX_CATEGORIES = 5;
+
+function getErrorMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (typeof err === "string") return err;
+  if (err && typeof err === "object" && "message" in err) {
+    const m = (err as { message?: unknown }).message;
+    if (typeof m === "string") return m;
+  }
+  return "알 수 없는 오류가 발생했어요.";
+}
 
 export function ReportPopup({ onNavigate }: ReportPopupProps) {
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState<string[]>([]);
   const [description, setDescription] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
   const [toastType, setToastType] = useState<ToastType>("info");
 
-  const handleSubmit = () => {
+  const createReport = useCreatePopupReportMutation();
+  const isSubmitting = createReport.isPending;
+
+  const openToast = (msg: string, type: ToastType) => {
+    setToastMsg(msg);
+    setToastType(type);
+    setToastOpen(true);
+  };
+
+  const handleSubmit = async () => {
     const missing: string[] = [];
-    if (!title) missing.push("팝업 이름");
-    if (!location) missing.push("위치");
+    if (!title.trim()) missing.push("팝업 이름");
+    if (!location.trim()) missing.push("위치");
     if (!startDate) missing.push("시작일");
     if (!endDate) missing.push("종료일");
-    if (!category) missing.push("카테고리");
+    if (categories.length === 0) missing.push("카테고리");
 
     if (missing.length) {
-      setToastMsg(`${missing.join(", ")} 입력이 필요해요`);
-      setToastType("error");
-      setToastOpen(true);
+      openToast(`${missing.join(", ")} 입력이 필요해요`, "error");
       return;
     }
 
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    if (startDate && endDate && endDate < startDate) {
+      openToast("종료일은 시작일 이후여야 해요", "error");
+      return;
+    }
+
+    try {
+      await createReport.mutateAsync({
+        title: title.trim(),
+        locationText: location.trim(),
+        startDate: startDate!,
+        endDate: endDate!,
+        categoryCodes: categories,
+        description: description.trim().length ? description.trim() : null,
+      });
+
       setIsSubmitted(true);
-    }, 1500);
+    } catch (e: unknown) {
+      const msg = getErrorMessage(e);
+
+      if (msg.toLowerCase().includes("row-level security")) {
+        openToast("로그인이 필요해요", "error");
+        return;
+      }
+
+      openToast(msg || "제보에 실패했어요. 잠시 후 다시 시도해 주세요.", "error");
+    }
   };
 
   if (isSubmitted) return <SuccessView onNavigate={onNavigate} />;
@@ -84,8 +123,17 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
 
           <CategorySelector
             categories={REPORT_CATEGORIES}
-            selected={category}
-            onSelect={(id) => setCategory(id)}
+            selected={categories}
+            onChange={setCategories}
+            maxSelected={MAX_CATEGORIES}
+            minSelected={1}
+            onInvalid={(reason) => {
+              if (reason === "max") {
+                openToast(`카테고리는 최대 ${MAX_CATEGORIES}개까지 선택할 수 있어요`, "warning");
+              } else {
+                openToast("카테고리는 최소 1개 이상 선택되어야 해요", "warning");
+              }
+            }}
           />
 
           <DescriptionTextArea
