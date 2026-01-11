@@ -8,6 +8,7 @@ export function InputWithIcon({
   onChange,
   gradient,
   icon: Icon,
+  readOnly = false,
   focusBorderColor,
   focusShadowRgba,
   iconColor = "white",
@@ -18,9 +19,10 @@ export function InputWithIcon({
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   gradient: string; // 아이콘 배경 그라데이션
   icon: LucideIcon;
+  readOnly?: boolean;
   focusBorderColor: string; // 포커스 시 보더 색
-  focusShadowRgba: string; // 포커스 시 아웃라인(박스섀도) rgba
-  iconColor?: string; // 아이콘 색 (기본 white)
+  focusShadowRgba: string; // 포커스 시 아웃라인 rgba
+  iconColor?: string;
 }) {
   return (
     <div>
@@ -56,7 +58,7 @@ export function InputWithIcon({
 
         <input
           type={type}
-          readOnly={type === "email"}
+          readOnly={readOnly}
           value={value}
           onChange={onChange}
           style={{

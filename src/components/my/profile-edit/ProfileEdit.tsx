@@ -7,6 +7,8 @@ import { SaveButton } from "@/components/my/profile-edit/parts/SaveButton";
 import { useMeQuery } from "@/apis/auth/useMeQuery";
 import { useMyProfileQuery } from "@/apis/auth/useMyProfileQuery";
 import { useUpsertMyProfileMutation } from "@/apis/auth/useUpsertMyProfileMutation";
+import { createHandleSave } from "@/components/my/profile-edit/utils/createHandleSave";
+import { Toast, type ToastType } from "@/components/Toast";
 
 export function ProfileEdit() {
   const { data: me, refetch: refetchMe } = useMeQuery();
@@ -24,29 +26,25 @@ export function ProfileEdit() {
   const bio = bioDraft ?? profile?.bio ?? "";
   const email = me?.email ?? "";
   const avatarUrl = avatarDraft ?? me?.avatarUrl ?? null;
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState("");
+  const [toastType, setToastType] = useState<ToastType>("error");
 
-  const toNullable = (v: string) => {
-    const t = v.trim();
-    return t.length ? t : null;
+  const showToast = (opts: { message: string; type: ToastType }) => {
+    setToastMsg(opts.message);
+    setToastType(opts.type);
+    setToastOpen(true);
   };
 
-  const handleSave = async () => {
-    if (isSaving) return;
-
-    try {
-      await saveProfile({
-        nickname: toNullable(name),
-        location: toNullable(location),
-        bio: toNullable(bio),
-      });
-
-      setShowSuccess(true);
-      window.setTimeout(() => setShowSuccess(false), 2000);
-    } catch (e) {
-      console.error(e);
-      alert("저장에 실패했어요. 잠시 후 다시 시도해 주세요.");
-    }
-  };
+  const handleSave = createHandleSave({
+    isSaving,
+    saveProfile,
+    name,
+    location,
+    bio,
+    setShowSuccess,
+    showToast,
+  });
 
   return (
     <div
@@ -119,6 +117,14 @@ export function ProfileEdit() {
           color: var(--color-text-tertiary);
         }
       `}</style>
+      {toastOpen && (
+        <Toast
+          message={toastMsg}
+          type={toastType}
+          duration={2200}
+          onClose={() => setToastOpen(false)}
+        />
+      )}
     </div>
   );
 }
