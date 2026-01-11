@@ -1,10 +1,11 @@
 import { useState } from "react";
 import type { ViewType } from "@/routes/routes";
 import { buildDefaultMenuItems } from "@/components/my/data/menuItems";
-import { ProfileHeader } from "@/components/my/mypage/parts/ProfileHeader";
+import ProfileHeader from "@/components/my/mypage/parts/ProfileHeader";
 import { StatsGrid } from "@/components/my/mypage/parts/StatsGrid";
 import { MenuItemButton } from "@/components/my/mypage/parts/MenuItemButton";
 import { AchievementCard } from "@/components/my/mypage/parts/AchievementCard";
+import { useMeQuery } from "@/apis/auth/useMeQuery";
 
 interface MyProps {
   onNavigate: (view: ViewType) => void;
@@ -13,7 +14,7 @@ interface MyProps {
 
 export function My({ onNavigate }: MyProps) {
   const [activeRipple, setActiveRipple] = useState<string | null>(null);
-
+  const { data: me } = useMeQuery();
   const menuItems = buildDefaultMenuItems(onNavigate);
 
   const handleMenuClick = (label: string, action: () => void) => {
@@ -30,7 +31,7 @@ export function My({ onNavigate }: MyProps) {
         minHeight: "100vh",
       }}
     >
-      <ProfileHeader />
+      <ProfileHeader name={me?.name} email={me?.email ?? undefined} />
       <StatsGrid />
       <div style={{ padding: "var(--space-4)" }}>
         <h4

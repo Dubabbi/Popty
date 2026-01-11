@@ -1,7 +1,7 @@
 import { Sparkles } from "lucide-react";
 import { Mascot } from "@/components/Mascot";
 
-export function ProfileHeader() {
+const ProfileHeader = ({ name, email }: { name?: string; email?: string }) => {
   return (
     <div
       style={{
@@ -91,7 +91,7 @@ export function ProfileHeader() {
             fontSize: "1.375rem",
           }}
         >
-          팝업 탐험가
+          {name ?? "팝업 탐험가"}
         </h3>
         <p
           style={{
@@ -101,9 +101,11 @@ export function ProfileHeader() {
             opacity: 0.8,
           }}
         >
-          popup.lover@email.com
+          {email ?? "popup.lover@email.com"}
         </p>
       </div>
     </div>
   );
-}
+};
+
+export default ProfileHeader;
