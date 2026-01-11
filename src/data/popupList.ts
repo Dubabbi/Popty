@@ -35,9 +35,12 @@ export type PopupListItem = {
   tags: string[];
   bookmarksCount: number;
   createdAt: string;
+  dday?: number;
   updatedAt: string;
+  bookmarked: boolean;
   lat: number | null;
   lng: number | null;
+  regionNameKo?: string;
 };
 
 export function parseISODate(d: string): Date {

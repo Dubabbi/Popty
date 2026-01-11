@@ -55,7 +55,7 @@ export type PopupDetailItem = {
 
   priceText: string | null;
   descriptionMd: string | null;
-
+  bookmarked?: boolean;
   parkingInfo: string | null;
   transitInfo: string | null;
 
