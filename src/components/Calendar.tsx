@@ -1,17 +1,62 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PopupCard } from "@/components/popup-card/PopupCard";
-import { popupsData } from "@/data/popups";
+import type { PopupCardItem } from "@/components/popup-card/PopupCard";
 import type { ViewType } from "@/routes/routes";
+import { REGION_ZONE_LABEL_KO } from "@/data/popupList";
+
+import {
+  usePopupCalendarMarkersQuery,
+  usePopupsOnDateQuery,
+  type PopupOnDateRow,
+} from "@/apis/calendar/calendar";
 
 interface CalendarProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
   breakpoint: "mobile" | "tablet" | "desktop";
 }
 
+type RegionZoneCode = keyof typeof REGION_ZONE_LABEL_KO | "OTHERS";
+function isRegionZoneCode(v: unknown): v is RegionZoneCode {
+  if (v === "OTHERS") return true;
+  return typeof v === "string" && v in REGION_ZONE_LABEL_KO;
+}
+
+function formatDateYMD(d: Date): string {
+  const y = d.getFullYear();
+  const m = `${d.getMonth() + 1}`.padStart(2, "0");
+  const day = `${d.getDate()}`.padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+function formatMonthFirstDay(d: Date): string {
+  return `${d.getFullYear()}-${`${d.getMonth() + 1}`.padStart(2, "0")}-01`;
+}
+
+function toPopupCardItemFromRow(row: PopupOnDateRow): PopupCardItem {
+  const regionRaw = row.region_zone_code;
+  const regionZoneCode: RegionZoneCode = isRegionZoneCode(regionRaw) ? regionRaw : "OTHERS";
+
+  return {
+    id: row.id,
+    title: row.title ?? "Untitled",
+    thumbnailUrl: row.thumbnail_url,
+    startDate: row.start_date,
+    endDate: row.end_date,
+    tags: [],
+    regionZoneCode,
+
+    bookmarksCount: row.bookmarks_count ?? 0,
+    bookmarked: row.bookmarked ?? false,
+
+    dday: undefined,
+  };
+}
+
 export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
-  const [currentMonth, setCurrentMonth] = useState(() => new Date(2025, 11, 1)); // 2025-12
+  const [currentMonth, setCurrentMonth] = useState(() => new Date(2025, 11, 1));
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const regionZoneCode: string | null = null;
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -22,29 +67,9 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
     const startingDayOfWeek = firstDay.getDay();
 
     const days: (Date | null)[] = [];
-
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(null);
-    }
-
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push(new Date(year, month, i));
-    }
-
+    for (let i = 0; i < startingDayOfWeek; i++) days.push(null);
+    for (let i = 1; i <= daysInMonth; i++) days.push(new Date(year, month, i));
     return days;
-  };
-
-  const getPopupsForDate = (date: Date) => {
-    return popupsData.filter((popup) => {
-      const start = new Date(popup.startDate);
-      const end = new Date(popup.endDate);
-      return date >= start && date <= end;
-    });
-  };
-
-  const hasPopups = (date: Date | null) => {
-    if (!date) return false;
-    return getPopupsForDate(date).length > 0;
   };
 
   const days = getDaysInMonth(currentMonth);
@@ -54,7 +79,32 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
     year: "numeric",
   });
 
-  const selectedDatePopups = selectedDate ? getPopupsForDate(selectedDate) : [];
+  const monthFirstDay = useMemo(() => formatMonthFirstDay(currentMonth), [currentMonth]);
+
+  const markersQuery = usePopupCalendarMarkersQuery({
+    monthFirstDay,
+    regionZoneCode,
+  });
+
+  const daysWithPopups = useMemo(() => {
+    const set = new Set<string>();
+    for (const m of markersQuery.data ?? []) set.add(m.day);
+    return set;
+  }, [markersQuery.data]);
+
+  const hasPopups = (date: Date | null) => {
+    if (!date) return false;
+    return daysWithPopups.has(formatDateYMD(date));
+  };
+
+  const selectedDateYMD = selectedDate ? formatDateYMD(selectedDate) : null;
+
+  const popupsOnDateQuery = usePopupsOnDateQuery({
+    date: selectedDateYMD,
+    regionZoneCode,
+  });
+
+  const selectedDatePopups = popupsOnDateQuery.data ?? [];
 
   const previousMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
@@ -91,7 +141,7 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
       <div
         style={{
           position: "sticky",
-          top: 0, // (sticky 안정화)
+          top: 0,
           background: "white",
           borderBottom: "1px solid var(--color-gray-200)",
           padding: "var(--space-4)",
@@ -145,9 +195,7 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
       </div>
 
       <div style={{ paddingBottom: "var(--space-8)" }}>
-        {/* Calendar Grid */}
         <div style={{ padding: "var(--space-4)" }}>
-          {/* ✅ 캘린더 전체를 감싸는 컨테이너: maxWidth + center */}
           <div style={{ maxWidth: calendarMaxWidth, margin: "0 auto" }}>
             {/* Day Headers */}
             <div
@@ -210,19 +258,16 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
                     transition: "all 0.2s",
                   }}
                   onMouseEnter={(e) => {
-                    if (day && !isSelected(day)) {
-                      e.currentTarget.style.background = "#F5F5F5";
-                    }
+                    if (day && !isSelected(day)) e.currentTarget.style.background = "#F5F5F5";
                   }}
                   onMouseLeave={(e) => {
-                    if (day && !isSelected(day)) {
-                      e.currentTarget.style.background = "transparent";
-                    }
+                    if (day && !isSelected(day)) e.currentTarget.style.background = "transparent";
                   }}
                 >
                   {day && (
                     <>
                       <span>{day.getDate()}</span>
+
                       {hasPopups(day) && (
                         <div
                           style={{
@@ -251,7 +296,19 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
             </div>
 
             {/* Selected Date Pop-ups */}
-            {selectedDate && selectedDatePopups.length > 0 && (
+            {selectedDate && popupsOnDateQuery.isLoading && (
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "var(--space-8)",
+                  color: "var(--color-text-tertiary)",
+                }}
+              >
+                <p>Loading...</p>
+              </div>
+            )}
+
+            {selectedDate && !popupsOnDateQuery.isLoading && selectedDatePopups.length > 0 && (
               <div>
                 <h4 style={{ marginBottom: "var(--space-3)" }}>
                   Pop-ups on{" "}
@@ -260,26 +317,24 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
                     day: "numeric",
                   })}
                 </h4>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "var(--space-3)",
-                  }}
-                >
-                  {selectedDatePopups.map((popup) => (
-                    <PopupCard
-                      key={popup.id}
-                      popup={popup}
-                      onClick={() => onNavigate("detail", popup.id)}
-                      layout="list"
-                    />
-                  ))}
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+                  {selectedDatePopups.map((row) => {
+                    const item = toPopupCardItemFromRow(row);
+                    return (
+                      <PopupCard
+                        key={item.id}
+                        popup={item}
+                        onClick={() => onNavigate("detail", item.id)}
+                        layout="list"
+                      />
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {selectedDate && selectedDatePopups.length === 0 && (
+            {selectedDate && !popupsOnDateQuery.isLoading && selectedDatePopups.length === 0 && (
               <div
                 style={{
                   textAlign: "center",

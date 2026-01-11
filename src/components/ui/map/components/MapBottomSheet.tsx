@@ -10,9 +10,9 @@ type Props = {
   onSelect: (popupId: string) => void;
 };
 
-const COLLAPSED_HEIGHT = 84; // px (핸들 + 제목 정도)
-const EXPANDED_VH = 0.7; // 70vh
-const SNAP_THRESHOLD = 0.45; // 스냅 임계값(0~1)
+const COLLAPSED_HEIGHT = 84;
+const EXPANDED_VH = 0.7;
+const SNAP_THRESHOLD = 0.45;
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
@@ -21,15 +21,12 @@ function clamp(n: number, min: number, max: number) {
 export function MapBottomSheet({ popups, onClose, onSelect }: Props) {
   const canDrag = popups.length >= 3;
 
-  // ✅ effect 없이 한번 계산 (dev 환경 setState 경고 회피)
   const expandedPx = useMemo(() => {
     if (typeof window === "undefined") return 560;
     return Math.round(window.innerHeight * EXPANDED_VH);
   }, []);
 
-  const collapseOffset = canDrag
-    ? Math.max(0, expandedPx - COLLAPSED_HEIGHT)
-    : 0;
+  const collapseOffset = canDrag ? Math.max(0, expandedPx - COLLAPSED_HEIGHT) : 0;
 
   // 0 = fully expanded, collapseOffset = collapsed
   const [offsetY, setOffsetY] = useState(0);
@@ -133,7 +130,7 @@ export function MapBottomSheet({ popups, onClose, onSelect }: Props) {
             paddingBottom: "var(--space-3)",
             cursor: canDrag ? (dragging ? "grabbing" : "grab") : "default",
             userSelect: "none",
-            touchAction: "none", // ✅ 모바일에서 drag가 스크롤보다 우선
+            touchAction: "none",
           }}
         >
           {canDrag && (
@@ -148,9 +145,7 @@ export function MapBottomSheet({ popups, onClose, onSelect }: Props) {
             />
           )}
 
-          <h3 style={{ margin: 0, fontSize: "1rem" }}>
-            {popups.length}개의 팝업스토어
-          </h3>
+          <h3 style={{ margin: 0, fontSize: "1rem" }}>{popups.length}개의 팝업스토어</h3>
 
           {canDrag && (
             <div
@@ -160,9 +155,7 @@ export function MapBottomSheet({ popups, onClose, onSelect }: Props) {
                 marginTop: 6,
               }}
             >
-              {isCollapsed
-                ? "위로 드래그해서 펼치기"
-                : "아래로 드래그해서 접기"}
+              {isCollapsed ? "위로 드래그해서 펼치기" : "아래로 드래그해서 접기"}
             </div>
           )}
         </div>
@@ -214,9 +207,7 @@ export function MapBottomSheet({ popups, onClose, onSelect }: Props) {
                   }}
                 >
                   <img
-                    src={
-                      imageMapping[popup.thumbnail as keyof typeof imageMapping]
-                    }
+                    src={imageMapping[popup.thumbnail as keyof typeof imageMapping]}
                     alt={popup.popupName}
                     style={{
                       width: "100%",

@@ -12,7 +12,7 @@ interface CategorySectionProps {
 }
 
 type CategorySectionConfig = {
-  tag: string; // ✅ 이제 category code가 아니라 tag로 섹션 나눔
+  tag: string;
   label: string;
 };
 
@@ -36,9 +36,8 @@ export function CategorySection({ onNavigate }: CategorySectionProps) {
           sort: "bookmarks_desc",
           status: "ongoing",
 
-          // ✅ tags 기반 조회
           tags: [s.tag],
-          tagsMatchMode: "overlaps", // OR 매칭(해당 태그 포함이면)
+          tagsMatchMode: "overlaps",
         }),
       staleTime: 30_000,
     })),
