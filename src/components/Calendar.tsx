@@ -22,7 +22,6 @@ function isRegionZoneCode(v: unknown): v is RegionZoneCode {
   return typeof v === "string" && v in REGION_ZONE_LABEL_KO;
 }
 
-// ✅ 타임존 이슈 방지용: Date -> YYYY-MM-DD (local 기준)
 function formatDateYMD(d: Date): string {
   const y = d.getFullYear();
   const m = `${d.getMonth() + 1}`.padStart(2, "0");
