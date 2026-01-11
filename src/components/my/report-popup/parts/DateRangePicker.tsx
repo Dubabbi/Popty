@@ -19,6 +19,7 @@ export function DateRangePicker({
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isOpen, setIsOpen] = useState(false);
 
+  const MAX_CALENDAR_WIDTH = 430;
   const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
 
   const getDaysInMonth = (date: Date) => {
@@ -85,19 +86,23 @@ export function DateRangePicker({
   const isToday = (date: Date) => isSameDay(date, new Date());
 
   return (
-    <div style={{ position: "relative" }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        maxWidth: MAX_CALENDAR_WIDTH,
+        boxSizing: "border-box",
+      }}
+    >
       <button
         onClick={() => {
           setIsOpen((prev) => {
             const next = !prev;
-
             if (next) {
-              // ✅ 열릴 때만: DOM 반영 후 스크롤 콜백
               requestAnimationFrame(() => {
                 requestAnimationFrame(() => onOpen?.());
               });
             }
-
             return next;
           });
         }}
@@ -116,6 +121,7 @@ export function DateRangePicker({
           color: startDate ? "#000" : "var(--color-text-tertiary)",
           fontWeight: startDate ? 600 : 400,
           boxShadow: isOpen ? "0 0 0 4px rgba(217, 249, 95, 0.1)" : "none",
+          boxSizing: "border-box",
         }}
       >
         <Calendar
@@ -151,6 +157,7 @@ export function DateRangePicker({
               top: "calc(100% + 8px)",
               left: 0,
               right: 0,
+              width: "100%", // ✅ 래퍼가 430으로 고정이니까 얘도 같이 고정됨
               background: "white",
               borderRadius: "var(--radius-xl)",
               boxShadow: "0 12px 48px rgba(0, 0, 0, 0.16)",
@@ -158,6 +165,7 @@ export function DateRangePicker({
               zIndex: 999,
               animation: "calendarSlideIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
               border: "2px solid #D9F95F",
+              boxSizing: "border-box",
             }}
           >
             {/* Month Navigation */}
