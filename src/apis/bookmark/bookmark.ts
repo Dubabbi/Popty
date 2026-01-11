@@ -1,27 +1,24 @@
 import { supabase } from "@/supabase/client";
 
-export async function addBookmark(popupId: string) {
-  const { error } = await supabase.from("bookmarks").insert({ popup_id: popupId });
-  if (error) throw error;
-}
+export type SetBookmarkResult = {
+  bookmarked: boolean;
+  bookmarks_count: number;
+};
 
-export async function removeBookmark(popupId: string) {
-  const { error } = await supabase.from("bookmarks").delete().eq("popup_id", popupId);
-  if (error) throw error;
-}
+export async function setBookmark(popupId: string, next: boolean): Promise<SetBookmarkResult> {
+  const { data, error } = (await supabase.rpc("set_bookmark", {
+    p_popup_id: popupId,
+    p_next: next,
+  })) as {
+    data: SetBookmarkResult[] | null;
+    error: { message: string } | null;
+  };
 
-export async function isBookmarked(popupId: string) {
-  const { data, error } = await supabase
-    .from("bookmarks")
-    .select("popup_id")
-    .eq("popup_id", popupId)
-    .maybeSingle();
+  if (error) throw new Error(error.message);
 
-  if (error) throw error;
-  return !!data;
-}
-
-export async function toggleBookmark(popupId: string, next: boolean) {
-  if (next) return addBookmark(popupId);
-  return removeBookmark(popupId);
+  const row = data?.[0];
+  return {
+    bookmarked: row?.bookmarked ?? next,
+    bookmarks_count: row?.bookmarks_count ?? 0,
+  };
 }

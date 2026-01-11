@@ -12,9 +12,22 @@ import { imageMapping } from "../../data/imageMapping";
 import { Badge } from "../Badge";
 
 import { useBookmarkToggle } from "@/apis/bookmark/useBookmarkToggle";
+export type PopupCardItem = Pick<
+  PopupListItem,
+  | "id"
+  | "title"
+  | "thumbnailUrl"
+  | "startDate"
+  | "endDate"
+  | "tags"
+  | "regionZoneCode"
+  | "bookmarksCount"
+  | "bookmarked"
+  | "dday"
+>;
 
 interface PopupCardProps {
-  popup: PopupListItem;
+  popup: PopupCardItem;
   onClick: () => void;
   layout?: "grid" | "list";
 }
