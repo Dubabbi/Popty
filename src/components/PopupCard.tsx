@@ -1,15 +1,38 @@
 import { Bookmark, MapPin, Clock } from "lucide-react";
-import { type Popup, calculateDday, formatDateRange, isOpenToday } from "@/data/popups";
+import { useEffect, useState } from "react";
+import Img from "@/assets/popup-img.png";
+import type { PopupListItem } from "@/data/popupList";
+import {
+  calculateDday,
+  formatDateRange,
+  isOpenToday,
+  REGION_ZONE_LABEL_KO,
+} from "@/data/popupList";
+
 import { imageMapping } from "../data/imageMapping";
 import { Badge } from "./Badge";
-import { useEffect, useState } from "react";
 
 interface PopupCardProps {
-  popup: Popup;
+  popup: PopupListItem;
   onClick: () => void;
   layout?: "grid" | "list";
   isSaved?: boolean;
   onSaveToggle?: () => void;
+}
+const DEFAULT_THUMB = Img;
+
+function resolveThumb(src: string | null): string {
+  if (!src) return DEFAULT_THUMB;
+
+  if (src.startsWith("http")) return src;
+
+  return imageMapping[src] ?? src;
+}
+
+function regionLabel(regionZoneCode: PopupListItem["regionZoneCode"]): string {
+  if (!regionZoneCode) return "기타";
+  if (regionZoneCode === "ETC") return "기타";
+  return REGION_ZONE_LABEL_KO[regionZoneCode] ?? regionZoneCode;
 }
 
 export function PopupCard({
@@ -20,6 +43,7 @@ export function PopupCard({
   onSaveToggle,
 }: PopupCardProps) {
   const [saved, setSaved] = useState(isSaved);
+
   const dday = calculateDday(popup.endDate);
   const openingToday = isOpenToday(popup.startDate);
 
@@ -86,6 +110,10 @@ export function PopupCard({
     />
   );
 
+  const thumbSrc = resolveThumb(popup.thumbnailUrl);
+  const title = popup.title;
+  const areaText = regionLabel(popup.regionZoneCode);
+
   if (layout === "list") {
     return (
       <div
@@ -111,15 +139,20 @@ export function PopupCard({
           style={{
             position: "relative",
             width: 120,
-            height: 120,
+            height: 200,
             flexShrink: 0,
             borderRadius: "var(--radius-md)",
             overflow: "hidden",
+            background: "var(--color-gray-100)",
           }}
         >
           <img
-            src={imageMapping[popup.thumbnail]}
-            alt={popup.popupName}
+            src={thumbSrc}
+            alt={title}
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_THUMB;
+            }}
             style={{
               width: "100%",
               height: "100%",
@@ -148,11 +181,13 @@ export function PopupCard({
             }}
           >
             <div>
-              <h4 style={{ margin: 0, marginBottom: "var(--space-1)" }}>{popup.popupName}</h4>
+              <h4 style={{ margin: 0, marginBottom: "var(--space-1)" }}>{title}</h4>
             </div>
+
             <button
               onClick={handleSaveClick}
               type="button"
+              aria-label={saved ? "북마크 해제" : "북마크"}
               style={{
                 background: "none",
                 border: "none",
@@ -171,8 +206,7 @@ export function PopupCard({
           <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
             {openingToday && <Badge variant="new">Opens Today!</Badge>}
             {dday > 0 && dday <= 3 && <Badge variant="ending">D-{dday}</Badge>}
-            {popup.trending && <Badge variant="trending">🔥 Trending</Badge>}
-            {popup.isNew && !openingToday && <Badge variant="new">NEW</Badge>}
+            {popup.bookmarksCount >= 30 && <Badge variant="trending">🔥 Trending</Badge>}
           </div>
 
           <div
@@ -194,6 +228,7 @@ export function PopupCard({
               <Clock size={14} />
               {formatDateRange(popup.startDate, popup.endDate)}
             </div>
+
             <div
               style={{
                 display: "flex",
@@ -203,7 +238,7 @@ export function PopupCard({
               }}
             >
               <MapPin size={14} />
-              {popup.area}
+              {areaText}
             </div>
           </div>
         </div>
@@ -231,8 +266,12 @@ export function PopupCard({
     >
       <div style={{ position: "relative" }}>
         <img
-          src={imageMapping[popup.thumbnail]}
-          alt={popup.popupName}
+          src={thumbSrc}
+          alt={title}
+          loading="lazy"
+          onError={(e) => {
+            e.currentTarget.src = DEFAULT_THUMB;
+          }}
           style={{
             width: "100%",
             height: 140,
@@ -247,6 +286,7 @@ export function PopupCard({
         <button
           onClick={handleSaveClick}
           type="button"
+          aria-label={saved ? "북마크 해제" : "북마크"}
           style={{
             position: "absolute",
             top: "var(--space-2)",
@@ -285,8 +325,7 @@ export function PopupCard({
         >
           {openingToday && <Badge variant="new">Opens Today!</Badge>}
           {dday > 0 && dday <= 3 && <Badge variant="dday">D-{dday}</Badge>}
-          {popup.trending && <Badge variant="trending">🔥</Badge>}
-          {popup.isNew && !openingToday && <Badge variant="new">NEW</Badge>}
+          {popup.bookmarksCount >= 30 && <Badge variant="trending">🔥</Badge>}
         </div>
       </div>
 
@@ -299,7 +338,7 @@ export function PopupCard({
             lineHeight: "1.3",
           }}
         >
-          {popup.popupName}
+          {title}
         </h4>
 
         <div
@@ -327,7 +366,7 @@ export function PopupCard({
           }}
         >
           <MapPin size={12} color="var(--color-text-tertiary)" />
-          <span style={{ color: "var(--color-text-secondary)" }}>{popup.area}</span>
+          <span style={{ color: "var(--color-text-secondary)" }}>{areaText}</span>
         </div>
       </div>
     </div>

@@ -34,7 +34,7 @@ export async function createPopupReport(input: CreatePopupReportInput) {
     p_location_text: locationText,
     p_start_date: toDateOnlyString(startDate),
     p_end_date: toDateOnlyString(endDate),
-    p_category_codes: trimmedCodes,
+    p_tags: trimmedCodes,
     p_description: description,
   });
 
