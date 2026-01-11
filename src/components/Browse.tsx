@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { SlidersHorizontal, Grid3x3, List as ListIcon } from "lucide-react";
-import { PopupCard } from "@/components/PopupCard";
+import { PopupCard } from "@/components/popup-card/PopupCard";
 import { FilterChip } from "@/components/FilterChip";
 import { FilterModal } from "@/components/home/parts/FilterModal";
 import { popupsData } from "@/data/popups";

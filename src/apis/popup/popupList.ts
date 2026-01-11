@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/supabase/client";
-import type { PopupListItem } from "@/data/popupList";
+import type { PopupListItem, RegionZoneCode } from "@/data/popupList";
 
 export type PopupRow = {
   id: string;
@@ -8,16 +8,15 @@ export type PopupRow = {
   thumbnail_url: string | null;
   start_date: string;
   end_date: string;
-  address: string | null;
-  region_zone_code: string | null;
-  lat: number | null;
-  lng: number | null;
-  bookmarks_count: number;
-  created_at: string;
-  updated_at: string;
 
-  // ✅ Supabase / View / 타입 상황에 따라 string[] | string | null 로 올 수도 있어서 방어적으로 처리
+  dday: number | null;
+  region_code: string | null;
+  region_name: string | null;
+
   tags: unknown;
+
+  bookmarks_count: number | null;
+  bookmarked: boolean | null;
 };
 
 export type PopupsSort = "end_date_asc" | "created_desc" | "bookmarks_desc";
@@ -28,11 +27,10 @@ export type ListPopupsParams = {
   limit?: number;
   offset?: number;
   q?: string | null;
-  regionZoneCode?: string | null;
+  regionZoneCode?: RegionZoneCode | null;
   status?: PopupsStatus | null;
   sort?: PopupsSort;
 
-  // ✅ tags 기반 필터
   tags?: string[];
   tagsMatchMode?: TagsMatchMode;
 };
@@ -50,7 +48,6 @@ function todayLocalISODate(): string {
   return `${y}-${m}-${day}`;
 }
 
-/** ✅ tags가 어떤 형태로 와도 string[]로 정규화 */
 function normalizeTags(v: unknown): string[] {
   if (Array.isArray(v)) {
     return v.filter((x): x is string => typeof x === "string" && x.trim().length > 0);
@@ -68,7 +65,7 @@ function normalizeTags(v: unknown): string[] {
           return parsed.filter((x): x is string => typeof x === "string" && x.trim().length > 0);
         }
       } catch {
-        // ignore
+        //
       }
     }
 
@@ -97,26 +94,34 @@ function normalizeTags(v: unknown): string[] {
 }
 
 function mapRow(row: PopupRow): PopupListItem {
+  const fallbackISO = new Date(0).toISOString();
+
   return {
     id: row.id,
     title: row.title,
     thumbnailUrl: row.thumbnail_url,
-
     startDate: row.start_date,
     endDate: row.end_date,
 
-    address: row.address,
-    regionZoneCode: row.region_zone_code,
+    address: null,
+    lat: null,
+    lng: null,
+    createdAt: fallbackISO,
+    updatedAt: fallbackISO,
 
-    // ✅ 핵심
+    // region
+    regionZoneCode: (row.region_code ?? null) as RegionZoneCode | null,
+    regionNameKo: row.region_name ?? undefined,
+
+    // tags
     tags: normalizeTags(row.tags),
 
-    bookmarksCount: row.bookmarks_count,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    // bookmarks
+    bookmarksCount: row.bookmarks_count ?? 0,
+    bookmarked: row.bookmarked ?? false,
 
-    lat: row.lat,
-    lng: row.lng,
+    // optional
+    dday: row.dday ?? undefined,
   };
 }
 
@@ -127,21 +132,19 @@ export async function listPopups(params: ListPopupsParams): Promise<PopupsPage> 
   const today = todayLocalISODate();
   const tagsMatchMode: TagsMatchMode = params.tagsMatchMode ?? "overlaps";
 
-  let q = supabase.from("popups").select(
+  let q = supabase.from("v_popups_list").select(
     `
       id,
       title,
       thumbnail_url,
       start_date,
       end_date,
-      address,
-      region_zone_code,
-      lat,
-      lng,
+      dday,
+      region_code,
+      region_name,
+      tags,
       bookmarks_count,
-      created_at,
-      updated_at,
-      tags
+      bookmarked
     `,
     { count: "exact" }
   );
@@ -151,10 +154,9 @@ export async function listPopups(params: ListPopupsParams): Promise<PopupsPage> 
   }
 
   if (params.regionZoneCode) {
-    q = q.eq("region_zone_code", params.regionZoneCode);
+    q = q.eq("region_code", params.regionZoneCode);
   }
 
-  // ✅ tags 필터
   if (params.tags && params.tags.length > 0) {
     q =
       tagsMatchMode === "contains"
@@ -171,7 +173,7 @@ export async function listPopups(params: ListPopupsParams): Promise<PopupsPage> 
   if (sort === "end_date_asc") {
     q = q.order("end_date", { ascending: true }).order("id", { ascending: true });
   } else if (sort === "created_desc") {
-    q = q.order("created_at", { ascending: false }).order("id", { ascending: true });
+    q = q.order("id", { ascending: false });
   } else if (sort === "bookmarks_desc") {
     q = q.order("bookmarks_count", { ascending: false }).order("id", { ascending: true });
   }
@@ -198,14 +200,9 @@ export function useTrendingPopupsQuery(limit = 10) {
 }
 
 export function useEndingSoonPopupsQuery(limit = 6) {
-  return usePopupsListQuery({
-    limit,
-    offset: 0,
-    sort: "end_date_asc",
-    status: "ongoing",
-  });
+  return usePopupsListQuery({ limit, offset: 0, sort: "end_date_asc", status: "ongoing" });
 }
 
-export function useRegionPopupsQuery(regionZoneCode: string, limit = 4) {
+export function useRegionPopupsQuery(regionZoneCode: RegionZoneCode, limit = 4) {
   return usePopupsListQuery({ limit, offset: 0, regionZoneCode, sort: "end_date_asc" });
 }

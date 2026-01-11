@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/supabase/client";
-import { REGION_ZONE_LABEL_KO } from "@/data/popupList";
+import { REGION_ZONE_LABEL_KO, type RegionZoneCode } from "@/data/popupList";
 
 export type PopupDetailRow = {
   id: string;
@@ -10,7 +10,7 @@ export type PopupDetailRow = {
   end_date: string;
 
   address: string | null;
-  region_zone_code: string | null;
+  region_zone_code: RegionZoneCode | null;
 
   lat: number | null;
   lng: number | null;
@@ -34,6 +34,8 @@ export type PopupDetailRow = {
   updated_at: string;
 
   tags: string[] | null;
+
+  bookmarks: Array<{ popup_id: string }>;
 };
 
 export type PopupDetailItem = {
@@ -47,7 +49,7 @@ export type PopupDetailItem = {
   endDate: string;
 
   address: string | null;
-  regionZoneCode: string | null;
+  regionZoneCode: RegionZoneCode | null;
   regionNameKo: string;
 
   lat: number | null;
@@ -75,10 +77,12 @@ export type PopupDetailItem = {
 
   trending: boolean;
   isNew: boolean;
+
+  bookmarked: boolean;
 };
 
-function regionLabelKo(code: string | null): string {
-  if (!code || code === "ETC") return "기타";
+function regionLabelKo(code: RegionZoneCode | null): string {
+  if (!code || code === "OTHERS") return "기타";
   return REGION_ZONE_LABEL_KO[code] ?? code;
 }
 
@@ -88,6 +92,8 @@ function mapRowToDetail(row: PopupDetailRow): PopupDetailItem {
   const days7 = 7 * 24 * 60 * 60 * 1000;
 
   const images = row.thumbnail_url ? [row.thumbnail_url] : [];
+
+  const bookmarked = row.bookmarks.length > 0;
 
   return {
     id: row.id,
@@ -128,6 +134,8 @@ function mapRowToDetail(row: PopupDetailRow): PopupDetailItem {
 
     trending: row.bookmarks_count >= 30,
     isNew: now - createdAtMs <= days7,
+
+    bookmarked,
   };
 }
 
@@ -157,7 +165,8 @@ export async function getPopupDetail(popupId: string): Promise<PopupDetailItem |
       bookmarks_count,
       created_at,
       updated_at,
-      tags
+      tags,
+      bookmarks!left(popup_id)
     `
     )
     .eq("id", popupId)
@@ -172,10 +181,7 @@ export async function getPopupDetail(popupId: string): Promise<PopupDetailItem |
 export function usePopupDetailQuery(popupId: string | undefined) {
   return useQuery({
     queryKey: ["popups", "detail", popupId],
-    queryFn: () => {
-      if (!popupId) return Promise.resolve(null);
-      return getPopupDetail(popupId);
-    },
+    queryFn: () => (popupId ? getPopupDetail(popupId) : Promise.resolve(null)),
     enabled: !!popupId,
     staleTime: 30_000,
   });

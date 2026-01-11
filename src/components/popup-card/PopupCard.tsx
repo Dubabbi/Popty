@@ -1,5 +1,4 @@
 import { Bookmark, MapPin, Clock } from "lucide-react";
-import { useEffect, useState } from "react";
 import Img from "@/assets/popup-img.png";
 import type { PopupListItem } from "@/data/popupList";
 import {
@@ -9,52 +8,46 @@ import {
   REGION_ZONE_LABEL_KO,
 } from "@/data/popupList";
 
-import { imageMapping } from "../data/imageMapping";
-import { Badge } from "./Badge";
+import { imageMapping } from "../../data/imageMapping";
+import { Badge } from "../Badge";
+
+import { useBookmarkToggle } from "@/apis/bookmark/useBookmarkToggle";
 
 interface PopupCardProps {
   popup: PopupListItem;
   onClick: () => void;
   layout?: "grid" | "list";
-  isSaved?: boolean;
-  onSaveToggle?: () => void;
 }
+
 const DEFAULT_THUMB = Img;
 
 function resolveThumb(src: string | null): string {
   if (!src) return DEFAULT_THUMB;
-
   if (src.startsWith("http")) return src;
-
   return imageMapping[src] ?? src;
 }
 
 function regionLabel(regionZoneCode: PopupListItem["regionZoneCode"]): string {
   if (!regionZoneCode) return "기타";
-  if (regionZoneCode === "ETC") return "기타";
+  if (regionZoneCode === "OTHERS") return "기타";
   return REGION_ZONE_LABEL_KO[regionZoneCode] ?? regionZoneCode;
 }
 
-export function PopupCard({
-  popup,
-  onClick,
-  layout = "grid",
-  isSaved = false,
-  onSaveToggle,
-}: PopupCardProps) {
-  const [saved, setSaved] = useState(isSaved);
+export function PopupCard({ popup, onClick, layout = "grid" }: PopupCardProps) {
+  const bookmarkToggle = useBookmarkToggle();
 
-  const dday = calculateDday(popup.endDate);
+  const saved = popup.bookmarked;
+  const dday = popup.dday ?? calculateDday(popup.endDate);
   const openingToday = isOpenToday(popup.startDate);
-
-  useEffect(() => {
-    setSaved(isSaved);
-  }, [isSaved]);
 
   const handleSaveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setSaved((prev) => !prev);
-    onSaveToggle?.();
+    if (bookmarkToggle.isPending) return;
+
+    bookmarkToggle.mutate({
+      popupId: popup.id,
+      next: !saved,
+    });
   };
 
   const renderImageTagsOverlay = (max: number) => {
@@ -188,11 +181,13 @@ export function PopupCard({
               onClick={handleSaveClick}
               type="button"
               aria-label={saved ? "북마크 해제" : "북마크"}
+              disabled={bookmarkToggle.isPending}
               style={{
                 background: "none",
                 border: "none",
-                cursor: "pointer",
+                cursor: bookmarkToggle.isPending ? "not-allowed" : "pointer",
                 padding: "var(--space-2)",
+                opacity: bookmarkToggle.isPending ? 0.6 : 1,
               }}
             >
               <Bookmark
@@ -246,6 +241,7 @@ export function PopupCard({
     );
   }
 
+  // grid
   return (
     <div
       onClick={onClick}
@@ -287,6 +283,7 @@ export function PopupCard({
           onClick={handleSaveClick}
           type="button"
           aria-label={saved ? "북마크 해제" : "북마크"}
+          disabled={bookmarkToggle.isPending}
           style={{
             position: "absolute",
             top: "var(--space-2)",
@@ -300,9 +297,10 @@ export function PopupCard({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            cursor: "pointer",
+            cursor: bookmarkToggle.isPending ? "not-allowed" : "pointer",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
             zIndex: 4,
+            opacity: bookmarkToggle.isPending ? 0.7 : 1,
           }}
         >
           <Bookmark

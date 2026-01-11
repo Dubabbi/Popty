@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Bell, Calendar as CalendarIcon } from "lucide-react";
-import { PopupCard } from "@/components/PopupCard";
+import { PopupCard } from "@/components/popup-card/PopupCard";
 import { Badge } from "@/components/Badge";
 import { Mascot } from "@/components/Mascot";
 import { popupsData, savedPopupIds } from "@/data/popups";
@@ -39,10 +39,7 @@ export function Saved({ onNavigate }: SavedProps) {
 
   const reminders = useMemo(() => INITIAL_REMINDERS, []);
 
-  const savedPopups = useMemo(
-    () => popupsData.filter((p) => savedIds.includes(p.id)),
-    [savedIds],
-  );
+  const savedPopups = useMemo(() => popupsData.filter((p) => savedIds.includes(p.id)), [savedIds]);
 
   // Group by timeline
   const thisWeek = useMemo(
@@ -51,7 +48,7 @@ export function Saved({ onNavigate }: SavedProps) {
         const diffDays = getDiffDays(p.endDate);
         return diffDays >= 0 && diffDays <= 7;
       }),
-    [savedPopups],
+    [savedPopups]
   );
 
   const nextWeek = useMemo(
@@ -60,7 +57,7 @@ export function Saved({ onNavigate }: SavedProps) {
         const diffDays = getDiffDays(p.endDate);
         return diffDays > 7 && diffDays <= 14;
       }),
-    [savedPopups],
+    [savedPopups]
   );
 
   const later = useMemo(
@@ -69,7 +66,7 @@ export function Saved({ onNavigate }: SavedProps) {
         const diffDays = getDiffDays(p.endDate);
         return diffDays > 14;
       }),
-    [savedPopups],
+    [savedPopups]
   );
 
   const getReminderForPopup = (popupId: string) => {
@@ -108,8 +105,7 @@ export function Saved({ onNavigate }: SavedProps) {
             maxWidth: 320,
           }}
         >
-          Start exploring and save your favorites! I'll remind you so you never
-          miss them. 💫
+          Start exploring and save your favorites! I'll remind you so you never miss them. 💫
         </p>
         <button
           onClick={() => onNavigate("browse")}
