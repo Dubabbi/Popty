@@ -4,22 +4,48 @@ import { AvatarSection } from "@/components/my/profile-edit/parts/AvatarSection"
 import { InputWithIcon } from "@/components/my/profile-edit/parts/InputWithIcon";
 import { TextAreaField } from "@/components/my/profile-edit/parts/TextAreaField";
 import { SaveButton } from "@/components/my/profile-edit/parts/SaveButton";
+import { useMeQuery } from "@/apis/auth/useMeQuery";
+import { useMyProfileQuery } from "@/apis/auth/useMyProfileQuery";
+import { useUpsertMyProfileMutation } from "@/apis/auth/useUpsertMyProfileMutation";
 
 export function ProfileEdit() {
-  const [name, setName] = useState("팝업 탐험가");
-  const [email, setEmail] = useState("popup.lover@email.com");
-  const [location, setLocation] = useState("서울, 대한민국");
-  const [bio, setBio] = useState("팝업을 사랑하는 탐험가입니다 🎨");
-  const [isSaving, setIsSaving] = useState(false);
+  const { data: me, refetch: refetchMe } = useMeQuery();
+  const { data: profile } = useMyProfileQuery();
+  const { mutateAsync: saveProfile, isPending: isSaving } = useUpsertMyProfileMutation();
+
+  const [nameDraft, setNameDraft] = useState<string | null>(null);
+  const [locationDraft, setLocationDraft] = useState<string | null>(null);
+  const [bioDraft, setBioDraft] = useState<string | null>(null);
+  const [avatarDraft, setAvatarDraft] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleSave = () => {
-    setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
+  const name = nameDraft ?? profile?.nickname ?? me?.name ?? "팝업 탐험가";
+  const location = locationDraft ?? profile?.location ?? "";
+  const bio = bioDraft ?? profile?.bio ?? "";
+  const email = me?.email ?? "";
+  const avatarUrl = avatarDraft ?? me?.avatarUrl ?? null;
+
+  const toNullable = (v: string) => {
+    const t = v.trim();
+    return t.length ? t : null;
+  };
+
+  const handleSave = async () => {
+    if (isSaving) return;
+
+    try {
+      await saveProfile({
+        nickname: toNullable(name),
+        location: toNullable(location),
+        bio: toNullable(bio),
+      });
+
       setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 2000);
-    }, 800);
+      window.setTimeout(() => setShowSuccess(false), 2000);
+    } catch (e) {
+      console.error(e);
+      alert("저장에 실패했어요. 잠시 후 다시 시도해 주세요.");
+    }
   };
 
   return (
@@ -30,59 +56,63 @@ export function ProfileEdit() {
         paddingBottom: "var(--space-8)",
       }}
     >
-      <AvatarSection />
-      {/* Form Fields */}
+      <AvatarSection
+        avatarUrl={avatarUrl}
+        onAvatarUrlChange={(url) => {
+          setAvatarDraft(url);
+          void refetchMe();
+        }}
+      />
+
       <div style={{ padding: "0 var(--space-4)" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-          {/* Name */}
           <InputWithIcon
             label="이름"
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => setNameDraft(e.target.value)}
             gradient="linear-gradient(135deg, #FFB6D9 0%, #FF8BA0 100%)"
             icon={User}
             focusBorderColor="#FFB6D9"
             focusShadowRgba="rgba(255, 182, 217, 0.1)"
           />
 
-          {/* Email */}
           <InputWithIcon
             label="이메일"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={() => {}}
             gradient="linear-gradient(135deg, #C4E5FF 0%, #A3B9FF 100%)"
             icon={Mail}
             focusBorderColor="#A3B9FF"
             focusShadowRgba="rgba(163, 185, 255, 0.1)"
           />
 
-          {/* Location (아이콘은 검정색) */}
           <InputWithIcon
             label="위치"
             type="text"
             value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            onChange={(e) => setLocationDraft(e.target.value)}
             gradient="linear-gradient(135deg, #D9F95F 0%, #B8E04F 100%)"
             icon={MapPin}
             iconColor="#000"
             focusBorderColor="#D9F95F"
             focusShadowRgba="rgba(217, 249, 95, 0.1)"
           />
+
           <TextAreaField
             label="소개"
             value={bio}
-            onChange={(e) => setBio(e.target.value)}
+            onChange={(e) => setBioDraft(e.target.value)}
             rows={4}
             focusBorderColor="#D9F95F"
             focusShadowRgba="rgba(217, 249, 95, 0.1)"
           />
         </div>
+
         <SaveButton isSaving={isSaving} showSuccess={showSuccess} onClick={handleSave} />
       </div>
 
-      {/* placeholder 스타일 */}
       <style>{`
         input::-webkit-input-placeholder,
         textarea::-webkit-input-placeholder {

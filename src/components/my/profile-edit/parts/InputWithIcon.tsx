@@ -56,6 +56,7 @@ export function InputWithIcon({
 
         <input
           type={type}
+          readOnly={type === "email"}
           value={value}
           onChange={onChange}
           style={{
