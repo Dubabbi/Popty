@@ -6,7 +6,7 @@ import { Browse } from "@/components/Browse";
 import { Calendar } from "@/components/Calendar";
 import { MapView } from "@/components/ui/map/MapView";
 import { Saved } from "@/components/Saved";
-import { PopupDetail } from "@/components/PopupDetail";
+import { PopupDetail } from "@/components/popup-detail/PopupDetail";
 import { Notifications } from "@/components/Notifications";
 import { Search } from "@/components/Search";
 import { Capsule } from "@/components/Capsule";
