@@ -6,6 +6,7 @@ interface DateRangePickerProps {
   endDate: Date | null;
   onStartDateChange: (date: Date | null) => void;
   onEndDateChange: (date: Date | null) => void;
+  onOpen?: () => void;
 }
 
 export function DateRangePicker({
@@ -13,6 +14,7 @@ export function DateRangePicker({
   endDate,
   onStartDateChange,
   onEndDateChange,
+  onOpen,
 }: DateRangePickerProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isOpen, setIsOpen] = useState(false);
@@ -28,17 +30,8 @@ export function DateRangePicker({
     const startingDayOfWeek = firstDay.getDay();
 
     const days: (Date | null)[] = [];
-
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(null);
-    }
-
-    // Add all days in the month
-    for (let day = 1; day <= daysInMonth; day++) {
-      days.push(new Date(year, month, day));
-    }
-
+    for (let i = 0; i < startingDayOfWeek; i++) days.push(null);
+    for (let day = 1; day <= daysInMonth; day++) days.push(new Date(year, month, day));
     return days;
   };
 
@@ -63,15 +56,12 @@ export function DateRangePicker({
 
   const handleDateClick = (date: Date) => {
     if (!startDate || (startDate && endDate)) {
-      // Start new selection
       onStartDateChange(date);
       onEndDateChange(null);
     } else if (date < startDate) {
-      // If clicking before start date, set as new start
       onStartDateChange(date);
       onEndDateChange(null);
     } else {
-      // Set as end date
       onEndDateChange(date);
     }
   };
@@ -92,16 +82,25 @@ export function DateRangePicker({
     return `${startStr} ~ ${endStr}`;
   };
 
-  const isToday = (date: Date) => {
-    const today = new Date();
-    return isSameDay(date, today);
-  };
+  const isToday = (date: Date) => isSameDay(date, new Date());
 
   return (
     <div style={{ position: "relative" }}>
-      {/* Trigger Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen((prev) => {
+            const next = !prev;
+
+            if (next) {
+              // ✅ 열릴 때만: DOM 반영 후 스크롤 콜백
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => onOpen?.());
+              });
+            }
+
+            return next;
+          });
+        }}
         style={{
           width: "100%",
           padding: "var(--space-4)",
@@ -132,10 +131,8 @@ export function DateRangePicker({
         {formatDateRange()}
       </button>
 
-      {/* Calendar Dropdown */}
       {isOpen && (
         <>
-          {/* Backdrop */}
           <div
             onClick={() => setIsOpen(false)}
             style={{
@@ -148,7 +145,6 @@ export function DateRangePicker({
             }}
           />
 
-          {/* Calendar */}
           <div
             style={{
               position: "absolute",
@@ -186,13 +182,6 @@ export function DateRangePicker({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(217, 249, 95, 0.3)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(217, 249, 95, 0.15)";
                 }}
               >
                 <ChevronLeft size={18} color="#000" />
@@ -214,13 +203,6 @@ export function DateRangePicker({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(217, 249, 95, 0.3)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(217, 249, 95, 0.15)";
                 }}
               >
                 <ChevronRight size={18} color="#000" />
@@ -266,9 +248,7 @@ export function DateRangePicker({
               }}
             >
               {days.map((day, index) => {
-                if (!day) {
-                  return <div key={`empty-${index}`} />;
-                }
+                if (!day) return <div key={`empty-${index}`} />;
 
                 const isStart = isRangeStart(day);
                 const isEnd = isRangeEnd(day);
@@ -294,19 +274,8 @@ export function DateRangePicker({
                       fontSize: "0.938rem",
                       fontWeight: isStart || isEnd ? 700 : today ? 600 : 400,
                       color: isStart || isEnd ? "#000" : today ? "#D9F95F" : "#000",
-                      transition: "all 0.2s ease",
                       position: "relative",
                       boxShadow: isStart || isEnd ? "0 2px 8px rgba(217, 249, 95, 0.4)" : "none",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isStart && !isEnd && !inRange) {
-                        e.currentTarget.style.background = "rgba(217, 249, 95, 0.1)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isStart && !isEnd && !inRange) {
-                        e.currentTarget.style.background = "transparent";
-                      }
                     }}
                   >
                     {day.getDate()}
@@ -329,14 +298,7 @@ export function DateRangePicker({
               })}
             </div>
 
-            {/* Action Buttons */}
-            <div
-              style={{
-                marginTop: "var(--space-4)",
-                display: "flex",
-                gap: "var(--space-2)",
-              }}
-            >
+            <div style={{ marginTop: "var(--space-4)", display: "flex", gap: "var(--space-2)" }}>
               <button
                 onClick={() => {
                   onStartDateChange(null);
@@ -352,13 +314,6 @@ export function DateRangePicker({
                   fontWeight: 600,
                   color: "var(--color-text-secondary)",
                   cursor: "pointer",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(0, 0, 0, 0.02)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "white";
                 }}
               >
                 초기화
@@ -375,16 +330,7 @@ export function DateRangePicker({
                   fontWeight: 700,
                   color: "#000",
                   cursor: "pointer",
-                  transition: "all 0.2s ease",
                   boxShadow: "0 2px 8px rgba(217, 249, 95, 0.3)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(217, 249, 95, 0.4)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(217, 249, 95, 0.3)";
                 }}
               >
                 확인
@@ -394,14 +340,8 @@ export function DateRangePicker({
 
           <style>{`
             @keyframes calendarSlideIn {
-              from {
-                opacity: 0;
-                transform: translateY(-10px);
-              }
-              to {
-                opacity: 1;
-                transform: translateY(0);
-              }
+              from { opacity: 0; transform: translateY(-10px); }
+              to { opacity: 1; transform: translateY(0); }
             }
           `}</style>
         </>

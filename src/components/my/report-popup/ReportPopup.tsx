@@ -59,7 +59,6 @@ export function ReportPopup({ onNavigate }: ReportPopupProps) {
     >
       <IntroCard />
 
-      {/* Form */}
       <div style={{ padding: "0 var(--space-4)" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
           <TextInput
