@@ -154,9 +154,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
               width: 40,
               height: 40,
               borderRadius: "var(--radius-full)",
-              background: saved
-                ? "var(--color-primary-bg)"
-                : "var(--color-gray-100)",
+              background: saved ? "var(--color-primary-bg)" : "var(--color-gray-100)",
               border: "none",
               display: "flex",
               alignItems: "center",
@@ -167,9 +165,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
             <Bookmark
               size={20}
               fill={saved ? "var(--color-primary)" : "none"}
-              color={
-                saved ? "var(--color-primary)" : "var(--color-text-secondary)"
-              }
+              color={saved ? "var(--color-primary)" : "var(--color-text-secondary)"}
             />
           </button>
         </div>
@@ -213,27 +209,12 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
               marginBottom: "var(--space-3)",
             }}
           >
-            {dday > 0 && dday <= 3 && (
-              <Badge variant="dday">D-{dday} Ending Soon!</Badge>
-            )}
+            {dday > 0 && dday <= 3 && <Badge variant="dday">D-{dday} Ending Soon!</Badge>}
             {popup.trending && <Badge variant="trending">🔥 Trending</Badge>}
             {popup.isNew && <Badge variant="new">NEW</Badge>}
-            {popup.entryFee === "free" && (
-              <Badge variant="free">Free Entry</Badge>
-            )}
+            {popup.entryFee === "free" && <Badge variant="free">Free Entry</Badge>}
           </div>
-          <h2 style={{ margin: 0, marginBottom: "var(--space-2)" }}>
-            {popup.popupName}
-          </h2>
-          <p
-            style={{
-              margin: 0,
-              fontSize: "1.125rem",
-              color: "var(--color-text-secondary)",
-            }}
-          >
-            {popup.brandName}
-          </p>
+          <h2 style={{ margin: 0, marginBottom: "var(--space-2)" }}>{popup.popupName}</h2>
         </div>
 
         {/* Key Info Summary Card */}
@@ -331,9 +312,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
                   Entry Fee
                 </div>
                 <div style={{ fontWeight: 600 }}>
-                  {popup.entryFee === "free"
-                    ? "Free"
-                    : popup.entryFeeAmount || "Paid"}
+                  {popup.entryFee === "free" ? "Free" : popup.entryFeeAmount || "Paid"}
                 </div>
               </div>
             </div>
@@ -351,9 +330,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
         {/* Tags */}
         <div style={{ marginBottom: "var(--space-6)" }}>
           <h4 style={{ marginBottom: "var(--space-3)" }}>Tags</h4>
-          <div
-            style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}
-          >
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
             {popup.tags.map((tag, index) => (
               <span
                 key={index}
@@ -388,11 +365,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
             >
               {popup.crowdLevel && (
                 <div style={{ display: "flex", gap: "var(--space-2)" }}>
-                  <Users
-                    size={18}
-                    color="var(--color-text-secondary)"
-                    style={{ flexShrink: 0 }}
-                  />
+                  <Users size={18} color="var(--color-text-secondary)" style={{ flexShrink: 0 }} />
                   <div>
                     <div
                       style={{
@@ -425,14 +398,8 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
 
               {popup.parkingInfo && (
                 <div style={{ display: "flex", gap: "var(--space-2)" }}>
-                  <Car
-                    size={18}
-                    color="var(--color-text-secondary)"
-                    style={{ flexShrink: 0 }}
-                  />
-                  <div style={{ fontSize: "0.875rem" }}>
-                    {popup.parkingInfo}
-                  </div>
+                  <Car size={18} color="var(--color-text-secondary)" style={{ flexShrink: 0 }} />
+                  <div style={{ fontSize: "0.875rem" }}>{popup.parkingInfo}</div>
                 </div>
               )}
             </div>
@@ -627,9 +594,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
                 marginBottom: "var(--space-4)",
               }}
             >
-              <h4 style={{ margin: 0, marginBottom: "var(--space-2)" }}>
-                {popup.popupName}
-              </h4>
+              <h4 style={{ margin: 0, marginBottom: "var(--space-2)" }}>{popup.popupName}</h4>
               <p
                 style={{
                   margin: 0,
