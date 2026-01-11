@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { signInWithKakao } from "@/apis/auth/kakaoLogin";
 import { getErrorMessage } from "./utils/getErrorMessage";
-import { DecorativeShapes } from "./utils/components/DecorativeShapes";
-import { LogoTitle } from "./utils/components/LogoTitle";
-import { LoginActions } from "./utils/components/LoginActions";
-import { LoginKeyframes } from "./utils/components/LoginKeyframes";
+import { DecorativeShapes } from "./components/DecorativeShapes";
+import { LogoTitle } from "./components/LogoTitle";
+import { LoginActions } from "./components/LoginActions";
+import { LoginKeyframes } from "./components/LoginKeyframes";
 
 interface LoginProps {
   onLogin?: () => void;

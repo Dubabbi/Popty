@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { KakaoLoginButton } from "./KakaoLoginButton";
-import { AppleLoginButton } from "./AppleLoginButton";
+import { GoogleLoginButton } from "./GoogleLoginButton";
 import { TermsText } from "./TermsText";
 
 type Props = {
@@ -80,7 +80,7 @@ export function LoginActions({ loading, errorMsg, onKakaoLogin }: Props) {
           <KakaoLoginButton loading={loading} onClick={onKakaoLogin} />
         </div>
         <div style={{ flex: isWide ? 1 : undefined }}>
-          <AppleLoginButton />
+          <GoogleLoginButton />
         </div>
       </div>
 
