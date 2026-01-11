@@ -6,6 +6,7 @@ import { StatsGrid } from "@/components/my/mypage/parts/StatsGrid";
 import { MenuItemButton } from "@/components/my/mypage/parts/MenuItemButton";
 import { AchievementCard } from "@/components/my/mypage/parts/AchievementCard";
 import { useMeQuery } from "@/apis/auth/useMeQuery";
+import { useMyProfileQuery } from "@/apis/auth/useMyProfileQuery";
 
 interface MyProps {
   onNavigate: (view: ViewType) => void;
@@ -16,13 +17,13 @@ export function My({ onNavigate }: MyProps) {
   const [activeRipple, setActiveRipple] = useState<string | null>(null);
   const { data: me } = useMeQuery();
   const menuItems = buildDefaultMenuItems(onNavigate);
-
+  const { data: profile } = useMyProfileQuery();
   const handleMenuClick = (label: string, action: () => void) => {
     setActiveRipple(label);
     setTimeout(() => setActiveRipple(null), 600);
     action();
   };
-
+  const displayName = profile?.nickname ?? me?.name;
   return (
     <div
       style={{
@@ -31,7 +32,7 @@ export function My({ onNavigate }: MyProps) {
         minHeight: "100vh",
       }}
     >
-      <ProfileHeader name={me?.name} email={me?.email ?? undefined} />
+      <ProfileHeader name={displayName} email={me?.email ?? undefined} />
       <StatsGrid />
       <div style={{ padding: "var(--space-4)" }}>
         <h4
