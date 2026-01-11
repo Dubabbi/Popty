@@ -9,7 +9,6 @@ import type { ViewType } from "@/routes/routes";
 
 import { useBookmarkToggle } from "@/apis/bookmark/useBookmarkToggle";
 import { usePopupDetailQuery } from "@/apis/popup/popupDetail";
-
 import { EmptyState } from "./components/EmptyState";
 import { PopupHeader } from "./components/PopupHeader";
 import { PopupGallery } from "./components/PopupGallery";
@@ -20,6 +19,10 @@ import { PopupLinks } from "./components/PopupLinks";
 import { ReminderSheet } from "./components/ReminderSheet";
 import { ShareSheet } from "./components/ShareSheet";
 import { isFreePriceText } from "./utils/popupDetailUtils";
+
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeSanitize from "rehype-sanitize";
 
 interface PopupDetailProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
@@ -37,16 +40,6 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
 
   const detail = usePopupDetailQuery(popupId ?? "");
 
-  if (!popupId) {
-    return (
-      <EmptyState
-        title="Invalid popup id"
-        actionLabel="Go Home"
-        onAction={() => onNavigate("home")}
-      />
-    );
-  }
-
   if (detail.isError) {
     return (
       <EmptyState title="Failed to load" actionLabel="Retry" onAction={() => detail.refetch()} />
@@ -56,13 +49,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
   const popup = detail.data;
 
   if (!popup) {
-    return (
-      <EmptyState
-        title="Pop-up not found"
-        actionLabel="Go Home"
-        onAction={() => onNavigate("home")}
-      />
-    );
+    return null;
   }
 
   const dday = calculateDday(popup.endDate);
@@ -84,11 +71,11 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
   const shareMetaLine = `${formatDateRange(popup.startDate, popup.endDate)} · ${popup.regionNameKo}`;
 
   const handleCopyShareLink = async () => {
-    const url = window.location.href; // 라우팅 규칙이 확실하면 여기서 생성해도 됨
+    const url = window.location.href;
     try {
       await navigator.clipboard.writeText(url);
       setShowShareModal(false);
-      // TODO: 토스트 연결하면 더 좋음
+      // TODO: 토스트 연결
     } catch {
       // clipboard 실패 시 fallback(선택)
       setShowShareModal(false);
@@ -136,15 +123,55 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
         {/* Description */}
         <div style={{ marginBottom: "var(--space-6)" }}>
           <h4 style={{ marginBottom: "var(--space-2)" }}>About</h4>
-          <p
+
+          <div
             style={{
               lineHeight: 1.6,
               color: "var(--color-text-secondary)",
-              whiteSpace: "pre-wrap",
             }}
           >
-            {popup.descriptionMd ?? "설명 정보 없음"}
-          </p>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeSanitize]}
+              components={{
+                code: ({ className, children, ...props }) => {
+                  const isBlock = Boolean(className);
+
+                  if (!isBlock) {
+                    return (
+                      <code
+                        {...props}
+                        style={{
+                          background: "var(--color-bg-tertiary)",
+                          padding: "0.1rem 0.3rem",
+                          borderRadius: "0.4rem",
+                        }}
+                      >
+                        {children}
+                      </code>
+                    );
+                  }
+
+                  return (
+                    <pre
+                      style={{
+                        background: "var(--color-bg-tertiary)",
+                        padding: "var(--space-3)",
+                        borderRadius: "var(--radius-md)",
+                        overflowX: "auto",
+                      }}
+                    >
+                      <code className={className} {...props}>
+                        {children}
+                      </code>
+                    </pre>
+                  );
+                },
+              }}
+            >
+              {popup.descriptionMd ?? "설명 정보 없음"}
+            </ReactMarkdown>
+          </div>
         </div>
 
         <PopupTags tags={popup.tags} />

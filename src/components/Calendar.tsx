@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { PopupCard } from "@/components/PopupCard";
+import { PopupCard } from "@/components/popup-card/PopupCard";
 import { popupsData } from "@/data/popups";
 import type { ViewType } from "@/routes/routes";
 
@@ -57,15 +57,11 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
   const selectedDatePopups = selectedDate ? getPopupsForDate(selectedDate) : [];
 
   const previousMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1),
-    );
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
   };
 
   const nextMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1),
-    );
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   };
 
   const isToday = (date: Date | null) => {
@@ -87,8 +83,7 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
     );
   };
 
-  const calendarMaxWidth =
-    breakpoint === "desktop" ? 720 : breakpoint === "tablet" ? 600 : "100%";
+  const calendarMaxWidth = breakpoint === "desktop" ? 720 : breakpoint === "tablet" ? 600 : "100%";
 
   return (
     <>
@@ -128,9 +123,7 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
             <ChevronLeft size={20} />
           </button>
 
-          <h3 style={{ margin: 0, minWidth: "180px", textAlign: "center" }}>
-            {monthName}
-          </h3>
+          <h3 style={{ margin: 0, minWidth: "180px", textAlign: "center" }}>{monthName}</h3>
 
           <button
             onClick={nextMonth}
@@ -165,22 +158,20 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
                 marginBottom: "var(--space-3)",
               }}
             >
-              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
-                (day, index) => (
-                  <div
-                    key={day}
-                    style={{
-                      textAlign: "center",
-                      fontSize: "0.875rem",
-                      fontWeight: 400,
-                      color: index === 0 || index === 6 ? "#FF6B6B" : "#000000",
-                      padding: "var(--space-2)",
-                    }}
-                  >
-                    {day}
-                  </div>
-                ),
-              )}
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
+                <div
+                  key={day}
+                  style={{
+                    textAlign: "center",
+                    fontSize: "0.875rem",
+                    fontWeight: 400,
+                    color: index === 0 || index === 6 ? "#FF6B6B" : "#000000",
+                    padding: "var(--space-2)",
+                  }}
+                >
+                  {day}
+                </div>
+              ))}
             </div>
 
             {/* Calendar Days */}
@@ -201,11 +192,7 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
                     aspectRatio: "1",
                     borderRadius: "var(--radius-sm)",
                     border: "none",
-                    background: !day
-                      ? "transparent"
-                      : isSelected(day)
-                        ? "#E8F4FF"
-                        : "transparent",
+                    background: !day ? "transparent" : isSelected(day) ? "#E8F4FF" : "transparent",
                     color: !day
                       ? "transparent"
                       : isSelected(day)
@@ -252,9 +239,7 @@ export function Calendar({ onNavigate, breakpoint }: CalendarProps) {
                               width: 4,
                               height: 4,
                               borderRadius: "50%",
-                              background: isSelected(day)
-                                ? "#4A90E2"
-                                : "var(--color-primary)",
+                              background: isSelected(day) ? "#4A90E2" : "var(--color-primary)",
                             }}
                           />
                         </div>

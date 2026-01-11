@@ -8,8 +8,8 @@ import {
   REGION_ZONE_LABEL_KO,
 } from "@/data/popupList";
 
-import { imageMapping } from "../data/imageMapping";
-import { Badge } from "./Badge";
+import { imageMapping } from "../../data/imageMapping";
+import { Badge } from "../Badge";
 
 import { useBookmarkToggle } from "@/apis/bookmark/useBookmarkToggle";
 

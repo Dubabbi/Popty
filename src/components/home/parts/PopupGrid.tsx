@@ -1,5 +1,5 @@
 import type { CSSProperties, ComponentProps } from "react";
-import { PopupCard } from "@/components/PopupCard";
+import { PopupCard } from "@/components/popup-card/PopupCard";
 
 type Popup = ComponentProps<typeof PopupCard>["popup"];
 
