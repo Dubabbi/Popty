@@ -1,20 +1,38 @@
 import { Bookmark, MapPin, Clock } from "lucide-react";
+import { useEffect, useState } from "react";
+import Img from "@/assets/popup-img.png";
+import type { PopupListItem } from "@/data/popupList";
 import {
-  type Popup,
   calculateDday,
   formatDateRange,
   isOpenToday,
-} from "@/data/popups";
+  REGION_ZONE_LABEL_KO,
+} from "@/data/popupList";
+
 import { imageMapping } from "../data/imageMapping";
 import { Badge } from "./Badge";
-import { useState } from "react";
 
 interface PopupCardProps {
-  popup: Popup;
+  popup: PopupListItem;
   onClick: () => void;
   layout?: "grid" | "list";
   isSaved?: boolean;
   onSaveToggle?: () => void;
+}
+const DEFAULT_THUMB = Img;
+
+function resolveThumb(src: string | null): string {
+  if (!src) return DEFAULT_THUMB;
+
+  if (src.startsWith("http")) return src;
+
+  return imageMapping[src] ?? src;
+}
+
+function regionLabel(regionZoneCode: PopupListItem["regionZoneCode"]): string {
+  if (!regionZoneCode) return "기타";
+  if (regionZoneCode === "ETC") return "기타";
+  return REGION_ZONE_LABEL_KO[regionZoneCode] ?? regionZoneCode;
 }
 
 export function PopupCard({
@@ -25,14 +43,76 @@ export function PopupCard({
   onSaveToggle,
 }: PopupCardProps) {
   const [saved, setSaved] = useState(isSaved);
+
   const dday = calculateDday(popup.endDate);
   const openingToday = isOpenToday(popup.startDate);
 
+  useEffect(() => {
+    setSaved(isSaved);
+  }, [isSaved]);
+
   const handleSaveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setSaved(!saved);
+    setSaved((prev) => !prev);
     onSaveToggle?.();
   };
+
+  const renderImageTagsOverlay = (max: number) => {
+    const tags = popup.tags?.slice(0, max) ?? [];
+    if (!tags.length) return null;
+
+    return (
+      <div
+        style={{
+          position: "absolute",
+          left: "var(--space-2)",
+          bottom: "var(--space-2)",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "var(--space-1)",
+          zIndex: 3,
+          maxWidth: "calc(100% - var(--space-4))",
+        }}
+      >
+        {tags.map((tag, index) => (
+          <span
+            key={`${tag}-${index}`}
+            style={{
+              fontSize: "0.6875rem",
+              padding: "2px var(--space-2)",
+              borderRadius: "var(--radius-sm)",
+              background: "rgba(255, 255, 255, 0.6)",
+              backdropFilter: "blur(10px)",
+              color: "var(--color-text-secondary)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    );
+  };
+
+  const renderBottomGradient = () => (
+    <div
+      aria-hidden
+      style={{
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: 54,
+        background: "linear-gradient(to top, rgba(0,0,0,0.28), rgba(0,0,0,0))",
+        zIndex: 2,
+        pointerEvents: "none",
+      }}
+    />
+  );
+
+  const thumbSrc = resolveThumb(popup.thumbnailUrl);
+  const title = popup.title;
+  const areaText = regionLabel(popup.regionZoneCode);
 
   if (layout === "list") {
     return (
@@ -55,17 +135,36 @@ export function PopupCard({
           e.currentTarget.style.transform = "translateY(0)";
         }}
       >
-        <img
-          src={imageMapping[popup.thumbnail]}
-          alt={popup.popupName}
+        <div
           style={{
+            position: "relative",
             width: 120,
-            height: 120,
-            borderRadius: "var(--radius-md)",
-            objectFit: "cover",
+            height: 200,
             flexShrink: 0,
+            borderRadius: "var(--radius-md)",
+            overflow: "hidden",
+            background: "var(--color-gray-100)",
           }}
-        />
+        >
+          <img
+            src={thumbSrc}
+            alt={title}
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_THUMB;
+            }}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+
+          {renderBottomGradient()}
+          {renderImageTagsOverlay(3)}
+        </div>
+
         <div
           style={{
             flex: 1,
@@ -82,21 +181,13 @@ export function PopupCard({
             }}
           >
             <div>
-              <h4 style={{ margin: 0, marginBottom: "var(--space-1)" }}>
-                {popup.popupName}
-              </h4>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "0.875rem",
-                  color: "var(--color-text-tertiary)",
-                }}
-              >
-                {popup.brandName}
-              </p>
+              <h4 style={{ margin: 0, marginBottom: "var(--space-1)" }}>{title}</h4>
             </div>
+
             <button
               onClick={handleSaveClick}
+              type="button"
+              aria-label={saved ? "북마크 해제" : "북마크"}
               style={{
                 background: "none",
                 border: "none",
@@ -112,13 +203,10 @@ export function PopupCard({
             </button>
           </div>
 
-          <div
-            style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}
-          >
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
             {openingToday && <Badge variant="new">Opens Today!</Badge>}
             {dday > 0 && dday <= 3 && <Badge variant="ending">D-{dday}</Badge>}
-            {popup.trending && <Badge variant="trending">🔥 Trending</Badge>}
-            {popup.isNew && !openingToday && <Badge variant="new">NEW</Badge>}
+            {popup.bookmarksCount >= 30 && <Badge variant="trending">🔥 Trending</Badge>}
           </div>
 
           <div
@@ -140,6 +228,7 @@ export function PopupCard({
               <Clock size={14} />
               {formatDateRange(popup.startDate, popup.endDate)}
             </div>
+
             <div
               style={{
                 display: "flex",
@@ -149,27 +238,8 @@ export function PopupCard({
               }}
             >
               <MapPin size={14} />
-              {popup.area}
+              {areaText}
             </div>
-          </div>
-
-          <div
-            style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)" }}
-          >
-            {popup.tags.slice(0, 3).map((tag, index) => (
-              <span
-                key={index}
-                style={{
-                  fontSize: "0.75rem",
-                  padding: "var(--space-1) var(--space-2)",
-                  background: "var(--color-gray-100)",
-                  color: "var(--color-text-secondary)",
-                  borderRadius: "var(--radius-sm)",
-                }}
-              >
-                {tag}
-              </span>
-            ))}
           </div>
         </div>
       </div>
@@ -196,16 +266,27 @@ export function PopupCard({
     >
       <div style={{ position: "relative" }}>
         <img
-          src={imageMapping[popup.thumbnail]}
-          alt={popup.popupName}
+          src={thumbSrc}
+          alt={title}
+          loading="lazy"
+          onError={(e) => {
+            e.currentTarget.src = DEFAULT_THUMB;
+          }}
           style={{
             width: "100%",
             height: 140,
             objectFit: "cover",
+            display: "block",
           }}
         />
+
+        {renderBottomGradient()}
+        {renderImageTagsOverlay(2)}
+
         <button
           onClick={handleSaveClick}
+          type="button"
+          aria-label={saved ? "북마크 해제" : "북마크"}
           style={{
             position: "absolute",
             top: "var(--space-2)",
@@ -221,6 +302,7 @@ export function PopupCard({
             justifyContent: "center",
             cursor: "pointer",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            zIndex: 4,
           }}
         >
           <Bookmark
@@ -238,12 +320,12 @@ export function PopupCard({
             display: "flex",
             gap: "var(--space-1)",
             flexWrap: "wrap",
+            zIndex: 4,
           }}
         >
           {openingToday && <Badge variant="new">Opens Today!</Badge>}
           {dday > 0 && dday <= 3 && <Badge variant="dday">D-{dday}</Badge>}
-          {popup.trending && <Badge variant="trending">🔥</Badge>}
-          {popup.isNew && !openingToday && <Badge variant="new">NEW</Badge>}
+          {popup.bookmarksCount >= 30 && <Badge variant="trending">🔥</Badge>}
         </div>
       </div>
 
@@ -256,19 +338,8 @@ export function PopupCard({
             lineHeight: "1.3",
           }}
         >
-          {popup.popupName}
+          {title}
         </h4>
-        <p
-          style={{
-            margin: 0,
-            marginBottom: "var(--space-2)",
-            fontSize: "0.8125rem",
-            color: "var(--color-text-tertiary)",
-            lineHeight: "1.4",
-          }}
-        >
-          {popup.brandName}
-        </p>
 
         <div
           style={{
@@ -295,28 +366,7 @@ export function PopupCard({
           }}
         >
           <MapPin size={12} color="var(--color-text-tertiary)" />
-          <span style={{ color: "var(--color-text-secondary)" }}>
-            {popup.area}
-          </span>
-        </div>
-
-        <div
-          style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)" }}
-        >
-          {popup.tags.slice(0, 2).map((tag, index) => (
-            <span
-              key={index}
-              style={{
-                fontSize: "0.6875rem",
-                padding: "2px var(--space-2)",
-                background: "var(--color-gray-100)",
-                color: "var(--color-text-secondary)",
-                borderRadius: "var(--radius-sm)",
-              }}
-            >
-              {tag}
-            </span>
-          ))}
+          <span style={{ color: "var(--color-text-secondary)" }}>{areaText}</span>
         </div>
       </div>
     </div>

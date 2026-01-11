@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import Img from "@/assets/popup-img.png";
 import {
   ArrowLeft,
   Share2,
@@ -10,21 +11,47 @@ import {
   Calendar as CalendarIcon,
   ExternalLink,
   Instagram,
-  Users,
   Car,
   DollarSign,
   AlertCircle,
 } from "lucide-react";
-import { getPopupById, calculateDday, formatDateRange } from "../data/popups";
+
+import { calculateDday, formatDateRange } from "../data/popups";
 import { imageMapping } from "@/data/imageMapping";
 import { Badge } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { Mascot } from "@/components/Mascot";
 import type { ViewType } from "@/routes/routes";
 
+import { usePopupDetailQuery } from "@/apis/popup/popupDetail";
+
 interface PopupDetailProps {
   onNavigate: (view: ViewType, popupId?: string) => void;
   breakpoint: "mobile" | "tablet" | "desktop";
+}
+
+const DEFAULT_THUMB = Img;
+
+function resolveImage(src?: string | null): string {
+  if (!src) return DEFAULT_THUMB;
+  if (src.startsWith("http")) return src;
+  return imageMapping[src] ?? src;
+}
+
+function isFreePriceText(priceText: string | null): boolean {
+  if (!priceText) return false;
+  const t = priceText.trim();
+  return t.includes("무료") || t === "0원" || t.toLowerCase() === "free";
+}
+
+function instagramLabel(url: string) {
+  try {
+    const u = new URL(url);
+    const handle = u.pathname.replace(/\//g, "");
+    return handle ? `@${handle}` : url;
+  } catch {
+    return url;
+  }
 }
 
 export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
@@ -34,9 +61,8 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
   const [reminderSet, setReminderSet] = useState(false);
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const detail = usePopupDetailQuery(popupId);
 
-  // popupId 없으면 안전 처리
   if (!popupId) {
     return (
       <div
@@ -57,7 +83,19 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
     );
   }
 
-  const popup = getPopupById(popupId);
+  if (detail.isError) {
+    return (
+      <div style={{ padding: "var(--space-16) var(--space-4)", textAlign: "center" }}>
+        <Mascot pose="empty" size="large" />
+        <h3 style={{ marginTop: "var(--space-6)" }}>Failed to load</h3>
+        <Button variant="primary" onClick={() => detail.refetch()}>
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  const popup = detail.data;
 
   if (!popup) {
     return (
@@ -80,20 +118,21 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
   }
 
   const dday = calculateDday(popup.endDate);
+  const isFree = isFreePriceText(popup.priceText);
+
+  const images = popup.images.length > 0 ? popup.images : [DEFAULT_THUMB];
 
   const handleSave = () => {
     setSaved((prev) => !prev);
     if (!saved) {
-      setShowSuccessToast(true);
-      setTimeout(() => setShowSuccessToast(false), 3000);
+      // 로직 추가
     }
   };
 
   const handleReminder = () => {
     setReminderSet(true);
     setShowReminderModal(false);
-    setShowSuccessToast(true);
-    setTimeout(() => setShowSuccessToast(false), 3000);
+    // 로직 추가
   };
 
   return (
@@ -154,9 +193,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
               width: 40,
               height: 40,
               borderRadius: "var(--radius-full)",
-              background: saved
-                ? "var(--color-primary-bg)"
-                : "var(--color-gray-100)",
+              background: saved ? "var(--color-primary-bg)" : "var(--color-gray-100)",
               border: "none",
               display: "flex",
               alignItems: "center",
@@ -167,9 +204,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
             <Bookmark
               size={20}
               fill={saved ? "var(--color-primary)" : "none"}
-              color={
-                saved ? "var(--color-primary)" : "var(--color-text-secondary)"
-              }
+              color={saved ? "var(--color-primary)" : "var(--color-text-secondary)"}
             />
           </button>
         </div>
@@ -185,11 +220,14 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
           scrollbarWidth: "none",
         }}
       >
-        {popup.images.map((img, index) => (
+        {images.map((img, index) => (
           <img
             key={index}
-            src={imageMapping[img]}
-            alt={`${popup.popupName} ${index + 1}`}
+            src={resolveImage(img)}
+            alt={`${popup.title} ${index + 1}`}
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_THUMB;
+            }}
             style={{
               width: "100%",
               height: breakpoint === "mobile" ? 300 : 400,
@@ -213,27 +251,12 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
               marginBottom: "var(--space-3)",
             }}
           >
-            {dday > 0 && dday <= 3 && (
-              <Badge variant="dday">D-{dday} Ending Soon!</Badge>
-            )}
+            {dday > 0 && dday <= 3 && <Badge variant="dday">D-{dday} Ending Soon!</Badge>}
             {popup.trending && <Badge variant="trending">🔥 Trending</Badge>}
             {popup.isNew && <Badge variant="new">NEW</Badge>}
-            {popup.entryFee === "free" && (
-              <Badge variant="free">Free Entry</Badge>
-            )}
+            {isFree && <Badge variant="free">Free Entry</Badge>}
           </div>
-          <h2 style={{ margin: 0, marginBottom: "var(--space-2)" }}>
-            {popup.popupName}
-          </h2>
-          <p
-            style={{
-              margin: 0,
-              fontSize: "1.125rem",
-              color: "var(--color-text-secondary)",
-            }}
-          >
-            {popup.brandName}
-          </p>
+          <h2 style={{ margin: 0, marginBottom: "var(--space-2)" }}>{popup.title}</h2>
         </div>
 
         {/* Key Info Summary Card */}
@@ -245,13 +268,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
             marginBottom: "var(--space-6)",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "var(--space-3)",
-            }}
-          >
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
             <div style={{ display: "flex", gap: "var(--space-3)" }}>
               <CalendarIcon
                 size={20}
@@ -290,7 +307,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
                 >
                   Hours
                 </div>
-                <div style={{ fontWeight: 600 }}>{popup.openHours}</div>
+                <div style={{ fontWeight: 600 }}>정보 없음</div>
               </div>
             </div>
 
@@ -310,7 +327,9 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
                 >
                   Location
                 </div>
-                <div style={{ fontWeight: 600 }}>{popup.address}</div>
+                <div style={{ fontWeight: 600 }}>
+                  {popup.address ?? `${popup.regionNameKo} (주소 정보 없음)`}
+                </div>
               </div>
             </div>
 
@@ -330,11 +349,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
                 >
                   Entry Fee
                 </div>
-                <div style={{ fontWeight: 600 }}>
-                  {popup.entryFee === "free"
-                    ? "Free"
-                    : popup.entryFeeAmount || "Paid"}
-                </div>
+                <div style={{ fontWeight: 600 }}>{popup.priceText ?? "정보 없음"}</div>
               </div>
             </div>
           </div>
@@ -343,37 +358,47 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
         {/* Description */}
         <div style={{ marginBottom: "var(--space-6)" }}>
           <h4 style={{ marginBottom: "var(--space-2)" }}>About</h4>
-          <p style={{ lineHeight: 1.6, color: "var(--color-text-secondary)" }}>
-            {popup.description}
+          <p
+            style={{
+              lineHeight: 1.6,
+              color: "var(--color-text-secondary)",
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {popup.descriptionMd ?? "설명 정보 없음"}
           </p>
         </div>
 
         {/* Tags */}
         <div style={{ marginBottom: "var(--space-6)" }}>
           <h4 style={{ marginBottom: "var(--space-3)" }}>Tags</h4>
-          <div
-            style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}
-          >
-            {popup.tags.map((tag, index) => (
-              <span
-                key={index}
-                style={{
-                  padding: "var(--space-2) var(--space-3)",
-                  background: "white",
-                  border: "1px solid var(--color-gray-300)",
-                  borderRadius: "var(--radius-full)",
-                  fontSize: "0.875rem",
-                  color: "var(--color-text-secondary)",
-                }}
-              >
-                {tag}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
+            {(popup.tags ?? []).length === 0 ? (
+              <span style={{ color: "var(--color-text-tertiary)", fontSize: "0.875rem" }}>
+                태그 없음
               </span>
-            ))}
+            ) : (
+              popup.tags.map((tag, index) => (
+                <span
+                  key={index}
+                  style={{
+                    padding: "var(--space-2) var(--space-3)",
+                    background: "white",
+                    border: "1px solid var(--color-gray-300)",
+                    borderRadius: "var(--radius-full)",
+                    fontSize: "0.875rem",
+                    color: "var(--color-text-secondary)",
+                  }}
+                >
+                  {tag}
+                </span>
+              ))
+            )}
           </div>
         </div>
 
         {/* Practical Info */}
-        {(popup.crowdLevel || popup.queueInfo || popup.parkingInfo) && (
+        {(popup.transitInfo || popup.parkingInfo) && (
           <div style={{ marginBottom: "var(--space-6)" }}>
             <h4 style={{ marginBottom: "var(--space-3)" }}>Good to Know</h4>
             <div
@@ -386,53 +411,21 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
                 gap: "var(--space-3)",
               }}
             >
-              {popup.crowdLevel && (
-                <div style={{ display: "flex", gap: "var(--space-2)" }}>
-                  <Users
-                    size={18}
-                    color="var(--color-text-secondary)"
-                    style={{ flexShrink: 0 }}
-                  />
-                  <div>
-                    <div
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        marginBottom: "var(--space-1)",
-                      }}
-                    >
-                      Crowd Level:{" "}
-                      {popup.crowdLevel === "high"
-                        ? "🔴 High"
-                        : popup.crowdLevel === "medium"
-                          ? "🟡 Medium"
-                          : "🟢 Low"}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {popup.queueInfo && (
+              {popup.transitInfo && (
                 <div style={{ display: "flex", gap: "var(--space-2)" }}>
                   <AlertCircle
                     size={18}
                     color="var(--color-text-secondary)"
                     style={{ flexShrink: 0 }}
                   />
-                  <div style={{ fontSize: "0.875rem" }}>{popup.queueInfo}</div>
+                  <div style={{ fontSize: "0.875rem" }}>{popup.transitInfo}</div>
                 </div>
               )}
 
               {popup.parkingInfo && (
                 <div style={{ display: "flex", gap: "var(--space-2)" }}>
-                  <Car
-                    size={18}
-                    color="var(--color-text-secondary)"
-                    style={{ flexShrink: 0 }}
-                  />
-                  <div style={{ fontSize: "0.875rem" }}>
-                    {popup.parkingInfo}
-                  </div>
+                  <Car size={18} color="var(--color-text-secondary)" style={{ flexShrink: 0 }} />
+                  <div style={{ fontSize: "0.875rem" }}>{popup.parkingInfo}</div>
                 </div>
               )}
             </div>
@@ -440,19 +433,15 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
         )}
 
         {/* Links */}
-        {(popup.officialLink || popup.officialSNS || popup.reservationLink) && (
+        {(popup.websiteUrl || popup.instagramUrl || popup.naverMapUrl) && (
           <div style={{ marginBottom: "var(--space-6)" }}>
             <h4 style={{ marginBottom: "var(--space-3)" }}>Links</h4>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "var(--space-2)",
-              }}
-            >
-              {popup.officialLink && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+              {popup.websiteUrl && (
                 <a
-                  href={popup.officialLink}
+                  href={popup.websiteUrl}
+                  target="_blank"
+                  rel="noreferrer"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -471,9 +460,11 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
                 </a>
               )}
 
-              {popup.officialSNS && (
+              {popup.instagramUrl && (
                 <a
-                  href={`https://instagram.com/${popup.officialSNS}`}
+                  href={popup.instagramUrl}
+                  target="_blank"
+                  rel="noreferrer"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -488,7 +479,30 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
                   }}
                 >
                   <Instagram size={18} />
-                  {popup.officialSNS}
+                  {instagramLabel(popup.instagramUrl)}
+                </a>
+              )}
+
+              {popup.naverMapUrl && (
+                <a
+                  href={popup.naverMapUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "var(--space-2)",
+                    padding: "var(--space-3)",
+                    background: "white",
+                    border: "1px solid var(--color-gray-300)",
+                    borderRadius: "var(--radius-md)",
+                    color: "var(--color-accent)",
+                    textDecoration: "none",
+                    fontWeight: 500,
+                  }}
+                >
+                  <MapPin size={18} />
+                  Naver Map
                 </a>
               )}
             </div>
@@ -496,13 +510,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
         )}
 
         {/* Actions */}
-        <div
-          style={{
-            display: "flex",
-            gap: "var(--space-3)",
-            marginBottom: "var(--space-4)",
-          }}
-        >
+        <div style={{ display: "flex", gap: "var(--space-3)", marginBottom: "var(--space-4)" }}>
           <Button
             variant="secondary"
             onClick={() => setShowReminderModal(true)}
@@ -510,16 +518,32 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
           >
             {reminderSet ? "Reminder Set" : "Set Reminder"}
           </Button>
-          <Button variant="primary" fullWidth icon={<MapPin size={18} />}>
+
+          <Button
+            variant="primary"
+            fullWidth
+            icon={<MapPin size={18} />}
+            onClick={() => {
+              if (popup.naverMapUrl) window.open(popup.naverMapUrl, "_blank", "noreferrer");
+            }}
+          >
             Get Directions
           </Button>
         </div>
 
-        {popup.reservationLink && (
-          <Button variant="primary" fullWidth icon={<ExternalLink size={18} />}>
-            Make Reservation
-          </Button>
-        )}
+        {/* 예약 링크가 따로 없으니, 필요하면 websiteUrl로 대체 */}
+        {popup.websiteUrl &&
+          popup.reservationOnlineText &&
+          popup.reservationOnlineText !== "없음" && (
+            <Button
+              variant="primary"
+              fullWidth
+              icon={<ExternalLink size={18} />}
+              onClick={() => window.open(popup.websiteUrl!, "_blank", "noreferrer")}
+            >
+              Make Reservation
+            </Button>
+          )}
       </div>
 
       {/* Reminder Modal */}
@@ -527,12 +551,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
         <>
           <div
             onClick={() => setShowReminderModal(false)}
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0, 0, 0, 0.5)",
-              zIndex: 200,
-            }}
+            style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.5)", zIndex: 200 }}
           />
           <div
             style={{
@@ -559,23 +578,12 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
               <Mascot pose="reminder" size="medium" />
               <h3 style={{ margin: 0 }}>Set a Reminder</h3>
             </div>
-            <p
-              style={{
-                marginBottom: "var(--space-4)",
-                color: "var(--color-text-secondary)",
-              }}
-            >
+
+            <p style={{ marginBottom: "var(--space-4)", color: "var(--color-text-secondary)" }}>
               Save it and I'll remind you!
             </p>
 
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "var(--space-2)",
-              }}
-            >
-              {/* ✅ type 인자 제거 */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
               <Button variant="secondary" onClick={handleReminder}>
                 1 day before opening
               </Button>
@@ -595,12 +603,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
         <>
           <div
             onClick={() => setShowShareModal(false)}
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0, 0, 0, 0.5)",
-              zIndex: 200,
-            }}
+            style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.5)", zIndex: 200 }}
           />
           <div
             style={{
@@ -627,26 +630,13 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
                 marginBottom: "var(--space-4)",
               }}
             >
-              <h4 style={{ margin: 0, marginBottom: "var(--space-2)" }}>
-                {popup.popupName}
-              </h4>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "0.875rem",
-                  marginBottom: "var(--space-2)",
-                }}
-              >
-                {formatDateRange(popup.startDate, popup.endDate)} · {popup.area}
+              <h4 style={{ margin: 0, marginBottom: "var(--space-2)" }}>{popup.title}</h4>
+              <p style={{ margin: 0, fontSize: "0.875rem", marginBottom: "var(--space-2)" }}>
+                {formatDateRange(popup.startDate, popup.endDate)} · {popup.regionNameKo}
               </p>
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "var(--space-1)",
-                }}
-              >
-                {popup.tags.slice(0, 3).map((tag, i) => (
+
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)" }}>
+                {(popup.tags ?? []).slice(0, 3).map((tag, i) => (
                   <Badge key={i} variant="reservation" size="small">
                     {tag}
                   </Badge>
@@ -659,33 +649,6 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
             </Button>
           </div>
         </>
-      )}
-
-      {/* Success Toast */}
-      {showSuccessToast && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 100,
-            left: "50%",
-            transform: "translateX(-50%)",
-            background: "var(--color-gray-900)",
-            color: "white",
-            padding: "var(--space-3) var(--space-6)",
-            borderRadius: "var(--radius-xl)",
-            boxShadow: "var(--shadow-xl)",
-            zIndex: 300,
-            animation: "slideUp 0.3s",
-            display: "flex",
-            alignItems: "center",
-            gap: "var(--space-2)",
-          }}
-        >
-          <Mascot pose="success" size="small" />
-          <span style={{ fontWeight: 500 }}>
-            {saved && !reminderSet ? "Saved!" : "Reminder is set! 🔔"}
-          </span>
-        </div>
       )}
     </div>
   );
