@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Bell, ExternalLink, MapPin } from "lucide-react";
 
 import { calculateDday, formatDateRange } from "@/data/popups";
@@ -19,7 +19,7 @@ import { PopupLinks } from "./components/PopupLinks";
 import { ReminderSheet } from "./components/ReminderSheet";
 import { ShareSheet } from "./components/ShareSheet";
 import { isFreePriceText } from "./utils/popupDetailUtils";
-
+import { LoginModal } from "../my/mypage/modal/LoginModal";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
@@ -29,14 +29,22 @@ interface PopupDetailProps {
   breakpoint: "mobile" | "tablet" | "desktop";
 }
 
+function isNotAuthenticatedError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : "";
+  return msg.includes("Not authenticated");
+}
+
+type PendingToggle = { popupId: string; next: boolean };
+
 export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
   const { popupId } = useParams<{ popupId: string }>();
-
+  const navigate = useNavigate();
   const bookmarkToggle = useBookmarkToggle();
 
   const [reminderSet, setReminderSet] = useState(false);
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
 
   const detail = usePopupDetailQuery(popupId ?? "");
 
@@ -47,10 +55,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
   }
 
   const popup = detail.data;
-
-  if (!popup) {
-    return null;
-  }
+  if (!popup) return null;
 
   const dday = calculateDday(popup.endDate);
   const isFree = isFreePriceText(popup.priceText);
@@ -59,7 +64,16 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
 
   const handleToggleSave = () => {
     if (bookmarkToggle.isPending) return;
-    bookmarkToggle.mutate({ popupId: popup.id, next: !saved });
+
+    const vars: PendingToggle = { popupId: popup.id, next: !saved };
+
+    bookmarkToggle.mutate(vars, {
+      onError: (err) => {
+        if (isNotAuthenticatedError(err)) {
+          setLoginOpen(true);
+        }
+      },
+    });
   };
 
   const handlePickReminder = () => {
@@ -77,7 +91,6 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
       setShowShareModal(false);
       // TODO: 토스트 연결
     } catch {
-      // clipboard 실패 시 fallback(선택)
       setShowShareModal(false);
     }
   };
@@ -124,12 +137,7 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
         <div style={{ marginBottom: "var(--space-6)" }}>
           <h4 style={{ marginBottom: "var(--space-2)" }}>About</h4>
 
-          <div
-            style={{
-              lineHeight: 1.6,
-              color: "var(--color-text-secondary)",
-            }}
-          >
+          <div style={{ lineHeight: 1.6, color: "var(--color-text-secondary)" }}>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeSanitize]}
@@ -175,7 +183,6 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
         </div>
 
         <PopupTags tags={popup.tags} />
-
         <PopupGoodToKnow transitInfo={popup.transitInfo} parkingInfo={popup.parkingInfo} />
 
         <PopupLinks
@@ -206,7 +213,6 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
           </Button>
         </div>
 
-        {/* 예약 링크가 따로 없으니, 필요하면 websiteUrl로 대체 */}
         {popup.websiteUrl &&
         popup.reservationOnlineText &&
         popup.reservationOnlineText !== "없음" ? (
@@ -234,6 +240,19 @@ export function PopupDetail({ onNavigate, breakpoint }: PopupDetailProps) {
         metaLine={shareMetaLine}
         tags={popup.tags ?? []}
         onCopyLink={handleCopyShareLink}
+      />
+
+      <LoginModal
+        isOpen={loginOpen}
+        onClose={() => {
+          setLoginOpen(false);
+        }}
+        onLogin={() => {
+          setLoginOpen(false);
+          navigate("/login", {
+            state: { from: window.location.pathname },
+          });
+        }}
       />
     </div>
   );
