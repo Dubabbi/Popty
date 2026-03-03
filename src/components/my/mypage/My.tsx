@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { ViewType } from "@/routes/routes";
 import { buildDefaultMenuItems } from "@/components/my/data/menuItems";
 import ProfileHeader from "@/components/my/mypage/parts/ProfileHeader";
@@ -7,6 +7,7 @@ import { MenuItemButton } from "@/components/my/mypage/parts/MenuItemButton";
 import { AchievementCard } from "@/components/my/mypage/parts/AchievementCard";
 import { useMeQuery } from "@/apis/auth/useMeQuery";
 import { useMyProfileQuery } from "@/apis/auth/useMyProfileQuery";
+import { LoginModal } from "./modal/LoginModal";
 
 interface MyProps {
   onNavigate: (view: ViewType) => void;
@@ -15,15 +16,31 @@ interface MyProps {
 
 export function My({ onNavigate }: MyProps) {
   const [activeRipple, setActiveRipple] = useState<string | null>(null);
+
   const { data: me } = useMeQuery();
-  const menuItems = buildDefaultMenuItems(onNavigate);
   const { data: profile } = useMyProfileQuery();
+
+  const isLoggedIn = !!me;
+
+  const [dismissedLoginModal, setDismissedLoginModal] = useState(false);
+
+  const isLoginModalOpen = !isLoggedIn && !dismissedLoginModal;
+
+  const menuItems = useMemo(() => buildDefaultMenuItems(onNavigate), [onNavigate]);
+
   const handleMenuClick = (label: string, action: () => void) => {
+    if (!isLoggedIn) {
+      setDismissedLoginModal(false);
+      return;
+    }
+
     setActiveRipple(label);
     setTimeout(() => setActiveRipple(null), 600);
     action();
   };
+
   const displayName = profile?.nickname ?? me?.name;
+
   return (
     <div
       style={{
@@ -32,8 +49,15 @@ export function My({ onNavigate }: MyProps) {
         minHeight: "100vh",
       }}
     >
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setDismissedLoginModal(true)}
+        onLogin={() => onNavigate("login")}
+      />
+
       <ProfileHeader name={displayName} email={me?.email ?? undefined} />
       <StatsGrid />
+
       <div style={{ padding: "var(--space-4)" }}>
         <h4
           style={{
@@ -49,13 +73,7 @@ export function My({ onNavigate }: MyProps) {
           메뉴
         </h4>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--space-2)",
-          }}
-        >
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
           {menuItems.map((item) => (
             <MenuItemButton
               key={item.label}
