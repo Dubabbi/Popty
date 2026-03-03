@@ -18,7 +18,6 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
@@ -60,14 +59,13 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
                 width: "100%",
                 maxWidth: 520,
                 borderRadius: 20,
-                overflow: "hidden", // ✅ 카드 안에서만 정리
+                overflow: "hidden",
                 background: "white",
                 boxShadow: "0 32px 100px rgba(0,0,0,0.30), 0 2px 0 rgba(255,255,255,0.6) inset",
                 border: "1px solid rgba(0,0,0,0.06)",
                 position: "relative",
               }}
             >
-              {/* Close Button */}
               <button
                 onClick={onClose}
                 aria-label="닫기"
@@ -99,18 +97,16 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
                 <X size={18} color="#4A4A4A" />
               </button>
 
-              {/* ✅ Header: 그라데이션을 위까지 쭉 + 캐릭터를 "안"에 배치 */}
               <div
                 style={{
-                  position: "relative", // ✅ pattern/캐릭터 기준
+                  position: "relative",
                   padding: "28px 22px 18px",
-                  paddingTop: 34, // 기본 상단 여백
+                  paddingTop: 34,
                   background:
                     "radial-gradient(120% 160% at 30% 0%, rgba(217,249,95,0.55) 0%, rgba(217,249,95,0.18) 32%, rgba(255,255,255,0) 72%), linear-gradient(180deg, rgba(250,250,250,1) 0%, rgba(255,255,255,1) 100%)",
                   textAlign: "center",
                 }}
               >
-                {/* subtle pattern */}
                 <div
                   aria-hidden
                   style={{
