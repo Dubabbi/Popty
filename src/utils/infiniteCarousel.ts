@@ -1,43 +1,33 @@
 export function buildInfiniteItems<T>(realItems: readonly T[]): T[] {
-  const len = realItems.length;
+  const len = realItems?.length ?? 0;
   if (len === 0) return [];
   if (len === 1) return [realItems[0]];
 
-  return [realItems[len - 1], ...realItems, realItems[0], realItems[1 % len]];
+  return [...realItems, ...realItems, ...realItems];
 }
 
-export function getActualIndexFromInfinite(
-  infiniteIndex: number,
-  realLen: number,
-): number {
+export function getActualIndexFromInfinite(infiniteIndex: number, realLen: number): number {
   if (realLen <= 0) return 0;
   if (realLen === 1) return 0;
 
-  if (infiniteIndex === 0) return realLen - 1;
-
-  if (infiniteIndex <= realLen) return infiniteIndex - 1;
-
-  return infiniteIndex - realLen - 1;
+  const m = infiniteIndex % realLen;
+  return m < 0 ? m + realLen : m;
 }
 
-export function getStartInfiniteIndex(realLen: number): number {
+export function getStartInfiniteIndex(realLen: number, initialActualIndex = 0): number {
   if (realLen <= 0) return 0;
-  return realLen >= 2 ? 1 : 0;
+  if (realLen === 1) return 0;
+
+  const actual = ((initialActualIndex % realLen) + realLen) % realLen;
+  return realLen + actual;
 }
 
-export function getJumpTarget(
-  infiniteIndex: number,
-  realLen: number,
-): number | null {
-  if (realLen < 2) return null;
+export function getJumpTarget(infiniteIndex: number, realLen: number): number | null {
+  if (realLen <= 1) return null;
 
-  const lastReal = realLen;
-  const firstClone = realLen + 1;
-  const secondClone = realLen + 2;
+  if (infiniteIndex < realLen) return infiniteIndex + realLen;
 
-  if (infiniteIndex === 0) return lastReal;
-  if (infiniteIndex === firstClone) return 1;
-  if (infiniteIndex === secondClone) return 2;
+  if (infiniteIndex >= realLen * 2) return infiniteIndex - realLen;
 
   return null;
 }
